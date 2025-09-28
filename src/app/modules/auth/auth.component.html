@@ -1,0 +1,23 @@
+<form [formGroup]="form" class="login-form">
+  <ub-input-text
+    type="text"
+    placeholder="Username"
+    [control]="form | getControl : 'username'"
+    [class.invalid]="
+      form.get('username')?.invalid && form.get('username')?.touched
+    "
+  />
+  <ub-input-text
+    type="password"
+    placeholder="Password"
+    [control]="form | getControl : 'password'"
+    [class.invalid]="
+      form.get('password')?.invalid && form.get('password')?.touched
+    "
+  />
+  <button (click)="login()">Login</button>
+</form>
+
+<div *ngIf="loginError" class="error">
+  {{ loginError }}
+</div>

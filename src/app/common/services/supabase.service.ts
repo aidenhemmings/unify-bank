@@ -1,20 +1,18 @@
-import { inject, Injectable } from "@angular/core";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { environment } from "../environment/environment";
-
+import { Injectable } from '@angular/core';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../../../environment/environment';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
-export class SupabaseService {
-
-  private supabase: SupabaseClient
+export class UbSupabaseService {
+  private supabase: SupabaseClient;
 
   constructor() {
     this.supabase = new SupabaseClient(
       environment.supabaseUrl,
       environment.supabaseKey
-  );
+    );
   }
 
   async signIn(username: string, password: string) {
@@ -34,8 +32,6 @@ export class SupabaseService {
 
     // TODO: Leaving console log in for this PR but should be removed later
     console.log('Logged in successfully: ', data);
-    return { user: data };
+    return { user: data, error: error };
   }
-
-
 }
