@@ -1,24 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SupabaseService } from './services/supabase.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FormsModule],
+  imports: [RouterOutlet, ReactiveFormsModule, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  standalone: true,
 })
 export class AppComponent {
-  username = '';
-  password = '';
+  private supabaseService = inject(SupabaseService);
+  private fb = inject(FormBuilder);
+
+  loginForm: FormGroup;
   loginError = '';
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor() {
+    this.loginForm = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+    });
+  }
 
-  async login() {
-    const { error } = await this.supabaseService.signIn(this.username, this.password);
+  async login(): Promise<void> {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+    const { username, password } = this.loginForm.value;
+    const { error } = await this.supabaseService.signIn(username, password);
     if (error) {
       this.loginError = error.message;
     } else {
