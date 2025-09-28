@@ -9,4 +9,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   constructor() {}
+
+
+  mergeConflictTest() {
+    console.log('This is a test for merge conflicts.');
+  }
+
 }
