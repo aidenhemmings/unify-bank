@@ -1,22 +1,28 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { SupabaseService } from './services/supabase.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  standalone: true,
 })
 export class AppComponent {
-  user!: any;
+  username = '';
+  password = '';
+  loginError = '';
 
-  constructor() {
-    this.user = {
-      name: 'Aiden Hemmings',
-    };
-  }
+  constructor(private supabaseService: SupabaseService) {}
 
-  mergeConflictTest() {
-    console.log('This is a test for merge conflicts.');
+  async login() {
+    const { error } = await this.supabaseService.signIn(this.username, this.password);
+    if (error) {
+      this.loginError = error.message;
+    } else {
+      this.loginError = '';
+    }
   }
 }
