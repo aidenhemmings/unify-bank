@@ -15,4 +15,10 @@ export class AppComponent {
       name: 'Aiden Hemmings',
     };
   }
+
+
+  mergeConflictTest() {
+    console.log('This is a test for merge conflicts.');
+  }
+
 }
