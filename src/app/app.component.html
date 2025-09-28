@@ -1,1 +1,17 @@
 <h1>Unify Bank</h1>
+
+<form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+  <input type="text"
+         placeholder="Username"
+         formControlName="username"
+         [class.invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" />
+  <input type="password"
+         placeholder="Password"
+         formControlName="password"
+         [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
+  <button type="submit">Login</button>
+</form>
+
+<div *ngIf="loginError" class="error">
+  {{ loginError }}
+</div>
