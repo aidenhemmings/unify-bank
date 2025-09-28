@@ -1,0 +1,30 @@
+@if(formControl) {
+<input
+  [id]="id"
+  class="input-text"
+  pInputText
+  [type]="type"
+  [disabled]="disabled"
+  [placeholder]="placeholder"
+  [formControl]="formControl"
+  [readOnly]="readOnly"
+  (blur)="onBlur()"
+  autocomplete="off"
+/>
+} @else {
+<input
+  [id]="id"
+  class="input-text"
+  pInputText
+  [type]="type"
+  [disabled]="disabled"
+  [placeholder]="placeholder"
+  [readOnly]="readOnly"
+  [(ngModel)]="value"
+  (ngModelChange)="onChange($event)"
+  (blur)="onBlur()"
+  (click)="click.emit($event)"
+  (focus)="focus.emit($event)"
+  autocomplete="off"
+/>
+}
