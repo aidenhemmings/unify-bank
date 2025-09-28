@@ -32,6 +32,6 @@ export class UbSupabaseService {
 
     // TODO: Leaving console log in for this PR but should be removed later
     console.log('Logged in successfully: ', data);
-    return { user: data };
+    return { user: data, error: error };
   }
 }

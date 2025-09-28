@@ -10,6 +10,7 @@ import { UbGetFormControlPipe } from '@common/pipes';
 import { UbInputTextComponent } from '@common/ui';
 import { UbSupabaseService, UbUserService } from '@common/services';
 import { Router } from '@angular/router';
+import { User } from '@common/types';
 
 @Component({
   selector: 'ub-auth',
@@ -44,12 +45,15 @@ export class UbAuthComponent {
     }
 
     const { username, password } = this.form.value;
-    const { error } = await this.supabaseService.signIn(username, password);
+    const { user, error } = await this.supabaseService.signIn(
+      username,
+      password
+    );
     if (error) {
       this.loginError = error.message;
     } else {
       this.loginError = '';
-      this.userService.setCurrentUser({ username });
+      this.userService.setCurrentUser(user);
       this.router.navigate(['dashboard']);
     }
   }
