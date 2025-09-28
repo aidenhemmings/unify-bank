@@ -8,7 +8,13 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  constructor() {}
+  user!: any;
+
+  constructor() {
+    this.user = {
+      name: 'Aiden Hemmings',
+    };
+  }
 
 
   mergeConflictTest() {
