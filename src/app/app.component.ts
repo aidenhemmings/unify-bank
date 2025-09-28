@@ -16,9 +16,7 @@ export class AppComponent {
     };
   }
 
-
   mergeConflictTest() {
     console.log('This is a test for merge conflicts.');
   }
-
 }
