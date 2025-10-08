@@ -1,18 +1,22 @@
 import { inject, Injectable } from '@angular/core';
 import { CanActivate, CanMatch, Router, UrlTree } from '@angular/router';
-import { UbUserService } from '@common/services';
+import { UbSupabaseService, UbUserService } from '@common/services';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UbAuthGuard implements CanActivate, CanMatch {
   private router = inject(Router);
+  private supabaseService = inject(UbSupabaseService);
   private userService = inject(UbUserService);
 
-  private checkAuth(): boolean | UrlTree {
-    const user = this.userService.getCurrentUser();
-    if (user) {
+  private async checkAuth(): Promise<boolean | UrlTree> {
+    const { session } = await this.supabaseService.getSession();
+
+    if (session?.user) {
+      this.userService.setCurrentUser(session.user);
       return true;
     }
+
     return this.router.createUrlTree(['/auth/login']);
   }
 

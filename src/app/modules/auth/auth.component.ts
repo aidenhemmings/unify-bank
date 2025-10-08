@@ -7,10 +7,9 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UbGetFormControlPipe } from '@common/pipes';
-import { UbInputTextComponent } from '@common/ui';
+import { UbButtonComponent, UbInputTextComponent } from '@common/ui';
 import { UbSupabaseService, UbUserService } from '@common/services';
 import { Router } from '@angular/router';
-import { User } from '@common/types';
 
 @Component({
   selector: 'ub-auth',
@@ -21,6 +20,7 @@ import { User } from '@common/types';
     CommonModule,
     UbGetFormControlPipe,
     UbInputTextComponent,
+    UbButtonComponent,
   ],
 })
 export class UbAuthComponent {
@@ -29,7 +29,7 @@ export class UbAuthComponent {
   private userService = inject(UbUserService);
 
   form = new FormGroup({
-    username: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required]),
   });
 
@@ -38,20 +38,17 @@ export class UbAuthComponent {
   async login(): Promise<void> {
     if (
       this.form.invalid ||
-      !this.form.value.username ||
+      !this.form.value.email ||
       !this.form.value.password
     ) {
       return;
     }
 
-    const { username, password } = this.form.value;
-    const { user, error } = await this.supabaseService.signIn(
-      username,
-      password
-    );
+    const { email, password } = this.form.value;
+    const { user, error } = await this.supabaseService.signIn(email, password);
     if (error) {
       this.loginError = error.message;
-    } else {
+    } else if (user) {
       this.loginError = '';
       this.userService.setCurrentUser(user);
       this.router.navigate(['dashboard']);

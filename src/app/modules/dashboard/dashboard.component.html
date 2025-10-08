@@ -1,3 +1,7 @@
-<h1>Unify Bank Dashboard</h1>
+<div class="dashboard-header">
+  <h1>Unify Bank Dashboard</h1>
+  <button (click)="logout()" class="logout-btn">Logout</button>
+</div>
 <br />
-<p>{{ user.FirstName }} {{ user.LastName }}</p>
+<p *ngIf="user">{{ user.email }}</p>
+<p *ngIf="user">User ID: {{ user.id }}</p>

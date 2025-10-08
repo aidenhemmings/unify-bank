@@ -1,1 +1,190 @@
-/* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+
+:root {
+  --primary-color: #5a8a5a;
+  --primary-color-dark: #4a7a4a;
+  --primary-light-color: #6b9a6b;
+  --primary-color-light: #7fb069;
+  --background: #f8fafc;
+  --background-alt: #f8f9fa;
+  --white: #fff;
+  --black: #000;
+  --natural-black: #000;
+  --natural-white: #fff;
+  --gray-100: #f1f1f1;
+  --gray-200: #e2e8f0;
+  --gray-300: #e9ecef;
+  --gray-400: #e0e0e0;
+  --gray-500: #ccc;
+  --gray-600: #bbb;
+  --gray-700: #999;
+  --gray-800: #888;
+  --gray-900: #333;
+  --gray-950: #222;
+  --gray-960: #3d5a3d;
+  --gray-970: #64748b;
+  --gray-980: #6c757d;
+  --gray-990: #6b7280;
+  --gray-1000: #414040;
+  --gray-1100: #555;
+  --gray-1200: #bbc4cf;
+  --gray-1300: #95a5a6;
+  --gray-1400: #7f8c8d;
+  --gray-1500: #f3f3f3;
+  --gray-1600: #f9f9f9;
+  --gray-1700: #fdfcfb;
+  --gray-1800: #c4dcc4;
+  --gray-1900: #5f9a5f;
+  --gray-2000: #ddd;
+  --gray-2100: #cbd5e1;
+  --gray-2200: #c2c7ce;
+  --gray-2300: #ecf0f1;
+  --gray-2400: rgba(0, 0, 0, 0.01);
+  --gray-2500: rgba(0, 0, 0, 0.04);
+  --gray-2600: rgba(0, 0, 0, 0.05);
+  --gray-2700: rgba(0, 0, 0, 0.1);
+  --gray-2800: #45474b;
+  --gray-2900: #bbc4cf;
+  --gray-3000: #ffffff;
+  --gray-3100: #f0faf0;
+  --gray-3200: #f5f5f5;
+  --gray-3300: #f3f3f3;
+  --gray-3400: rgba(0, 0, 0, 0.01);
+  --gray-3500: rgba(101, 151, 101, 0.07);
+  --gray-3600: #e3e7ee;
+  --gray-3700: #f8fafc;
+  --gray-3800: rgba(0, 0, 0, 0.1);
+  --gray-3900: #c7c7c7;
+  --gray-4000: #e2e8f0;
+  --gray-4100: #cbd5e1;
+
+  --orange: #f39c12;
+  --orange-dark: #e67e22;
+
+  --green-light: #7fb069;
+  --green-dark: #5a8a5a;
+
+  --red: #c36;
+  --red-dark: #a24;
+  --red-light: #e74c3c;
+  --red-accent: #ff6b6b;
+
+  --green: rgb(101, 151, 101);
+  --yellow: rgb(151, 137, 8);
+
+  --gradient-main: linear-gradient(180deg, #5a8a5a 47.94%, #7fb069 100%);
+  --gradient-sidebar: linear-gradient(180deg, #5a8a5a 47.94%, #7fb069 100%),
+    #ffffff;
+}
+
+.dark-mode {
+  --primary-color: #7fb069;
+  --primary-color-dark: #3d5a3d;
+  --primary-light-color: #5a8a5a;
+  --primary-color-light: #6b9a6b;
+  --background: #181a20;
+  --background-alt: #23262f;
+  --white: #181a20;
+  --black: #fff;
+  --natural-black: #000;
+  --natural-white: #fff;
+  --gray-100: #23262f;
+  --gray-200: #2d3748;
+  --gray-300: #22252a;
+  --gray-400: #23262f;
+  --gray-500: #2d3748;
+  --gray-600: #45474b;
+  --gray-700: #64748b;
+  --gray-800: #bbc4cf;
+  --gray-900: #f1f1f1;
+  --gray-950: #e2e8f0;
+  --gray-960: #7fb069;
+  --gray-970: #c4dcc4;
+  --gray-980: #a5fca5;
+  --gray-990: #e9ecef;
+  --gray-1000: #e0e0e0;
+  --gray-1100: #f3f3f3;
+  --gray-1200: #f9f9f9;
+  --gray-1300: #fdfcfb;
+  --gray-1400: #c4dcc4;
+  --gray-1500: #23262f;
+  --gray-1600: #181a20;
+  --gray-1700: #23262f;
+  --gray-1800: #3d5a3d;
+  --gray-1900: #5a8a5a;
+  --gray-2000: #45474b;
+  --gray-2100: #64748b;
+  --gray-2200: #bbc4cf;
+  --gray-2300: #23262f;
+  --gray-2400: rgba(255, 255, 255, 0.01);
+  --gray-2500: rgba(255, 255, 255, 0.04);
+  --gray-2600: rgba(255, 255, 255, 0.05);
+  --gray-2700: rgba(255, 255, 255, 0.1);
+  --gray-2800: #f9f9f9;
+  --gray-2900: #b9c1cf;
+  --gray-3000: #09090b;
+  --gray-3100: #23262f;
+  --gray-3200: #23262f;
+  --gray-3300: #65976522;
+  --gray-3400: rgba(255, 255, 255, 0.01);
+  --gray-3500: rgba(101, 151, 101, 0.07);
+  --gray-3600: #2c2f36;
+  --gray-3700: #27272a;
+  --gray-3800: rgba(255, 255, 255, 0.1);
+  --gray-3900: #888;
+  --gray-4000: #23262f;
+  --gray-4100: #2d3748;
+
+  --orange: #e67e22;
+  --orange-dark: #f39c12;
+
+  --green-light: #8bc78b;
+  --green-dark: #7fb069;
+
+  --red: #e74c3c;
+  --red-dark: #c36;
+  --red-light: #ff6b6b;
+  --red-accent: #a24;
+
+  --green: rgb(101, 151, 101);
+  --yellow: rgb(151, 137, 8);
+
+  --gradient-main: linear-gradient(180deg, #3d5a3d 47.94%, #5a8a5a 100%);
+  --gradient-sidebar: linear-gradient(180deg, #3d5a3d 47.94%, #5a8a5a 100%),
+    #181a20;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: "Inter", sans-serif;
+  min-height: calc(var(--vh, 1vh) * 100);
+  background-color: var(--background);
+  color: #2d3748;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color-dark);
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--gray-100);
+}

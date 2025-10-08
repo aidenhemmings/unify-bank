@@ -1,0 +1,87 @@
+.p-button.p-component {
+  outline: none;
+
+  &.p-button-ghost {
+    background: transparent;
+    color: var(--black);
+    border: none;
+
+    &:hover:not(.btn-disabled) {
+      background: var(--gray-2500);
+      color: var(--black);
+    }
+  }
+
+  &.p-button-outline {
+    background: transparent;
+    color: var(--black);
+    border: 1px solid var(--gray-200);
+
+    &:hover:not(.btn-disabled) {
+      background: var(--gray-2400);
+    }
+  }
+
+  &.p-button-primary {
+    background: var(--primary-color);
+    color: var(--natural-white);
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover:not(.btn-disabled) {
+      background: var(--primary-light-color);
+    }
+  }
+
+  &.p-button-error {
+    background: var(--red);
+    color: var(--natural-white);
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover:not(.btn-disabled) {
+      background: var(--red-dark);
+    }
+  }
+
+  &.p-button-secondary {
+    width: 100%;
+    border-radius: 8px;
+    background: var(--background-alt);
+    color: var(--primary-color);
+    border: 1.5px solid var(--primary-color-light);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+
+    &:hover:not(.btn-disabled) {
+      background: var(--primary-color-light);
+      color: var(--natural-white);
+      border-color: var(--primary-color-dark);
+    }
+  }
+
+  &.p-button-loading {
+    background: var(--primary-color);
+  }
+
+  &.btn-lg {
+    padding: 1rem;
+  }
+
+  &.btn-md {
+    padding: 0.5rem;
+  }
+
+  &.btn-sm {
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+  }
+
+  &.btn-vs {
+    font-size: 12px;
+    padding: 0.2rem 0.5rem;
+  }
+
+  &.fluid {
+    width: 100%;
+  }
+}

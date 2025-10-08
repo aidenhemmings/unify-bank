@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { SupabaseClient } from '@supabase/supabase-js';
+import {
+  createClient,
+  SupabaseClient,
+  User,
+  Session,
+} from '@supabase/supabase-js';
 import { environment } from '../../../environment/environment';
 
 @Injectable({
@@ -9,29 +14,47 @@ export class UbSupabaseService {
   private supabase: SupabaseClient;
 
   constructor() {
-    this.supabase = new SupabaseClient(
+    this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
     );
   }
 
-  async signIn(username: string, password: string) {
-    const { data, error } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('Username', username)
-      .eq('Password', password)
-      .single();
+  async signIn(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
-      return { error };
-    }
-    if (!data) {
-      return { error: { message: 'Invalid username or password' } };
+      return { user: null, session: null, error };
     }
 
-    // TODO: Leaving console log in for this PR but should be removed later
-    console.log('Logged in successfully: ', data);
-    return { user: data, error: error };
+    return { user: data.user, session: data.session, error: null };
+  }
+
+  async signOut() {
+    const { error } = await this.supabase.auth.signOut();
+    return { error };
+  }
+
+  async getSession(): Promise<{ session: Session | null; error: any }> {
+    const { data, error } = await this.supabase.auth.getSession();
+    return { session: data.session, error };
+  }
+
+  async getUser(): Promise<User | null> {
+    const { data } = await this.supabase.auth.getUser();
+    return data.user;
+  }
+
+  onAuthStateChange(callback: (session: Session | null) => void) {
+    return this.supabase.auth.onAuthStateChange((_event, session) => {
+      callback(session);
+    });
+  }
+
+  getSupabaseClient(): SupabaseClient {
+    return this.supabase;
   }
 }
