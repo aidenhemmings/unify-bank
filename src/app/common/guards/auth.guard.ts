@@ -6,15 +6,31 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class UbAuthGuard implements CanActivate, CanMatch {
   private router = inject(Router);
-  private supabaseService = inject(UbSupabaseService);
   private userService = inject(UbUserService);
+  private supabaseService = inject(UbSupabaseService);
 
   private async checkAuth(): Promise<boolean | UrlTree> {
-    const { session } = await this.supabaseService.getSession();
+    const user = this.userService.getCurrentUser();
 
-    if (session?.user) {
-      this.userService.setCurrentUser(session.user);
+    if (user) {
       return true;
+    }
+
+    const token = this.userService.getToken();
+
+    if (token) {
+      const { userId } = await this.supabaseService.validateToken(token);
+
+      if (userId) {
+        const { user: loadedUser } = await this.supabaseService.getUserById(
+          userId
+        );
+
+        if (loadedUser) {
+          this.userService.setCurrentUser(loadedUser);
+          return true;
+        }
+      }
     }
 
     return this.router.createUrlTree(['/auth/login']);

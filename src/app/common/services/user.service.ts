@@ -1,41 +1,36 @@
 import { Injectable } from '@angular/core';
 import { User } from '@common/types';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { User as SupabaseUser } from '@supabase/supabase-js';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbUserService {
-  private userSubject = new BehaviorSubject<SupabaseUser | null>(null);
-  private profileSubject = new BehaviorSubject<User | null>(null);
+  private userSubject = new BehaviorSubject<User | null>(null);
+  private readonly TOKEN_KEY = 'user_token';
 
-  get currentUser(): Observable<SupabaseUser | null> {
+  get currentUser(): Observable<User | null> {
     return this.userSubject.asObservable();
   }
 
-  get currentProfile(): Observable<User | null> {
-    return this.profileSubject.asObservable();
-  }
-
-  getCurrentUser(): SupabaseUser | null {
+  getCurrentUser(): User | null {
     return this.userSubject.value;
   }
 
-  getCurrentProfile(): User | null {
-    return this.profileSubject.value;
-  }
-
-  setCurrentUser(user: SupabaseUser | null): void {
+  setCurrentUser(user: User | null): void {
     this.userSubject.next(user);
   }
 
-  setCurrentProfile(profile: User | null): void {
-    this.profileSubject.next(profile);
+  setToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
-  clearUser(): void {
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  clearSession(): void {
     this.userSubject.next(null);
-    this.profileSubject.next(null);
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 }

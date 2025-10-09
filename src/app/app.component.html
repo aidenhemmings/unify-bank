@@ -1,1 +1,13 @@
-<router-outlet></router-outlet>
+<div class="app-container">
+  @if (currentUser) {
+  <ub-sidebar />
+  }
+  <main class="main-content" [style.margin-left]="mainContentMargin">
+    @if (currentUser) {
+    <ub-header-bar />
+    }
+    <div class="content-wrapper" [ngClass]="{ authorized: currentUser }">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

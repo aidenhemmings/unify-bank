@@ -1,12 +1,13 @@
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 export interface User {
-  UserId: string;
-  Username: string;
-  Password: string;
-  FirstName: string;
-  LastName: string;
-  CreatedAt: string;
+  id: string;
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
 }
 
 export interface AuthUser {
