@@ -4,13 +4,14 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { UbUserProfileComponent } from '@common/ui';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, UbUserProfileComponent],
 })
 export class UbDashboardComponent {
   private userService = inject(UbUserService);

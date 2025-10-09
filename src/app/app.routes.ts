@@ -14,7 +14,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: UbDashboardComponent,
-    canActivate: [UbAuthGuard],
+    canActivate: [],
     data: {
       breadcrumb: 'Dashboard',
     },

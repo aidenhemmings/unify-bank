@@ -1,0 +1,49 @@
+<div class="ub-profile-card">
+	<div class="ub-profile-header">
+		<div class="avatar" aria-hidden="true">{{ initials }}</div>
+
+		<div class="profile-meta">
+			<h3 class="name">{{ displayName }}</h3>
+			<div class="email">{{ user?.email || 'No email' }}</div>
+			<div class="member-since">Member since {{ memberSince() }}</div>
+		</div>
+
+		<div class="header-actions">
+			<ub-button variant="secondary" size="sm" (click)="editProfile()">Edit</ub-button>
+			<ub-button variant="error" size="sm" (click)="logout()">Log out</ub-button>
+		</div>
+	</div>
+
+	<div class="ub-profile-body">
+		<div class="field">
+			<label>User ID</label>
+			<div class="value">{{ profile?.UserId ?? user?.id ?? '—' }}</div>
+		</div>
+
+		<div class="field">
+			<label>Username</label>
+			<div class="value">{{ profile?.Username ?? '—' }}</div>
+		</div>
+
+		<div class="field">
+			<label>First name</label>
+			<div class="value">{{ profile?.FirstName ?? '—' }}</div>
+		</div>
+
+		<div class="field">
+			<label>Last name</label>
+			<div class="value">{{ profile?.LastName ?? '—' }}</div>
+		</div>
+
+		<div class="field">
+			<label>Account email</label>
+			<div class="value">{{ user?.email ?? '—' }}</div>
+		</div>
+
+		<div class="field">
+			<label>Created</label>
+			<div class="value">{{ memberSince() }}</div>
+		</div>
+	</div>
+</div>
+
