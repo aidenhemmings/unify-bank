@@ -31,9 +31,7 @@ import { UbGetFormControlPipe } from '@common/pipes';
 })
 export class UbUserProfileComponent {
   private userService = inject(UbUserService);
-  private router = inject(Router);
   private supabaseService = inject(UbSupabaseService);
-  private datePipe = inject(DatePipe);
 
   profile!: User;
   isEditing = false;
@@ -61,30 +59,18 @@ export class UbUserProfileComponent {
       });
   }
 
+  get memberSince(): string {
+    return this.profile.created_at;
+  }
+
   get displayName(): string {
-    if (this.profile)
-      return `${this.profile.first_name} ${this.profile.last_name}`.trim();
-    const meta = (
-      this.profile as unknown as {
-        user_metadata?: SupabaseUser['user_metadata'];
-      }
-    )?.user_metadata;
-    if (meta && typeof meta['full_name'] === 'string') return meta['full_name'];
-    return 'Unknown User';
+    return `${this.profile.first_name} ${this.profile.last_name}`;
   }
 
   get initials(): string {
-    const name = this.displayName;
-    const parts = name.split(' ').filter(Boolean);
-    if (parts.length === 0) return 'U';
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
-  }
-
-  memberStartDate(): string {
-    const dateStr = this.profile?.created_at ?? null;
-    if (!dateStr) return '—';
-    return formatDate(new Date(dateStr), 'MMM d, y', 'en-US') ?? dateStr;
+    return `${this.profile.first_name
+      .charAt(0)
+      .toUpperCase()}${this.profile.last_name.charAt(0).toUpperCase()}`;
   }
 
   startEditing(): void {
@@ -117,9 +103,5 @@ export class UbUserProfileComponent {
       console.error('Failed to update profile');
     }
     this.isEditing = false;
-  }
-
-  memberSince(): string {
-    return this.profile.created_at;
   }
 }

@@ -6,7 +6,7 @@
       <h3 class="name">{{ displayName }}</h3>
       <div class="email">{{ profile.username }}</div>
       <div class="member-since">
-        Member since {{ memberSince() | date : "mediumDate" }}
+        Member since {{ memberSince | date : "mediumDate" }}
       </div>
     </div>
 
@@ -35,7 +35,7 @@
 
     <div class="field">
       <label>Created</label>
-      <div class="value">{{ memberSince() | date : "mediumDate" }}</div>
+      <div class="value">{{ memberSince | date : "mediumDate" }}</div>
     </div>
 
     <div class="field">
