@@ -1,6 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { UbUserService, UbSupabaseService } from '@common/services';
+import {
+  UbUserService,
+  UbSupabaseService,
+  UbLoadingService,
+  UbToastService,
+} from '@common/services';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Router } from '@angular/router';
@@ -14,6 +19,7 @@ import { UbButtonComponent, UbInputTextComponent } from '@common/ui';
 import { formatDate } from '@angular/common';
 import { User } from '@common/types';
 import { UbGetFormControlPipe } from '@common/pipes';
+import { LoadingKeys } from '@common/enums';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
@@ -32,6 +38,8 @@ import { UbGetFormControlPipe } from '@common/pipes';
 export class UbUserProfileComponent {
   private userService = inject(UbUserService);
   private supabaseService = inject(UbSupabaseService);
+  private loadingService = inject(UbLoadingService);
+  private toastService = inject(UbToastService);
 
   profile!: User;
   isEditing = false;
@@ -92,15 +100,14 @@ export class UbUserProfileComponent {
   }
 
   async saveProfile(): Promise<void> {
-    // TODO: Add Loader
-    const updated = await this.supabaseService.updateUser(this.form);
+    this.loadingService.show(LoadingKeys.GLOBAL);
+    const result = await this.supabaseService.updateUser(this.form);
 
-    if (updated) {
-      // PLACEHOLDER FOR TOAST MESSAGE
-      console.log('Profile updated successfully');
+    if (result.success && result.data) {
+      this.userService.setCurrentUser(result.data);
+      this.toastService.info('Success', 'Profile updated successfully');
     } else {
-      // PLACEHOLDER FOR TOAST MESSAGE
-      console.error('Failed to update profile');
+      this.toastService.error('Error', 'Failed to update profile');
     }
     this.isEditing = false;
   }

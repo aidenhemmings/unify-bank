@@ -24,6 +24,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UbPaymentModalComponent } from '../payments/payment-modal';
 import { ModalResponse } from '@common/types/modal-response.type';
 import { TooltipModule } from 'primeng/tooltip';
+import { UbTransactionModalComponent } from '../transactions';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
@@ -211,6 +212,8 @@ export class UbDashboardComponent {
   handleQuickAction(action: QuickAction): void {
     if (action.label === 'Send Payment') {
       this.onAddPayment();
+    } else if (action.label === 'Pay Bills') {
+      this.onAddTransaction();
     } else {
       this.router.navigate([action.route]);
     }
@@ -294,6 +297,80 @@ export class UbDashboardComponent {
     } else {
       this.toastService.success('Success', 'Payment scheduled successfully!');
     }
+
+    await this.loadDashboardData();
+    this.loadingService.hide(this.loaderKey);
+  }
+
+  onAddTransaction(): void {
+    this.ref = this.dialogService.open(UbTransactionModalComponent, {
+      data: {
+        accounts: this.accounts,
+      },
+      modal: true,
+      width: '50vw',
+      closable: true,
+      baseZIndex: 6000,
+      breakpoints: {
+        '1700px': '65vw',
+        '1400px': '80vw',
+        '960px': '90vw',
+      },
+      templates: {
+        footer: UbModalFooterComponent,
+      },
+    });
+
+    this.ref.onClose
+      .pipe(untilDestroyed(this))
+      .subscribe((response: ModalResponse) => {
+        if (response) {
+          if (response.type === ModalResponseTypes.CONFIRM) {
+            this.handleTransactionCreation(response.form);
+          }
+        }
+      });
+  }
+
+  async handleTransactionCreation(form: any): Promise<void> {
+    const payload = form.getRawValue();
+
+    this.loadingService.show(this.loaderKey);
+
+    const { transaction, error } =
+      await this.transactionsService.createTransaction({
+        account_id: payload.accountId,
+        description: payload.description,
+        amount: payload.amount,
+        type: payload.type,
+        category: payload.category,
+        status: payload.status,
+        reference_number: payload.referenceNumber || undefined,
+      });
+
+    if (error) {
+      this.toastService.error('Error', 'Failed to create transaction.');
+      this.loadingService.hide(this.loaderKey);
+      return;
+    }
+
+    if (payload.status === 'completed') {
+      const { error: balanceError } =
+        await this.accountsService.updateAccountBalance(
+          payload.accountId,
+          payload.amount,
+          payload.type
+        );
+
+      if (balanceError) {
+        this.toastService.error(
+          'Warning',
+          'Transaction created but failed to update account balance.'
+        );
+      }
+    }
+
+    this.toastService.success('Success', 'Transaction created successfully!');
 
     await this.loadDashboardData();
     this.loadingService.hide(this.loaderKey);

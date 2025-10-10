@@ -170,6 +170,14 @@
             flex: 1;
           }
         }
+
+        p-datepicker {
+          width: 100%;
+
+          ::ng-deep .p-datepicker-input {
+            width: 100%;
+          }
+        }
       }
     }
 
