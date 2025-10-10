@@ -4,21 +4,36 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Development server
 
-To start a local development server, run:
+## Getting started
+
+Prerequisites:
+- Node.js
+- npm
+- Angular (npm install -g @angular/cli)
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the dev server:
 
 ```bash
 npm run start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open https://localhost:4200/ in your browser.
 
-## Description of UniFy Banking
+## Features
+- User authentication (username/password backed by Supabase table).
+- User Profile view and inline editing (reactive forms).
+- Dashboard layout with reusable components and guards to protect routes.
+- Small set of shared UI components (buttons, inputs, profile card) and pipes for form handling.
+- Transfering of funds between 2 accounts.
+- Viewing past transactions (sending and recieving).
 
-**UnifyBank** is a modern web application built with Angular, designed to serve as a platform for a international banking experience.
-
-The application is intended to offer users a secure, responsive, and user friendly interface for managing their finances online.
-
-As an Angular project, it leverages the framework's power for:
-* **Component-Based Architecture:** Ensuring modular, maintainable, and scalable code.
-* **Single-Page Application (SPA) Experience:** delivering seamless user experiences and quick transitions without requiring frequent page reloads.
-* **Modern Web Development:** applying front-end developments best practices, TypeScript, and reactive programming.
+## Tech stack
+- Framework: Angular 19.2.5
+- Component Library: PrimeNG
+- Database + Auth: Supabase + Supabase Auth
