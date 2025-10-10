@@ -1,0 +1,190 @@
+<div class="transactions-container">
+  <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+  @if (!loading) {
+  <div class="transactions-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fa fa-clock-rotate-left"></i>
+        Transactions
+      </h1>
+      <p class="page-subtitle">View and manage all your transaction history</p>
+    </div>
+    <div class="header-actions">
+      <ub-button variant="outline" size="md" (click)="onExportTransactions()">
+        <i class="fa fa-download"></i>
+        Export
+      </ub-button>
+      <ub-button variant="primary" size="md" (click)="onAddTransaction()">
+        <i class="fa fa-plus"></i>
+        Add Transaction
+      </ub-button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card income">
+      <div class="stat-icon">
+        <i class="fa fa-arrow-trend-up"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Total Income</div>
+        <div class="stat-value">{{ formatCurrency(totalIncome) }}</div>
+      </div>
+    </div>
+    <div class="stat-card expense">
+      <div class="stat-icon">
+        <i class="fa fa-arrow-trend-down"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Total Expenses</div>
+        <div class="stat-value">{{ formatCurrency(totalExpenses) }}</div>
+      </div>
+    </div>
+    <div class="stat-card total">
+      <div class="stat-icon">
+        <i class="fa fa-receipt"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Total Transactions</div>
+        <div class="stat-value">{{ transactions.length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <div class="filter-group">
+      <label class="filter-label">Transaction Type</label>
+      <div class="filter-buttons">
+        <ub-button
+          [variant]="selectedFilter === 'all' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setFilter('all')"
+        >
+          All
+        </ub-button>
+        <ub-button
+          [variant]="selectedFilter === 'credit' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setFilter('credit')"
+        >
+          <i class="fa fa-arrow-up"></i>
+          Income
+        </ub-button>
+        <ub-button
+          [variant]="selectedFilter === 'debit' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setFilter('debit')"
+        >
+          <i class="fa fa-arrow-down"></i>
+          Expenses
+        </ub-button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Category</label>
+      <div class="filter-buttons category-filters">
+        <ub-button
+          *ngFor="let category of categories"
+          [variant]="
+            selectedCategory === category.toLowerCase() ? 'primary' : 'ghost'
+          "
+          size="sm"
+          (click)="setCategory(category)"
+        >
+          {{ category }}
+        </ub-button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="transactions-list"
+    *ngIf="loading && filteredTransactions.length > 0"
+  >
+    <div
+      *ngFor="let transaction of filteredTransactions"
+      class="transaction-item"
+      (click)="onViewDetails(transaction)"
+    >
+      <div class="transaction-icon" [class]="transaction.type">
+        <i class="fa" [class]="getTransactionIcon(transaction.category)"></i>
+      </div>
+
+      <div class="transaction-main">
+        <div class="transaction-details">
+          <h4 class="transaction-description">{{ transaction.description }}</h4>
+          <div class="transaction-meta">
+            <span class="transaction-account">
+              <i class="fa fa-building-columns"></i>
+              {{ getAccountName(transaction.account_id) }}
+            </span>
+            <span class="transaction-separator">•</span>
+            <span class="transaction-category">{{ transaction.category }}</span>
+            <span class="transaction-separator">•</span>
+            <span class="transaction-date">{{
+              formatDate(transaction.created_at || transaction.date)
+            }}</span>
+          </div>
+        </div>
+
+        <div class="transaction-right">
+          <div class="transaction-amount" [class]="transaction.type">
+            {{ transaction.type === "credit" ? "+" : "-"
+            }}{{ formatCurrency(transaction.amount) }}
+          </div>
+          <div
+            class="transaction-status"
+            [class]="getStatusClass(transaction.status || 'completed')"
+          >
+            <span class="status-dot"></span>
+            {{ getStatusText(transaction.status || "completed") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="transaction-reference" *ngIf="transaction.reference_number">
+        <span class="reference-label">Ref:</span>
+        <span class="reference-number">{{ transaction.reference_number }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="empty-state"
+    *ngIf="
+      loading && filteredTransactions.length === 0 && transactions.length > 0
+    "
+  >
+    <div class="empty-icon">
+      <i class="fa fa-filter"></i>
+    </div>
+    <h3 class="empty-title">No Matching Transactions</h3>
+    <p class="empty-description">
+      Try adjusting your filters to see more results.
+    </p>
+    <ub-button
+      variant="outline"
+      size="md"
+      (click)="setFilter('all'); setCategory('All')"
+    >
+      Clear Filters
+    </ub-button>
+  </div>
+
+  <div class="empty-state" *ngIf="loading && transactions.length === 0">
+    <div class="empty-icon">
+      <i class="fa fa-clock-rotate-left"></i>
+    </div>
+    <h3 class="empty-title">No Transactions Yet</h3>
+    <p class="empty-description">
+      Your transactions will appear here as you use your accounts.
+    </p>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <i class="fa fa-spinner fa-spin"></i>
+    <p>Loading transactions...</p>
+  </div>
+  }
+</div>

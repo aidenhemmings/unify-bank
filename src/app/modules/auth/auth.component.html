@@ -23,6 +23,7 @@
             type="text"
             placeholder="Enter your username"
             [control]="form | getControl : 'username'"
+            [disabled]="isLoading"
             [class.invalid]="
               form.get('username')?.invalid && form.get('username')?.touched
             "
@@ -35,6 +36,7 @@
             type="password"
             placeholder="Enter your password"
             [control]="form | getControl : 'password'"
+            [disabled]="isLoading"
             [class.invalid]="
               form.get('password')?.invalid && form.get('password')?.touched
             "
@@ -50,10 +52,14 @@
           variant="primary"
           [fluid]="true"
           (click)="login()"
+          [disabled]="isLoading"
           class="login-button"
         >
-          <i class="fa fa-right-to-bracket"></i>
-          Sign In
+          <i
+            class="fa"
+            [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-right-to-bracket'"
+          ></i>
+          {{ isLoading ? "Signing In..." : "Sign In" }}
         </ub-button>
       </form>
 

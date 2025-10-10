@@ -1,0 +1,48 @@
+@if(formControl) {
+<p-select
+  class="select"
+  [ngClass]="{ 'p-select-sm': size === 'sm', 'p-select-lg': size === 'lg' }"
+  [formControl]="formControl"
+  [options]="options"
+  [optionLabel]="optionLabel"
+  [optionValue]="optionValue"
+  [placeholder]="placeholder"
+  [filter]="filter"
+  [filterBy]="filterBy"
+  [showClear]="showClear"
+  [disabled]="disabled"
+  [appendTo]="appendTo"
+>
+  @if (optionTemplate) {
+  <ng-template pTemplate="item" let-item>
+    <ng-container
+      *ngTemplateOutlet="optionTemplate; context: { $implicit: item }"
+    ></ng-container>
+  </ng-template>
+  }
+</p-select>
+} @else {
+<p-select
+  class="select"
+  [ngClass]="{ 'p-select-sm': size === 'sm', 'p-select-lg': size === 'lg' }"
+  [(ngModel)]="value"
+  (ngModelChange)="onChange($event)"
+  [options]="options"
+  [optionLabel]="optionLabel"
+  [optionValue]="optionValue"
+  [placeholder]="placeholder"
+  [disabled]="disabled"
+  [appendTo]="appendTo"
+  [filter]="filter"
+  [filterBy]="filterBy"
+  [showClear]="showClear"
+>
+  @if (optionTemplate) {
+  <ng-template pTemplate="item" let-item>
+    <ng-container
+      *ngTemplateOutlet="optionTemplate; context: { $implicit: item }"
+    ></ng-container>
+  </ng-template>
+  }
+</p-select>
+}

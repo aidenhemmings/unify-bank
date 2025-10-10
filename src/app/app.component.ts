@@ -4,11 +4,22 @@ import {
   UbSupabaseService,
   UbUserService,
   UbSidebarService,
+  UbLoadingService,
+  UbToastService,
 } from '@common/services';
-import { UbSidebarComponent, UbHeaderBarComponent } from '@common/ui';
+import {
+  UbSidebarComponent,
+  UbHeaderBarComponent,
+  UbLoaderComponent,
+} from '@common/ui';
 import { CommonModule } from '@angular/common';
 import { User } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { LoadingKeys } from '@common/enums';
+import { APP_CURRENCY_CONFIG } from './app.config.currency';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
@@ -18,17 +29,32 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
     UbSidebarComponent,
     UbHeaderBarComponent,
     CommonModule,
+    UbLoaderComponent,
+    ToastModule,
+    ConfirmDialogModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  providers: [ConfirmationService],
 })
 export class AppComponent implements OnInit {
   private userService = inject(UbUserService);
   private supabaseService = inject(UbSupabaseService);
   private sidebarService = inject(UbSidebarService);
+  private loadingService = inject(UbLoadingService);
+  private toastService = inject(UbToastService);
+
+  static readonly CURRENCY_CONFIG = APP_CURRENCY_CONFIG;
+
+  loaderKey = LoadingKeys.GLOBAL;
 
   currentUser: User | null = null;
   isCollapsed = false;
+
+  get loading(): boolean {
+    const state = this.loadingService.getLoaderStateValue(this.loaderKey);
+    return state.show;
+  }
 
   ngOnInit() {
     this.userService.currentUser
@@ -47,6 +73,8 @@ export class AppComponent implements OnInit {
   }
 
   async validateSession() {
+    this.loadingService.show(this.loaderKey, true);
+
     const token = this.userService.getToken();
 
     if (token) {
@@ -57,13 +85,21 @@ export class AppComponent implements OnInit {
 
         if (user) {
           this.userService.setCurrentUser(user);
+          this.loadingService.hide(this.loaderKey);
+          return;
         } else {
           this.userService.clearSession();
+          this.loadingService.hide(this.loaderKey);
+          return;
         }
       } else {
         this.userService.clearSession();
+        this.loadingService.hide(this.loaderKey);
+        return;
       }
     }
+
+    this.loadingService.hide(this.loaderKey);
   }
 
   get mainContentMargin(): string {

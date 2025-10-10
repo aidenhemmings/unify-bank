@@ -1,4 +1,7 @@
+<p-confirmdialog />
+<p-toast [baseZIndex]="9000" />
 <div class="app-container">
+  <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
   @if (currentUser) {
   <ub-sidebar />
   }

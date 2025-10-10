@@ -1,0 +1,81 @@
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(4px);
+    background: var(--white);
+    z-index: 8999;
+  }
+
+  &.inline {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+  }
+}
+
+.spinner {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--primary-color) 0deg,
+    var(--primary-color-light) 120deg,
+    transparent 270deg,
+    transparent 360deg
+  );
+  animation: spin 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.no-image {
+    mask: radial-gradient(
+      circle 36px at center,
+      transparent 0,
+      transparent 36px,
+      black 37px
+    );
+    -webkit-mask: radial-gradient(
+      circle 36px at center,
+      transparent 0,
+      transparent 36px,
+      black 37px
+    );
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    background-color: var(--white);
+    border-radius: 50%;
+    z-index: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

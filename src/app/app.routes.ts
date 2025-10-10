@@ -1,5 +1,11 @@
 import { Routes } from '@angular/router';
-import { UbAuthComponent, UbDashboardComponent } from './modules';
+import {
+  UbAccountsComponent,
+  UbAuthComponent,
+  UbDashboardComponent,
+  UbPaymentsComponent,
+  UbTransactionsComponent,
+} from './modules';
 import { UbAuthGuard, UbGuestGuard } from './common';
 
 export const routes: Routes = [
@@ -17,6 +23,30 @@ export const routes: Routes = [
     canActivate: [UbAuthGuard],
     data: {
       breadcrumb: 'Dashboard',
+    },
+  },
+  {
+    path: 'payments',
+    component: UbPaymentsComponent,
+    canActivate: [UbAuthGuard],
+    data: {
+      breadcrumb: 'Payments',
+    },
+  },
+  {
+    path: 'accounts',
+    component: UbAccountsComponent,
+    canActivate: [UbAuthGuard],
+    data: {
+      breadcrumb: 'Accounts',
+    },
+  },
+  {
+    path: 'transactions',
+    component: UbTransactionsComponent,
+    canActivate: [UbAuthGuard],
+    data: {
+      breadcrumb: 'Transactions',
     },
   },
   {

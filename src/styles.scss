@@ -188,3 +188,26 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--primary-color) var(--gray-100);
 }
+
+.p-dialog-content {
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color-dark);
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--gray-100);
+}

@@ -8,8 +8,11 @@ import * as bcrypt from 'bcryptjs';
 })
 export class UbSupabaseService {
   private supabase: SupabaseClient;
+  private currentToken: string | null = null;
 
   constructor() {
+    const token = localStorage.getItem('user_token');
+
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey,
@@ -19,8 +22,20 @@ export class UbSupabaseService {
           persistSession: false,
           detectSessionInUrl: false,
         },
+        global: {
+          headers: token
+            ? {
+                'X-User-Token': token,
+              }
+            : {},
+        },
       }
     );
+
+    if (token) {
+      this.currentToken = token;
+      this.setToken(token);
+    }
   }
 
   async signIn(username: string, password: string) {
@@ -114,5 +129,33 @@ export class UbSupabaseService {
 
   getSupabaseClient(): SupabaseClient {
     return this.supabase;
+  }
+
+  async setToken(token: string): Promise<void> {
+    this.currentToken = token;
+
+    this.supabase = createClient(
+      environment.supabaseUrl,
+      environment.supabaseKey,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false,
+        },
+        global: {
+          headers: {
+            'X-User-Token': token,
+          },
+        },
+      }
+    );
+
+    const { error } = await this.supabase.rpc('set_user_token', { token });
+
+    if (error) {
+      console.error('Error setting token for RLS:', error);
+      throw error;
+    }
   }
 }

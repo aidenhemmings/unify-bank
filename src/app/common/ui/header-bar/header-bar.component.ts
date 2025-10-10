@@ -1,20 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UbBreadcrumbService, UbUserService } from '@common/services';
 import { Breadcrumb, User } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { UbButtonComponent } from '../button';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-header-bar',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, UbButtonComponent],
   templateUrl: './header-bar.component.html',
   styleUrl: './header-bar.component.scss',
 })
 export class UbHeaderBarComponent implements OnInit {
   private breadcrumbService = inject(UbBreadcrumbService);
   private userService = inject(UbUserService);
+  private router = inject(Router);
 
   breadcrumbs: Breadcrumb[] = [];
   currentUser: User | null = null;
@@ -50,10 +52,10 @@ export class UbHeaderBarComponent implements OnInit {
     this.showProfileMenu = !this.showProfileMenu;
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
     this.closeProfileMenu();
-    this.userService.clearSession();
-    window.location.href = '/auth/login';
+    await this.userService.clearSession();
+    this.router.navigate(['auth', 'login']);
   }
 
   closeProfileMenu() {

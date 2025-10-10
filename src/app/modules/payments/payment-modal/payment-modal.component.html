@@ -1,0 +1,227 @@
+<div class="payment-modal">
+  <div class="modal-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fa fa-paper-plane"></i>
+      </div>
+      <div class="header-text">
+        <h2 class="modal-title">
+          {{ isEditMode ? "Edit Payment" : "Schedule New Payment" }}
+        </h2>
+        <p class="modal-subtitle">
+          {{
+            isEditMode
+              ? "Update payment details"
+              : "Send money to another account"
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="paymentForm" class="modal-body">
+    <div class="form-section">
+      <h3 class="section-title">Payment Details</h3>
+
+      <div class="form-group">
+        <label for="fromAccountId" class="form-label">
+          From Account <span class="required">*</span>
+        </label>
+        <ub-select
+          inputId="fromAccountId"
+          [options]="accountOptions"
+          [control]="paymentForm | getControl : 'fromAccountId'"
+          placeholder="Select source account"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('fromAccountId')"
+        >
+        </ub-select>
+        <div class="field-hint">Choose which account to send from</div>
+        <div class="error-message" *ngIf="isFieldInvalid('fromAccountId')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("fromAccountId") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amount" class="form-label">
+          Amount <span class="required">*</span>
+        </label>
+        <ub-input-number
+          id="amount"
+          [control]="paymentForm | getControl : 'amount'"
+          [prefix]="currencyConfig.symbol + ' '"
+          minFractionDigits="2"
+          maxFractionDigits="2"
+          min="0.01"
+          [useGrouping]="true"
+          placeholder="0.00"
+          [class.invalid]="isFieldInvalid('amount')"
+        ></ub-input-number>
+        <div class="field-hint">Enter the payment amount</div>
+        <div class="error-message" *ngIf="isFieldInvalid('amount')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("amount") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="paymentType" class="form-label">
+          Payment Type <span class="required">*</span>
+        </label>
+        <ub-select
+          inputId="paymentType"
+          [options]="paymentTypes"
+          [control]="paymentForm | getControl : 'paymentType'"
+          placeholder="Select payment type"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('paymentType')"
+        >
+        </ub-select>
+        <div class="error-message" *ngIf="isFieldInvalid('paymentType')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("paymentType") }}
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="isRecurringPayment">
+        <label for="frequency" class="form-label">
+          Frequency <span class="required">*</span>
+        </label>
+        <ub-select
+          inputId="frequency"
+          [options]="frequencies"
+          [control]="paymentForm | getControl : 'frequency'"
+          placeholder="Select frequency"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('frequency')"
+        >
+        </ub-select>
+        <div class="field-hint">How often should this payment repeat?</div>
+        <div class="error-message" *ngIf="isFieldInvalid('frequency')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("frequency") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="scheduledDate" class="form-label">
+          {{ isRecurringPayment ? "First Payment Date" : "Scheduled Date" }}
+        </label>
+        <ub-input-text
+          id="scheduledDate"
+          [control]="paymentForm | getControl : 'scheduledDate'"
+          type="date"
+          [class.invalid]="isFieldInvalid('scheduledDate')"
+        ></ub-input-text>
+        <div class="field-hint">
+          {{
+            isRecurringPayment
+              ? "When should the first payment be made?"
+              : "Leave blank to send immediately"
+          }}
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('scheduledDate')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("scheduledDate") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">Recipient Information</h3>
+
+      <div class="form-group">
+        <label for="recipientName" class="form-label">
+          Recipient Name <span class="required">*</span>
+        </label>
+        <ub-input-text
+          id="recipientName"
+          [control]="paymentForm | getControl : 'recipientName'"
+          placeholder="Enter recipient's full name"
+          [class.invalid]="isFieldInvalid('recipientName')"
+        ></ub-input-text>
+        <div class="field-hint">Full name of the person or business</div>
+        <div class="error-message" *ngIf="isFieldInvalid('recipientName')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("recipientName") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="toAccountNumber" class="form-label">
+          Account Number <span class="required">*</span>
+        </label>
+        <ub-input-text
+          id="toAccountNumber"
+          [control]="paymentForm | getControl : 'toAccountNumber'"
+          placeholder="Enter recipient's account number"
+          [class.invalid]="isFieldInvalid('toAccountNumber')"
+        ></ub-input-text>
+        <div class="field-hint">10-20 digit account number</div>
+        <div class="error-message" *ngIf="isFieldInvalid('toAccountNumber')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("toAccountNumber") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label"> Payment Reference </label>
+        <ub-input-text
+          id="description"
+          [control]="paymentForm | getControl : 'description'"
+          placeholder="Optional reference or note"
+          [class.invalid]="isFieldInvalid('description')"
+        ></ub-input-text>
+        <div class="field-hint">
+          Add a reference for your records (optional)
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("description") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-summary" *ngIf="paymentForm.valid">
+      <div class="summary-header">
+        <i class="fa fa-circle-info"></i>
+        <span>Payment Summary</span>
+      </div>
+      <div class="summary-content">
+        <div class="summary-row">
+          <span class="summary-label">Amount:</span>
+          <span class="summary-value amount">{{
+            formatCurrency(paymentForm.get("amount")?.value || 0)
+          }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Type:</span>
+          <span class="summary-value">{{
+            paymentForm.get("paymentType")?.value === "recurring"
+              ? "Recurring Payment"
+              : "One-Time Payment"
+          }}</span>
+        </div>
+        <div class="summary-row" *ngIf="isRecurringPayment">
+          <span class="summary-label">Frequency:</span>
+          <span class="summary-value">{{
+            paymentForm.get("frequency")?.value
+          }}</span>
+        </div>
+        <div
+          class="summary-row"
+          *ngIf="paymentForm.get('scheduledDate')?.value"
+        >
+          <span class="summary-label">Scheduled:</span>
+          <span class="summary-value">{{
+            paymentForm.get("scheduledDate")?.value
+          }}</span>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

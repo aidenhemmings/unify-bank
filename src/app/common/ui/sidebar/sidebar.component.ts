@@ -4,11 +4,12 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UbMenuService, UbSidebarService } from '@common/services';
 import { MenuItem } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { TooltipModule } from 'primeng/tooltip';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-sidebar',
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, TooltipModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
 })

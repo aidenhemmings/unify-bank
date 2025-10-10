@@ -1,0 +1,125 @@
+<div class="account-modal">
+  <div class="modal-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fa fa-building-columns"></i>
+      </div>
+      <div class="header-text">
+        <h2 class="modal-title">
+          {{ isEditMode ? "Edit Account" : "Create New Account" }}
+        </h2>
+        <p class="modal-subtitle">
+          {{
+            isEditMode
+              ? "Update your account details"
+              : "Set up a new bank account"
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="accountForm" class="modal-body">
+    <div class="form-section">
+      <h3 class="section-title">Account Information</h3>
+
+      <div class="form-group">
+        <label for="accountName" class="form-label">
+          Account Name <span class="required">*</span>
+        </label>
+        <ub-input-text
+          id="accountName"
+          [control]="accountForm | getControl : 'name'"
+          placeholder="e.g., Personal Checking"
+          [class.invalid]="isFieldInvalid('name')"
+        ></ub-input-text>
+        <div class="field-hint">Give your account a recognizable name</div>
+        <div class="error-message" *ngIf="isFieldInvalid('name')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("name") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="accountType" class="form-label">
+          Account Type <span class="required">*</span>
+        </label>
+        <ub-select
+          inputId="accountType"
+          [options]="accountTypes"
+          [control]="accountForm | getControl : 'type'"
+          placeholder="Select account type"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('type')"
+        >
+        </ub-select>
+        <div class="error-message" *ngIf="isFieldInvalid('type')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("type") }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="balance" class="form-label">
+            Initial Balance <span class="required">*</span>
+          </label>
+          <ub-input-number
+            id="balance"
+            [control]="accountForm | getControl : 'balance'"
+            [prefix]="currencyConfig.symbol + ' '"
+            minFractionDigits="2"
+            maxFractionDigits="2"
+            min="0"
+            [useGrouping]="true"
+            placeholder="0.00"
+            [class.invalid]="isFieldInvalid('balance')"
+          ></ub-input-number>
+          <div class="error-message" *ngIf="isFieldInvalid('balance')">
+            <i class="fa fa-circle-exclamation"></i>
+            {{ getErrorMessage("balance") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="currency" class="form-label">
+            Currency <span class="required">*</span>
+          </label>
+          <ub-input-text
+            id="currency"
+            [control]="accountForm | getControl : 'currency'"
+            placeholder="ZAR"
+            [readOnly]="true"
+            [class.invalid]="isFieldInvalid('currency')"
+          ></ub-input-text>
+          <div class="field-hint">Default currency</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">Account Number</h3>
+
+      <div class="form-group">
+        <label for="accountNumber" class="form-label">
+          Account Number <span class="required">*</span>
+        </label>
+        <div class="input-with-action">
+          <ub-input-text
+            id="accountNumber"
+            [control]="accountForm | getControl : 'accountNumber'"
+            placeholder="Enter or generate account number"
+            [readOnly]="true"
+            [class.invalid]="isFieldInvalid('accountNumber')"
+          ></ub-input-text>
+        </div>
+        <div class="field-hint">Auto-generated unique account number</div>
+        <div class="error-message" *ngIf="isFieldInvalid('accountNumber')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("accountNumber") }}
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
