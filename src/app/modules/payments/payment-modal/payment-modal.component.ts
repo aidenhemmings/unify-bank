@@ -17,6 +17,7 @@ import { AppComponent } from '../../../app.component';
 import { DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { UbModalFormService } from '@common/services';
 import { FrequencyOption, PaymentTypeOption } from './types';
+import { DatePicker } from 'primeng/datepicker';
 
 @Component({
   selector: 'ub-payment-modal',
@@ -29,6 +30,7 @@ import { FrequencyOption, PaymentTypeOption } from './types';
     UbInputNumberComponent,
     UbSelectComponent,
     UbGetFormControlPipe,
+    DatePicker,
   ],
 })
 export class UbPaymentModalComponent implements OnInit {
@@ -105,8 +107,8 @@ export class UbPaymentModalComponent implements OnInit {
       frequency: [this.payment?.frequency || ''],
       scheduledDate: [
         this.payment?.scheduled_date
-          ? new Date(this.payment.scheduled_date).toISOString().split('T')[0]
-          : '',
+          ? new Date(this.payment.scheduled_date)
+          : null,
       ],
       description: [
         this.payment?.description || '',
@@ -193,7 +195,7 @@ export class UbPaymentModalComponent implements OnInit {
     return 'Invalid field';
   }
 
-  getTodayDate(): string {
-    return new Date().toISOString().split('T')[0];
+  getTodayDate(): Date {
+    return new Date();
   }
 }

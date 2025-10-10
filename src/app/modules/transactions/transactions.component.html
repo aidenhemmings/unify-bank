@@ -10,7 +10,11 @@
       <p class="page-subtitle">View and manage all your transaction history</p>
     </div>
     <div class="header-actions">
-      <ub-button variant="outline" size="md" (click)="onExportTransactions()">
+      <ub-button
+        variant="outline"
+        size="md"
+        (click)="onToggleExportPopover($event)"
+      >
         <i class="fa fa-download"></i>
         Export
       </ub-button>
@@ -20,6 +24,61 @@
       </ub-button>
     </div>
   </div>
+
+  <p-popover #exportPopover [style]="{ width: '400px' }">
+    <div class="export-panel">
+      <h3 class="export-title">Select Date Range</h3>
+      <p class="export-subtitle">Choose the period for export</p>
+
+      <form [formGroup]="exportForm" class="export-form">
+        <div class="form-group">
+          <label for="fromDate" class="form-label">From Date</label>
+          <p-datepicker
+            inputId="fromDate"
+            [formControl]="exportForm | getControl : 'fromDate'"
+            placeholder="Select start date"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            iconDisplay="input"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="toDate" class="form-label">To Date</label>
+          <p-datepicker
+            inputId="toDate"
+            [formControl]="exportForm | getControl : 'toDate'"
+            placeholder="Select end date"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            iconDisplay="input"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="form-actions">
+          <ub-button
+            variant="outline"
+            size="sm"
+            (click)="exportPopover.hide()"
+            type="button"
+          >
+            Cancel
+          </ub-button>
+          <ub-button
+            variant="primary"
+            size="sm"
+            (click)="onExportTransactions()"
+            type="button"
+          >
+            <i class="fa fa-download"></i>
+            Export to Excel
+          </ub-button>
+        </div>
+      </form>
+    </div>
+  </p-popover>
 
   <div class="stats-grid">
     <div class="stat-card income">

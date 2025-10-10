@@ -111,12 +111,16 @@
         <label for="scheduledDate" class="form-label">
           {{ isRecurringPayment ? "First Payment Date" : "Scheduled Date" }}
         </label>
-        <ub-input-text
-          id="scheduledDate"
-          [control]="paymentForm | getControl : 'scheduledDate'"
-          type="date"
+        <p-datepicker
+          inputId="scheduledDate"
+          [formControl]="paymentForm | getControl : 'scheduledDate'"
+          placeholder="Select date (optional)"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          iconDisplay="input"
+          [fluid]="true"
           [class.invalid]="isFieldInvalid('scheduledDate')"
-        ></ub-input-text>
+        />
         <div class="field-hint">
           {{
             isRecurringPayment

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   UbTransactionsService,
@@ -19,16 +19,31 @@ import { AppComponent } from '../../app.component';
 import { LoadingKeys, ModalResponseTypes } from '@common/enums';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UbTransactionModalComponent } from './transaction-modal/transaction-modal.component';
+import { Popover } from 'primeng/popover';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { UbGetFormControlPipe } from '@common/pipes';
+import * as XLSX from 'xlsx';
+import { DatePicker } from 'primeng/datepicker';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-transactions',
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.scss'],
-  imports: [CommonModule, UbButtonComponent, UbLoaderComponent],
+  imports: [
+    CommonModule,
+    UbButtonComponent,
+    UbLoaderComponent,
+    Popover,
+    DatePicker,
+    ReactiveFormsModule,
+    UbGetFormControlPipe,
+  ],
   providers: [DialogService],
 })
 export class UbTransactionsComponent {
+  @ViewChild('exportPopover') exportPopover!: Popover;
+
   private userService = inject(UbUserService);
   private transactionsService = inject(UbTransactionsService);
   private accountsService = inject(UbAccountsService);
@@ -45,6 +60,11 @@ export class UbTransactionsComponent {
   accounts: Account[] = [];
   selectedFilter: 'all' | 'credit' | 'debit' = 'all';
   selectedCategory: string = 'all';
+
+  exportForm = new FormGroup({
+    fromDate: new FormControl(''),
+    toDate: new FormControl(''),
+  });
 
   loaderKey = LoadingKeys.TRANSACTIONS;
 
@@ -400,6 +420,81 @@ export class UbTransactionsComponent {
   }
 
   onExportTransactions(): void {
-    console.log('Export transactions clicked');
+    const fromDate = this.exportForm.get('fromDate')?.value;
+    const toDate = this.exportForm.get('toDate')?.value;
+
+    if (!fromDate || !toDate) {
+      this.toastService.error('Error', 'Please select both from and to dates.');
+      return;
+    }
+
+    const fromDateTime = new Date(fromDate).getTime();
+    const toDateTime = new Date(toDate).getTime();
+
+    if (fromDateTime > toDateTime) {
+      this.toastService.error('Error', 'From date must be before to date.');
+      return;
+    }
+
+    const filteredTransactions = this.transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.created_at || '').getTime();
+      return transactionDate >= fromDateTime && transactionDate <= toDateTime;
+    });
+
+    if (filteredTransactions.length === 0) {
+      this.toastService.error(
+        'No Data',
+        'No transactions found in the selected date range.'
+      );
+      return;
+    }
+
+    const excelData = filteredTransactions.map((transaction) => ({
+      Date: this.formatDate(transaction.created_at || ''),
+      Account: this.getAccountName(transaction.account_id),
+      Description: transaction.description,
+      Category:
+        transaction.category.charAt(0).toUpperCase() +
+        transaction.category.slice(1),
+      Type: transaction.type === 'credit' ? 'Income' : 'Expense',
+      Amount: transaction.amount,
+      Status: this.getStatusText(transaction.status || 'pending'),
+      'Reference Number': transaction.reference_number || 'N/A',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Transactions');
+
+    const columnWidths = [
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 10 },
+      { wch: 15 },
+      { wch: 12 },
+      { wch: 20 },
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const fromDateStr = new Date(fromDate).toISOString().split('T')[0];
+    const toDateStr = new Date(toDate).toISOString().split('T')[0];
+    const filename = `Transactions_${fromDateStr}_to_${toDateStr}.xlsx`;
+
+    XLSX.writeFile(workbook, filename);
+
+    this.toastService.success(
+      'Success',
+      `Exported ${filteredTransactions.length} transactions.`
+    );
+
+    this.exportPopover.hide();
+
+    this.exportForm.reset();
+  }
+
+  onToggleExportPopover(event: Event): void {
+    this.exportPopover.toggle(event);
   }
 }
