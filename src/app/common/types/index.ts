@@ -7,3 +7,4 @@ export * from './transaction.type';
 export * from './quick-action.type';
 export * from './payment.type';
 export * from './modal-response.type';
+export * from './user-settings.type';

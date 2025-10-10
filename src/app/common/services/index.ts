@@ -9,3 +9,4 @@ export * from './transactions.service';
 export * from './payments.service';
 export * from './modal-form.service';
 export * from './toast.service';
+export * from './user-settings.service';

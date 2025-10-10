@@ -5,6 +5,7 @@ import {
   UbDashboardComponent,
   UbPaymentsComponent,
   UbTransactionsComponent,
+  UbUserProfileDashboardComponent,
 } from './modules';
 import { UbAuthGuard, UbGuestGuard } from './common';
 
@@ -47,6 +48,14 @@ export const routes: Routes = [
     canActivate: [UbAuthGuard],
     data: {
       breadcrumb: 'Transactions',
+    },
+  },
+  {
+    path: 'user-profile',
+    component: UbUserProfileDashboardComponent,
+    canActivate: [UbAuthGuard],
+    data: {
+      breadcrumb: 'User Profile',
     },
   },
   {

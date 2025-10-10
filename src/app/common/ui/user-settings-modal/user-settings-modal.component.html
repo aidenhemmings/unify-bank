@@ -1,0 +1,50 @@
+<div class="user-settings-modal">
+  <div class="modal-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fa fa-gear"></i>
+      </div>
+      <div class="header-text">
+        <h2 class="modal-title">Settings</h2>
+        <p class="modal-subtitle">Customize your experience</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-body">
+    <div *ngIf="isLoading" class="loading-state">
+      <i class="fa fa-spinner fa-spin"></i>
+      <span>Loading settings...</span>
+    </div>
+
+    <div *ngIf="!isLoading && settings" class="settings-section">
+      <h3 class="section-title">
+        <i class="fa fa-palette"></i>
+        Appearance
+      </h3>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">
+            <i class="fa fa-moon"></i>
+            Dark Mode
+          </div>
+          <div class="setting-description">
+            Switch between light and dark themes
+          </div>
+        </div>
+        <div class="setting-control">
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [checked]="!settings.is_light_mode"
+              (change)="toggleDarkMode()"
+              [disabled]="isSaving"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

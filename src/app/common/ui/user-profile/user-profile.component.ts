@@ -6,9 +6,7 @@ import {
   UbLoadingService,
   UbToastService,
 } from '@common/services';
-import { User as SupabaseUser } from '@supabase/supabase-js';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { Router } from '@angular/router';
 import {
   FormGroup,
   FormControl,
@@ -16,7 +14,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { UbButtonComponent, UbInputTextComponent } from '@common/ui';
-import { formatDate } from '@angular/common';
 import { User } from '@common/types';
 import { UbGetFormControlPipe } from '@common/pipes';
 import { LoadingKeys } from '@common/enums';
@@ -100,15 +97,16 @@ export class UbUserProfileComponent {
   }
 
   async saveProfile(): Promise<void> {
-    this.loadingService.show(LoadingKeys.GLOBAL);
+    this.loadingService.show(LoadingKeys.USER_PROFILE);
     const result = await this.supabaseService.updateUser(this.form);
 
     if (result.success && result.data) {
-      this.userService.setCurrentUser(result.data);
+      await this.userService.setCurrentUser(result.data);
       this.toastService.info('Success', 'Profile updated successfully');
     } else {
       this.toastService.error('Error', 'Failed to update profile');
     }
     this.isEditing = false;
+    this.loadingService.hide(LoadingKeys.USER_PROFILE);
   }
 }

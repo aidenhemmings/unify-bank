@@ -61,7 +61,7 @@ export class UbAuthComponent {
       this.loginError = '';
       this.userService.setToken(token);
       await this.supabaseService.setToken(token);
-      this.userService.setCurrentUser(user);
+      await this.userService.setCurrentUser(user);
       this.router.navigate(['dashboard']);
     }
   }

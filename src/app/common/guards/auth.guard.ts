@@ -27,7 +27,7 @@ export class UbAuthGuard implements CanActivate, CanMatch {
         );
 
         if (loadedUser) {
-          this.userService.setCurrentUser(loadedUser);
+          await this.userService.setCurrentUser(loadedUser);
           return true;
         }
       }

@@ -12,7 +12,6 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Account, QuickAction, Transaction, User } from '@common/types';
-import { UbUserProfileComponent } from '@common/ui';
 import {
   UbButtonComponent,
   UbLoaderComponent,
@@ -32,7 +31,7 @@ import { UbTransactionModalComponent } from '../transactions';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   imports: [CommonModule, UbButtonComponent, UbLoaderComponent, TooltipModule],
-  providers: [DialogService, UbUserProfileComponent],
+  providers: [DialogService],
 })
 export class UbDashboardComponent {
   private userService = inject(UbUserService);

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { UbSupabaseService } from './supabase.service';
 import { LoadingKeys } from '@common/enums';
 import { UbLoadingService } from './loading.service';
+import { UbUserSettingsService } from './user-settings.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ import { UbLoadingService } from './loading.service';
 export class UbUserService {
   private loadingService = inject(UbLoadingService);
   private supabaseService = inject(UbSupabaseService);
+  private userSettingsService = inject(UbUserSettingsService);
 
   private userSubject = new BehaviorSubject<User | null>(null);
   private readonly TOKEN_KEY = 'user_token';
@@ -23,8 +25,17 @@ export class UbUserService {
     return this.userSubject.value;
   }
 
-  setCurrentUser(user: User | null): void {
+  async setCurrentUser(user: User | null): Promise<void> {
     this.userSubject.next(user);
+
+    if (user) {
+      const { settings } = await this.userSettingsService.getUserSettings(
+        user.id
+      );
+      if (settings) {
+        this.userSettingsService.applyTheme(settings.is_light_mode);
+      }
+    }
   }
 
   setToken(token: string): void {
@@ -44,6 +55,9 @@ export class UbUserService {
     }
 
     this.userSubject.next(null);
+    this.userSettingsService.setCurrentSettings(null);
+    // Reset to default light mode on logout
+    this.userSettingsService.applyTheme(true);
     localStorage.removeItem(this.TOKEN_KEY);
     this.loadingService.hide(LoadingKeys.GLOBAL);
   }

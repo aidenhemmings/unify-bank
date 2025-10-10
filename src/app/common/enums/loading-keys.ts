@@ -4,4 +4,5 @@ export enum LoadingKeys {
   ACCOUNTS = 'accounts',
   TRANSACTIONS = 'transactions',
   PAYMENTS = 'payments',
+  USER_PROFILE = 'user_profile',
 }
