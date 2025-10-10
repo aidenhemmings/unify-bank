@@ -4,40 +4,61 @@
 
 		<div class="profile-meta">
 			<h3 class="name">{{ displayName }}</h3>
-			<div class="email">{{ user?.email || 'No email' }}</div>
+			<div class="email">{{ profile?.email || 'No email' }}</div>
 			<div class="member-since">Member since {{ memberSince() }}</div>
 		</div>
 
-		<div class="header-actions">
-			<ub-button variant="secondary" size="sm" (click)="editProfile()">Edit</ub-button>
-			<ub-button variant="error" size="sm" (click)="logout()">Log out</ub-button>
-		</div>
+			<div class="header-actions">
+				<ng-container *ngIf="!isEditing; else editingActions">
+					<ub-button variant="secondary" size="sm" (click)="startEditing()">Edit</ub-button>
+				</ng-container>
+				<ng-template #editingActions>
+					<ub-button variant="primary" size="sm" (click)="saveProfile()">Save</ub-button>
+					<ub-button variant="ghost" size="sm" (click)="cancelEditing()">Cancel</ub-button>
+				</ng-template>
+				<ub-button variant="error" size="sm" (click)="logout()">Log out</ub-button>
+			</div>
 	</div>
 
 	<div class="ub-profile-body">
 		<div class="field">
 			<label>User ID</label>
-			<div class="value">{{ profile?.UserId ?? user?.id ?? '—' }}</div>
+			<div class="value">{{ profile?.id ?? '—' }}</div>
 		</div>
 
-		<div class="field">
-			<label>Username</label>
-			<div class="value">{{ profile?.Username ?? '—' }}</div>
-		</div>
+			<div class="field">
+				<label>Username</label>
+				<div class="value">
+					<ng-container *ngIf="!isEditing; else usernameInput">{{ profile?.username ?? '—' }}</ng-container>
+					<ng-template #usernameInput>
+						<ub-input-text [formControl]="form.controls['username']"></ub-input-text>
+					</ng-template>
+				</div>
+			</div>
 
-		<div class="field">
-			<label>First name</label>
-			<div class="value">{{ profile?.FirstName ?? '—' }}</div>
-		</div>
+			<div class="field">
+				<label>First name</label>
+				<div class="value">
+					<ng-container *ngIf="!isEditing; else firstInput">{{ profile?.first_name ?? '—' }}</ng-container>
+					<ng-template #firstInput>
+						<ub-input-text [formControl]="form.controls['first_name']"></ub-input-text>
+					</ng-template>
+				</div>
+			</div>
 
-		<div class="field">
-			<label>Last name</label>
-			<div class="value">{{ profile?.LastName ?? '—' }}</div>
-		</div>
+			<div class="field">
+				<label>Last name</label>
+				<div class="value">
+					<ng-container *ngIf="!isEditing; else lastInput">{{ profile?.last_name ?? '—' }}</ng-container>
+					<ng-template #lastInput>
+						<ub-input-text [formControl]="form.controls['last_name']"></ub-input-text>
+					</ng-template>
+				</div>
+			</div>
 
 		<div class="field">
 			<label>Account email</label>
-			<div class="value">{{ user?.email ?? '—' }}</div>
+			<div class="value">{{ profile?.email ?? '—' }}</div>
 		</div>
 
 		<div class="field">
