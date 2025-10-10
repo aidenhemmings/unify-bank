@@ -2,4 +2,7 @@ export * from './input';
 export * from './button';
 export * from './sidebar';
 export * from './header-bar';
+export * from './loader';
+export * from './modal-footer';
+export * from './select';
 export * from './user-profile';

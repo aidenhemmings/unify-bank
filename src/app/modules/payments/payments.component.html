@@ -1,0 +1,249 @@
+<div class="payments-container">
+  <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+  @if (!loading) {
+  <div class="payments-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fa fa-paper-plane"></i>
+        Payments
+      </h1>
+      <p class="page-subtitle">Manage your scheduled and completed payments</p>
+    </div>
+    <ub-button variant="primary" size="md" (click)="onAddPayment()">
+      <i class="fa fa-plus"></i>
+      New Payment
+    </ub-button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card pending">
+      <div class="stat-icon">
+        <i class="fa fa-clock"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Pending Payments</div>
+        <div class="stat-value">{{ pendingPayments.length }}</div>
+        <div class="stat-amount">{{ formatCurrency(totalPendingAmount) }}</div>
+      </div>
+    </div>
+    <div class="stat-card completed">
+      <div class="stat-icon">
+        <i class="fa fa-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Completed Payments</div>
+        <div class="stat-value">{{ completedPayments.length }}</div>
+        <div class="stat-amount">
+          {{ formatCurrency(totalCompletedAmount) }}
+        </div>
+      </div>
+    </div>
+    <div class="stat-card total">
+      <div class="stat-icon">
+        <i class="fa fa-receipt"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Total Payments</div>
+        <div class="stat-value">{{ payments.length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <div class="filter-group">
+      <label class="filter-label">Status</label>
+      <div class="filter-buttons">
+        <ub-button
+          [variant]="selectedFilter === 'all' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setStatusFilter('all')"
+        >
+          All
+        </ub-button>
+        <ub-button
+          [variant]="selectedFilter === 'pending' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setStatusFilter('pending')"
+        >
+          <i class="fa fa-clock"></i>
+          Pending
+        </ub-button>
+        <ub-button
+          [variant]="selectedFilter === 'completed' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setStatusFilter('completed')"
+        >
+          <i class="fa fa-check"></i>
+          Completed
+        </ub-button>
+        <ub-button
+          [variant]="selectedFilter === 'failed' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setStatusFilter('failed')"
+        >
+          <i class="fa fa-xmark"></i>
+          Failed
+        </ub-button>
+        <ub-button
+          [variant]="selectedFilter === 'cancelled' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setStatusFilter('cancelled')"
+        >
+          <i class="fa fa-ban"></i>
+          Cancelled
+        </ub-button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Payment Type</label>
+      <div class="filter-buttons">
+        <ub-button
+          [variant]="selectedType === 'all' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setTypeFilter('all')"
+        >
+          All
+        </ub-button>
+        <ub-button
+          [variant]="selectedType === 'one-time' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setTypeFilter('one-time')"
+        >
+          <i class="fa fa-paper-plane"></i>
+          One-Time
+        </ub-button>
+        <ub-button
+          [variant]="selectedType === 'recurring' ? 'primary' : 'ghost'"
+          size="sm"
+          (click)="setTypeFilter('recurring')"
+        >
+          <i class="fa fa-rotate"></i>
+          Recurring
+        </ub-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="payments-grid" *ngIf="!loading && filteredPayments.length > 0">
+    <div
+      *ngFor="let payment of filteredPayments"
+      class="payment-card"
+      [class]="'payment-' + payment.status"
+      (click)="onViewDetails(payment)"
+    >
+      <div class="payment-header">
+        <div class="payment-type-badge" [class]="payment.payment_type">
+          <i class="fa" [class]="getPaymentTypeIcon(payment.payment_type)"></i>
+          {{ payment.payment_type === "recurring" ? "Recurring" : "One-Time" }}
+        </div>
+        <div class="payment-status" [class]="getStatusClass(payment.status)">
+          <span class="status-dot"></span>
+          {{ getStatusText(payment.status) }}
+        </div>
+      </div>
+
+      <div class="payment-body">
+        <div class="payment-recipient">
+          <div class="recipient-icon">
+            <i class="fa fa-user"></i>
+          </div>
+          <div class="recipient-details">
+            <h3 class="recipient-name">{{ payment.recipient_name }}</h3>
+            <div class="recipient-account">{{ payment.to_account_number }}</div>
+          </div>
+        </div>
+
+        <div class="payment-amount-section">
+          <div class="amount-label">Amount</div>
+          <div class="amount-value">{{ formatCurrency(payment.amount) }}</div>
+        </div>
+
+        <div class="payment-info">
+          <div class="info-item">
+            <i class="fa fa-building-columns"></i>
+            <span>From: {{ getAccountName(payment.from_account_id) }}</span>
+          </div>
+          <div class="info-item" *ngIf="payment.scheduled_date">
+            <i class="fa fa-calendar"></i>
+            <span>Scheduled: {{ formatDate(payment.scheduled_date) }}</span>
+          </div>
+          <div class="info-item" *ngIf="payment.completed_at">
+            <i class="fa fa-check"></i>
+            <span>Completed: {{ formatDate(payment.completed_at) }}</span>
+          </div>
+          <div
+            class="info-item"
+            *ngIf="payment.payment_type === 'recurring' && payment.frequency"
+          >
+            <i class="fa fa-rotate"></i>
+            <span>{{ getFrequencyText(payment.frequency) }}</span>
+          </div>
+        </div>
+
+        <div class="payment-description" *ngIf="payment.description">
+          <i class="fa fa-note-sticky"></i>
+          <span>{{ payment.description }}</span>
+        </div>
+      </div>
+
+      <div class="payment-footer">
+        <div class="payment-date">
+          <i class="fa fa-clock"></i>
+          Created {{ formatDate(payment.created_at) }}
+        </div>
+        <div class="payment-actions" *ngIf="payment.status === 'pending'">
+          <ub-button
+            variant="error"
+            size="sm"
+            (click)="onCancelPayment(payment); $event.stopPropagation()"
+          >
+            <i class="fa fa-ban"></i>
+            Cancel
+          </ub-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="empty-state"
+    *ngIf="!loading && filteredPayments.length === 0 && payments.length > 0"
+  >
+    <div class="empty-icon">
+      <i class="fa fa-filter"></i>
+    </div>
+    <h3 class="empty-title">No Matching Payments</h3>
+    <p class="empty-description">
+      Try adjusting your filters to see more results.
+    </p>
+    <ub-button
+      variant="outline"
+      size="md"
+      (click)="setStatusFilter('all'); setTypeFilter('all')"
+    >
+      Clear Filters
+    </ub-button>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && payments.length === 0">
+    <div class="empty-icon">
+      <i class="fa fa-paper-plane"></i>
+    </div>
+    <h3 class="empty-title">No Payments Yet</h3>
+    <p class="empty-description">
+      Schedule your first payment to get started. You can set up one-time or
+      recurring payments.
+    </p>
+    <ub-button variant="primary" size="md" (click)="onAddPayment()">
+      <i class="fa fa-plus"></i>
+      Create First Payment
+    </ub-button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <i class="fa fa-spinner fa-spin"></i>
+    <p>Loading payments...</p>
+  </div>
+  }
+</div>

@@ -1,11 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { User } from '@common/types';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { UbSupabaseService } from './supabase.service';
+import { LoadingKeys } from '@common/enums';
+import { UbLoadingService } from './loading.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbUserService {
+  private loadingService = inject(UbLoadingService);
+  private supabaseService = inject(UbSupabaseService);
+
   private userSubject = new BehaviorSubject<User | null>(null);
   private readonly TOKEN_KEY = 'user_token';
 
@@ -29,8 +35,16 @@ export class UbUserService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  clearSession(): void {
+  async clearSession(): Promise<void> {
+    this.loadingService.show(LoadingKeys.GLOBAL, true);
+    const token = this.getToken();
+
+    if (token) {
+      await this.supabaseService.invalidateToken(token);
+    }
+
     this.userSubject.next(null);
     localStorage.removeItem(this.TOKEN_KEY);
+    this.loadingService.hide(LoadingKeys.GLOBAL);
   }
 }

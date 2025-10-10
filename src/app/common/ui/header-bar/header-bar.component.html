@@ -31,10 +31,13 @@
         (click)="toggleProfileMenu()"
         [class.active]="showProfileMenu"
       >
-        <span class="user-initials">{{ getUserInitials() }}</span>
-        <span class="user-name"
-          >{{ currentUser.first_name }} {{ currentUser.last_name }}</span
-        >
+        <div class="user-avatar">{{ getUserInitials() }}</div>
+        <div class="user-info">
+          <span class="user-name"
+            >{{ currentUser.first_name }} {{ currentUser.last_name }}</span
+          >
+          <span class="user-role">Account Holder</span>
+        </div>
         <i
           class="fa fa-chevron-down dropdown-icon"
           [class.rotated]="showProfileMenu"
@@ -49,41 +52,52 @@
             <p class="profile-name">
               {{ currentUser.first_name }} {{ currentUser.last_name }}
             </p>
-            <p class="profile-username">{{ currentUser.username }}</p>
+            <p class="profile-email">{{ currentUser.username }}</p>
           </div>
         </div>
         <div class="profile-menu-divider"></div>
-        <ul class="profile-menu-list">
-          <li>
-            <a
-              routerLink="/profile"
-              class="profile-menu-item"
-              (click)="closeProfileMenu()"
-            >
-              <i class="fa fa-user"></i>
-              <span>My Profile</span>
-            </a>
-          </li>
-          <li>
-            <a
-              routerLink="/settings"
-              class="profile-menu-item"
-              (click)="closeProfileMenu()"
-            >
-              <i class="fa fa-cog"></i>
-              <span>Settings</span>
-            </a>
-          </li>
-        </ul>
+        <nav class="profile-menu-nav">
+          <a
+            routerLink="/profile"
+            class="profile-menu-item"
+            (click)="closeProfileMenu()"
+          >
+            <i class="fa fa-user-circle"></i>
+            <div class="item-content">
+              <span class="item-label">My Profile</span>
+              <span class="item-description">View and edit your profile</span>
+            </div>
+          </a>
+          <a
+            routerLink="/settings"
+            class="profile-menu-item"
+            (click)="closeProfileMenu()"
+          >
+            <i class="fa fa-cog"></i>
+            <div class="item-content">
+              <span class="item-label">Settings</span>
+              <span class="item-description">Manage preferences</span>
+            </div>
+          </a>
+          <a
+            routerLink="/security"
+            class="profile-menu-item"
+            (click)="closeProfileMenu()"
+          >
+            <i class="fa fa-shield-halved"></i>
+            <div class="item-content">
+              <span class="item-label">Security</span>
+              <span class="item-description">Password and 2FA</span>
+            </div>
+          </a>
+        </nav>
         <div class="profile-menu-divider"></div>
-        <ul class="profile-menu-list">
-          <li>
-            <a class="profile-menu-item logout" (click)="logout()">
-              <i class="fa fa-sign-out-alt"></i>
-              <span>Logout</span>
-            </a>
-          </li>
-        </ul>
+        <div class="profile-menu-footer">
+          <ub-button [fluid]="true" variant="error" (click)="logout()">
+            <i class="fa fa-arrow-right-from-bracket"></i>
+            <span>Sign Out</span>
+          </ub-button>
+        </div>
       </div>
       }
     </div>

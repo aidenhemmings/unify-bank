@@ -1,0 +1,38 @@
+@if(formControl) {
+<p-inputnumber
+  [inputId]="id"
+  [mode]="mode"
+  [minFractionDigits]="minFractionDigits"
+  [maxFractionDigits]="maxFractionDigits"
+  [min]="min"
+  [max]="max"
+  [prefix]="prefix"
+  [suffix]="suffix"
+  [useGrouping]="useGrouping"
+  class="input-number"
+  [disabled]="disabled"
+  [placeholder]="placeholder"
+  [formControl]="formControl"
+  autocomplete="off"
+  (blur)="onBlur()"
+/>
+} @else {
+<p-inputnumber
+  [inputId]="id"
+  [mode]="mode"
+  [minFractionDigits]="minFractionDigits"
+  [maxFractionDigits]="maxFractionDigits"
+  [min]="min"
+  [max]="max"
+  [useGrouping]="useGrouping"
+  class="input-number"
+  autocomplete="off"
+  [disabled]="disabled"
+  [placeholder]="placeholder"
+  [(ngModel)]="value"
+  (ngModelChange)="onChange($event)"
+  (blur)="onBlur()"
+  (click)="click.emit($event)"
+  (focus)="focus.emit($event)"
+/>
+}

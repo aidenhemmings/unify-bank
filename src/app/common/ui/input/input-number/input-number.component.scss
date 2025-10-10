@@ -1,0 +1,30 @@
+.input-number {
+  width: 100%;
+
+  &.p-inputnumber.p-component {
+    width: 100% !important;
+
+    .p-inputtext.p-component {
+      width: 100% !important;
+      border: 1px solid var(--gray-2100) !important;
+      border-radius: 6px !important;
+      font-size: 16px !important;
+      padding: 6px !important;
+      outline: none !important;
+      font-family: "Inter", sans-serif !important;
+
+      &:hover {
+        border-color: var(--primary-light-color) !important;
+      }
+
+      &:enabled:focus {
+        border-color: var(--primary-color) !important;
+      }
+
+      &:disabled {
+        background: var(--gray-200) !important;
+        color: var(--gray-970) !important;
+      }
+    }
+  }
+}

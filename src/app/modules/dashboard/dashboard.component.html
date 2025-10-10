@@ -1,8 +1,202 @@
-<!-- <div class="dashboard-header">
-  <span>Unify Bank Dashboard</span>
-</div>
-<br />
-<p *ngIf="user">Welcome, {{ user.first_name }} {{ user.last_name }}</p>
-<p *ngIf="user">Username: {{ user.username }}</p> -->
+<div class="dashboard-container">
+  <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+  @if (!loading) {
+  <div class="welcome-section">
+    <div class="welcome-text">
+      <h1 class="welcome-title">
+        Welcome back, {{ user.first_name || "User" }}!
+      </h1>
+      <p class="welcome-subtitle">
+        Here's what's happening with your accounts today.
+      </p>
+    </div>
+    <div class="date-info">
+      <i class="fa fa-calendar"></i>
+      <span>{{ formatDate(currentDate) }}</span>
+    </div>
+  </div>
 
-<ub-user-profile></ub-user-profile>
+  <div class="balance-card">
+    <div class="balance-header">
+      <div class="balance-label">
+        <i class="fa fa-wallet"></i>
+        <span>Total Balance</span>
+      </div>
+      <div class="balance-actions">
+        <button
+          class="icon-btn"
+          pTooltip="Refresh"
+          tooltipPosition="top"
+          (click)="loadDashboardData()"
+        >
+          <i class="fa fa-rotate"></i>
+        </button>
+      </div>
+    </div>
+    <div class="balance-amount">
+      {{ formatCurrency(totalBalance) }}
+    </div>
+    <div class="balance-footer">
+      <span class="balance-accounts"
+        >Across {{ accounts.length }} accounts</span
+      >
+    </div>
+  </div>
+
+  <div class="quick-actions-section">
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="quick-actions-grid">
+      <button
+        *ngFor="let action of quickActions"
+        class="quick-action-card"
+        [class]="'action-' + action.color"
+        (click)="handleQuickAction(action)"
+      >
+        <div class="action-icon">
+          <i class="fa" [class]="action.icon"></i>
+        </div>
+        <span class="action-label">{{ action.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="card accounts-section">
+      <div class="card-header">
+        <h2 class="card-title">
+          <i class="fa fa-building-columns"></i>
+          My Accounts
+        </h2>
+        <button class="text-btn" (click)="navigateTo('/accounts')">
+          View All <i class="fa fa-arrow-right"></i>
+        </button>
+      </div>
+      <div class="accounts-list">
+        <div *ngIf="accounts.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="fa fa-building-columns"></i>
+          </div>
+          <h3 class="empty-title">No Accounts Found</h3>
+          <p class="empty-description">
+            You don't have any accounts yet. Create your first account to get
+            started.
+          </p>
+          <ub-button variant="primary" (click)="navigateTo('/accounts')">
+            <i class="fa fa-plus"></i>
+            Create Account
+          </ub-button>
+        </div>
+
+        <div *ngFor="let account of accounts" class="account-item">
+          <div
+            class="account-icon"
+            [class]="'account-' + account.type.toLowerCase()"
+          >
+            <i
+              class="fa"
+              [ngClass]="{
+                'fa-building-columns': account.type === 'Checking',
+                'fa-piggy-bank': account.type === 'Savings',
+                'fa-briefcase': account.type === 'Business'
+              }"
+            ></i>
+          </div>
+          <div class="account-details">
+            <div class="account-name">{{ account.name }}</div>
+            <div class="account-number">{{ account.account_number }}</div>
+          </div>
+          <div class="account-balance">
+            <div class="balance">{{ formatCurrency(account.balance) }}</div>
+            <div class="account-type">{{ account.type }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card transactions-section">
+      <div class="card-header">
+        <h2 class="card-title">
+          <i class="fa fa-clock-rotate-left"></i>
+          Recent Transactions
+        </h2>
+        <button class="text-btn" (click)="navigateTo('/transactions')">
+          View All <i class="fa fa-arrow-right"></i>
+        </button>
+      </div>
+      <div class="transactions-list">
+        <div *ngIf="recentTransactions.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="fa fa-clock-rotate-left"></i>
+          </div>
+          <h3 class="empty-title">No Transactions Yet</h3>
+          <p class="empty-description">
+            Your recent transactions will appear here once you start using your
+            accounts.
+          </p>
+        </div>
+
+        <div
+          *ngFor="let transaction of recentTransactions"
+          class="transaction-item"
+        >
+          <div class="transaction-icon" [class]="transaction.type">
+            <i
+              class="fa"
+              [class]="getTransactionIcon(transaction.category)"
+            ></i>
+          </div>
+          <div class="transaction-details">
+            <div class="transaction-description">
+              {{ transaction.description }}
+            </div>
+            <div class="transaction-meta">
+              <span class="transaction-account">
+                <i class="fa fa-building-columns"></i>
+                {{ getAccountName(transaction.account_id) }}
+              </span>
+              <span class="transaction-separator">•</span>
+              <span class="transaction-date">
+                {{ formatDate(transaction.date) }}
+              </span>
+            </div>
+          </div>
+          <div class="transaction-amount" [class]="transaction.type">
+            {{ transaction.type === "credit" ? "+" : ""
+            }}{{ formatCurrency(transaction.amount) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon income">
+        <i class="fa fa-arrow-trend-up"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Income This Month</div>
+        <div class="stat-value">{{ formatCurrency(monthlyIncome) }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon expense">
+        <i class="fa fa-arrow-trend-down"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Expenses This Month</div>
+        <div class="stat-value">{{ formatCurrency(monthlyExpenses) }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <i class="fa fa-clock"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Pending Payments</div>
+        <div class="stat-value">{{ pendingPaymentsCount }}</div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

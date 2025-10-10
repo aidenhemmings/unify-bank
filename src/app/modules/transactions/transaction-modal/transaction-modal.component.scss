@@ -1,0 +1,280 @@
+.transaction-modal {
+  width: 100%;
+  background: var(--white);
+
+  .modal-header {
+    padding: 2rem;
+    border-radius: 12px;
+    background: var(--gradient-main);
+    color: var(--natural-white);
+
+    @media (max-width: 1024px) {
+      padding: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      padding: 1rem;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+
+      .header-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--white);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+
+        i {
+          font-size: 1.75rem;
+          background: var(--gradient-main);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+      }
+
+      .header-text {
+        flex: 1;
+
+        .modal-title {
+          margin: 0 0 0.375rem 0;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--white);
+          letter-spacing: -0.5px;
+        }
+
+        .modal-subtitle {
+          margin: 0;
+          font-size: 0.9375rem;
+          color: var(--gray-100);
+          opacity: 0.95;
+        }
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 2rem;
+
+    @media (max-width: 1024px) {
+      padding: 2rem 0 0 0;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0 0 1.25rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.8125rem;
+
+        i {
+          color: var(--primary-color);
+          font-size: 1rem;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .form-label {
+          display: block;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--gray-900);
+          margin-bottom: 0.5rem;
+
+          .required {
+            color: var(--red-light);
+            margin-left: 0.25rem;
+          }
+        }
+
+        .field-hint {
+          font-size: 0.75rem;
+          color: var(--gray-600);
+          margin-top: 0.375rem;
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+
+          i {
+            font-size: 0.6875rem;
+          }
+        }
+
+        .error-message {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          color: var(--red-light);
+          font-size: 0.8125rem;
+          margin-top: 0.5rem;
+          font-weight: 500;
+
+          i {
+            font-size: 0.875rem;
+          }
+        }
+
+        .invalid {
+          border-color: var(--red-light) !important;
+
+          &:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+          }
+        }
+      }
+    }
+
+    .transaction-summary {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(
+        135deg,
+        var(--primary-light) 0%,
+        var(--gray-100) 100%
+      );
+      border-radius: 12px;
+      border: 2px solid var(--primary-color);
+
+      .summary-header {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        margin-bottom: 1rem;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        i {
+          font-size: 1.125rem;
+        }
+      }
+
+      .summary-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        .summary-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.625rem 0;
+          border-bottom: 1px solid var(--gray-200);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .summary-label {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            font-weight: 500;
+          }
+
+          .summary-value {
+            font-size: 0.9375rem;
+            color: var(--gray-900);
+            font-weight: 600;
+
+            &.amount {
+              font-size: 1.25rem;
+              font-weight: 700;
+
+              &.credit {
+                color: var(--success-color);
+              }
+
+              &.debit {
+                color: var(--red-light);
+              }
+            }
+
+            i {
+              margin-right: 0.5rem;
+              color: var(--primary-color);
+            }
+          }
+        }
+      }
+    }
+
+    .transaction-info {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--gray-100);
+      border-radius: 12px;
+
+      .info-section {
+        .section-title {
+          font-size: 0.9375rem;
+          font-weight: 700;
+          color: var(--gray-900);
+          margin: 0 0 1rem 0;
+          padding-bottom: 0.75rem;
+          border-bottom: 2px solid var(--gray-300);
+        }
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+
+          @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+          }
+
+          .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .info-label {
+              font-size: 0.75rem;
+              color: var(--gray-600);
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+
+            .info-value {
+              font-size: 0.875rem;
+              color: var(--gray-900);
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,121 @@
+<div class="accounts-container">
+  <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+  @if (!loading) {
+  <div class="accounts-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fa fa-building-columns"></i>
+        My Accounts
+      </h1>
+      <p class="page-subtitle">Manage and monitor all your bank accounts</p>
+    </div>
+    <ub-button variant="primary" size="md" (click)="onAddAccount()">
+      <i class="fa fa-plus"></i>
+      Add Account
+    </ub-button>
+  </div>
+
+  <div class="summary-card">
+    <div class="summary-content">
+      <div class="summary-label">
+        <i class="fa fa-wallet"></i>
+        Total Balance
+      </div>
+      <div class="summary-amount">{{ formatCurrency(totalBalance) }}</div>
+      <div class="summary-detail">
+        Across {{ accounts.length }}
+        {{ accounts.length === 1 ? "account" : "accounts" }}
+      </div>
+    </div>
+  </div>
+
+  <div class="accounts-grid" *ngIf="!loading && accounts.length > 0">
+    <div
+      *ngFor="let account of accounts"
+      class="account-card"
+      [class.inactive]="!account.is_active"
+    >
+      <div class="account-header">
+        <div
+          class="account-icon-wrapper"
+          [class]="'account-' + account.type.toLowerCase()"
+        >
+          <i class="fa" [class]="getAccountIcon(account.type)"></i>
+        </div>
+        <div
+          class="account-status"
+          [class]="getStatusClass(account.is_active ?? true)"
+        >
+          <span class="status-dot"></span>
+          {{ getStatusText(account.is_active ?? true) }}
+        </div>
+      </div>
+
+      <div class="account-body">
+        <h3 class="account-name">{{ account.name }}</h3>
+        <div class="account-number">{{ account.account_number }}</div>
+        <div class="account-type-badge">{{ account.type }}</div>
+      </div>
+
+      <div class="account-balance-section">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance-amount">{{ formatCurrency(account.balance) }}</div>
+      </div>
+
+      <div class="account-footer">
+        <div
+          class="account-meta"
+          *ngIf="account.updated_at || account.created_at"
+        >
+          <i class="fa fa-clock"></i>
+          <span
+            >Updated
+            {{
+              formatDate(account.updated_at || account.created_at || "")
+            }}</span
+          >
+        </div>
+      </div>
+
+      <div class="account-actions">
+        <ub-button variant="outline" size="sm" (click)="onViewDetails(account)">
+          <i class="fa fa-eye"></i>
+          View
+        </ub-button>
+        <ub-button variant="outline" size="sm" (click)="onEditAccount(account)">
+          <i class="fa fa-pen"></i>
+          Edit
+        </ub-button>
+        <ub-button
+          [variant]="account.is_active ? 'error' : 'primary'"
+          size="sm"
+          (click)="onToggleStatus(account)"
+        >
+          <i class="fa" [class]="account.is_active ? 'fa-ban' : 'fa-check'"></i>
+          {{ account.is_active ? "Deactivate" : "Activate" }}
+        </ub-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && accounts.length === 0">
+    <div class="empty-icon">
+      <i class="fa fa-building-columns"></i>
+    </div>
+    <h3 class="empty-title">No Accounts Yet</h3>
+    <p class="empty-description">
+      Get started by creating your first bank account. You can manage multiple
+      accounts all in one place.
+    </p>
+    <ub-button variant="primary" size="md" (click)="onAddAccount()">
+      <i class="fa fa-plus"></i>
+      Create Your First Account
+    </ub-button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <i class="fa fa-spinner fa-spin"></i>
+    <p>Loading accounts...</p>
+  </div>
+  }
+</div>

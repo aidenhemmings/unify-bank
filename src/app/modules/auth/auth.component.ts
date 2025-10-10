@@ -34,6 +34,7 @@ export class UbAuthComponent {
   });
 
   loginError = '';
+  isLoading = false;
 
   async login(): Promise<void> {
     if (
@@ -44,6 +45,9 @@ export class UbAuthComponent {
       return;
     }
 
+    this.isLoading = true;
+    this.loginError = '';
+
     const { username, password } = this.form.value;
     const { user, token, error } = await this.supabaseService.signIn(
       username,
@@ -52,9 +56,11 @@ export class UbAuthComponent {
 
     if (error) {
       this.loginError = error.message;
+      this.isLoading = false;
     } else if (user && token) {
       this.loginError = '';
       this.userService.setToken(token);
+      await this.supabaseService.setToken(token);
       this.userService.setCurrentUser(user);
       this.router.navigate(['dashboard']);
     }

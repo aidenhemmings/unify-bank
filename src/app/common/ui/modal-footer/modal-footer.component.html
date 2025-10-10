@@ -1,0 +1,17 @@
+<div *ngIf="isFooterVisible" class="modal-footer-container">
+  <ub-button
+    *ngIf="showCancel"
+    [variant]="cancelVariant"
+    size="sm"
+    (click)="cancel()"
+    >{{ cancelText }}</ub-button
+  >
+  <ub-button
+    *ngIf="showConfirm"
+    [variant]="confirmVariant"
+    size="sm"
+    (click)="confirm()"
+    [disabled]="disabled"
+    >{{ confirmText }}</ub-button
+  >
+</div>
