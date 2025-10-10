@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 import { UbAuthComponent, UbDashboardComponent } from './modules';
-import { UbAuthGuard } from './common';
+import { UbAuthGuard, UbGuestGuard } from './common';
 
 export const routes: Routes = [
   {
     path: 'auth/login',
     component: UbAuthComponent,
-    canActivate: [],
+    canActivate: [UbGuestGuard],
     data: {
       breadcrumb: 'Auth',
     },

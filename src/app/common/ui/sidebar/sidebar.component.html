@@ -1,0 +1,94 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <img
+        src="UnifyBanking-Logo-Transparent.png"
+        alt="Unify Banking"
+        class="logo"
+      />
+    </div>
+    <button
+      class="toggle-btn"
+      (click)="toggleSidebar()"
+      aria-label="Toggle Sidebar"
+    >
+      <i class="fa" [ngClass]="isCollapsed ? 'fa-bars' : 'fa-times'"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="menu-list">
+      @for (item of menuItems; track item.id) {
+      <li class="menu-item" *ngIf="item.visible !== false">
+        @if (!item.children || item.children.length === 0) {
+        <a
+          [routerLink]="
+            item.prefix
+              ? item.suffix
+                ? [item.prefix, item.routerLink, item.suffix]
+                : [item.prefix, item.routerLink]
+              : item.suffix
+              ? ['/', item.routerLink, item.suffix]
+              : ['/', item.routerLink]
+          "
+          routerLinkActive="active"
+          class="menu-link"
+          [title]="item.label"
+        >
+          <i class="fa menu-icon" [ngClass]="item.icon"></i>
+          <span class="menu-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+        </a>
+        } @if (item.children && item.children.length > 0) {
+        <div class="menu-parent">
+          <button
+            class="menu-link parent-link"
+            (click)="toggleMenuItem(item.id)"
+            [class.expanded]="isExpanded(item.id)"
+            [title]="item.label"
+          >
+            <i class="fa menu-icon" [ngClass]="item.icon"></i>
+            <span class="menu-label" *ngIf="!isCollapsed">{{
+              item.label
+            }}</span>
+            <i
+              class="fa fa-chevron-down expand-icon"
+              *ngIf="!isCollapsed"
+              [class.rotated]="isExpanded(item.id)"
+            ></i>
+          </button>
+
+          @if (isExpanded(item.id) && !isCollapsed) {
+          <ul class="dropdown-menu">
+            @for (child of item.children; track child.id) {
+            <li *ngIf="child.visible !== false">
+              <a
+                [routerLink]="
+                  child.prefix
+                    ? child.suffix
+                      ? [child.prefix, child.routerLink, child.suffix]
+                      : [child.prefix, child.routerLink]
+                    : child.suffix
+                    ? ['/', child.routerLink, child.suffix]
+                    : ['/', child.routerLink]
+                "
+                routerLinkActive="active"
+                class="dropdown-child"
+              >
+                <i class="fa" [ngClass]="child.icon"></i>
+                <span>{{ child.label }}</span>
+              </a>
+            </li>
+            }
+          </ul>
+          }
+        </div>
+        }
+      </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <p class="footer-text">© 2025 Unify Banking</p>
+  </div>
+</aside>

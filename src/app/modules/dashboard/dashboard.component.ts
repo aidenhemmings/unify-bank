@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { UbSupabaseService, UbUserService } from '@common/services';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { User as SupabaseUser } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { User } from '@common/types';
 import { UbUserProfileComponent } from '@common/ui';
 
 @UntilDestroy({ checkProperties: true })
@@ -18,7 +18,7 @@ export class UbDashboardComponent {
   private supabaseService = inject(UbSupabaseService);
   private router = inject(Router);
 
-  user!: SupabaseUser;
+  user!: User;
 
   constructor() {
     this.userService.currentUser
@@ -31,10 +31,13 @@ export class UbDashboardComponent {
   }
 
   async logout(): Promise<void> {
-    const { error } = await this.supabaseService.signOut();
-    if (!error) {
-      this.userService.clearUser();
-      this.router.navigate(['/auth/login']);
+    const token = this.userService.getToken();
+
+    if (token) {
+      await this.supabaseService.invalidateToken(token);
     }
+
+    this.userService.clearSession();
+    this.router.navigate(['/auth/login']);
   }
 }

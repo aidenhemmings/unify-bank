@@ -29,7 +29,7 @@ export class UbAuthComponent {
   private userService = inject(UbUserService);
 
   form = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    username: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
 
@@ -38,18 +38,23 @@ export class UbAuthComponent {
   async login(): Promise<void> {
     if (
       this.form.invalid ||
-      !this.form.value.email ||
+      !this.form.value.username ||
       !this.form.value.password
     ) {
       return;
     }
 
-    const { email, password } = this.form.value;
-    const { user, error } = await this.supabaseService.signIn(email, password);
+    const { username, password } = this.form.value;
+    const { user, token, error } = await this.supabaseService.signIn(
+      username,
+      password
+    );
+
     if (error) {
       this.loginError = error.message;
-    } else if (user) {
+    } else if (user && token) {
       this.loginError = '';
+      this.userService.setToken(token);
       this.userService.setCurrentUser(user);
       this.router.navigate(['dashboard']);
     }

@@ -18,13 +18,13 @@
 
       <form [formGroup]="form" class="login-form">
         <div class="form-group">
-          <label for="email" class="form-label">Email</label>
+          <label for="username" class="form-label">Username</label>
           <ub-input-text
-            type="email"
-            placeholder="Enter your email"
-            [control]="form | getControl : 'email'"
+            type="text"
+            placeholder="Enter your username"
+            [control]="form | getControl : 'username'"
             [class.invalid]="
-              form.get('email')?.invalid && form.get('email')?.touched
+              form.get('username')?.invalid && form.get('username')?.touched
             "
           />
         </div>

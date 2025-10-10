@@ -1,3 +1,6 @@
-<ub-user-profile>
-  
-</ub-user-profile>
+<div class="dashboard-header">
+  <span>Unify Bank Dashboard</span>
+</div>
+<br />
+<p *ngIf="user">Welcome, {{ user.first_name }} {{ user.last_name }}</p>
+<p *ngIf="user">Username: {{ user.username }}</p>
