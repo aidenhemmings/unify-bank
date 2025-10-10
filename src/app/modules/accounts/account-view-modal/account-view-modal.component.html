@@ -1,0 +1,150 @@
+<div class="account-view-modal">
+  <div class="modal-header">
+    <div class="header-content">
+      <div
+        class="header-icon"
+        [ngClass]="'icon-' + (account.type || '').toLowerCase()"
+      >
+        <i class="fa" [class]="getAccountIcon(account.type)"></i>
+      </div>
+      <div class="header-text">
+        <h2 class="modal-title">{{ account.name }}</h2>
+        <p class="modal-subtitle">
+          {{ account.type }} Account • {{ account.account_number }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-body">
+    <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+
+    @if (!loading) {
+    <div class="balance-section">
+      <div class="balance-card">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance-amount">
+          {{ formatCurrency(account.balance || 0) }}
+        </div>
+        <div class="balance-currency">{{ account.currency }}</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item income">
+          <div class="stat-icon">
+            <i class="fa fa-arrow-trend-up"></i>
+          </div>
+          <div class="stat-details">
+            <div class="stat-label">Total Income</div>
+            <div class="stat-value">{{ formatCurrency(totalIncome) }}</div>
+          </div>
+        </div>
+        <div class="stat-item expense">
+          <div class="stat-icon">
+            <i class="fa fa-arrow-trend-down"></i>
+          </div>
+          <div class="stat-details">
+            <div class="stat-label">Total Expenses</div>
+            <div class="stat-value">{{ formatCurrency(totalExpenses) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="details-section">
+      <h3 class="section-title">Account Information</h3>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Account Type:</span>
+          <span class="detail-value">{{ account.type }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Account Number:</span>
+          <span class="detail-value">{{ account.account_number }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Currency:</span>
+          <span class="detail-value">{{ account.currency }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">
+            <span
+              class="status-badge"
+              [class.active]="account.is_active"
+              [class.inactive]="!account.is_active"
+            >
+              {{ account.is_active ? "Active" : "Inactive" }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item" *ngIf="account.created_at">
+          <span class="detail-label">Created:</span>
+          <span class="detail-value">{{ formatDate(account.created_at) }}</span>
+        </div>
+        <div class="detail-item" *ngIf="account.updated_at">
+          <span class="detail-label">Last Updated:</span>
+          <span class="detail-value">{{ formatDate(account.updated_at) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="transactions-section">
+      <h3 class="section-title">
+        <i class="fa fa-clock-rotate-left"></i>
+        Transaction History
+        <span class="transaction-count">({{ transactions.length }})</span>
+      </h3>
+
+      <div class="transactions-list" *ngIf="transactions.length > 0">
+        <div *ngFor="let transaction of transactions" class="transaction-item">
+          <div class="transaction-icon" [class]="transaction.type">
+            <i
+              class="fa"
+              [class]="getTransactionIcon(transaction.category)"
+            ></i>
+          </div>
+
+          <div class="transaction-details">
+            <div class="transaction-description">
+              {{ transaction.description }}
+            </div>
+            <div class="transaction-meta">
+              <span class="transaction-category">
+                <i class="fa fa-tag"></i>
+                {{ transaction.category }}
+              </span>
+              <span class="transaction-separator">•</span>
+              <span class="transaction-date">
+                {{ formatDate(transaction.created_at || transaction.date) }}
+              </span>
+              <span class="transaction-separator">•</span>
+              <span
+                class="transaction-status"
+                [class]="getStatusClass(transaction.status || 'completed')"
+              >
+                {{ getStatusText(transaction.status || "completed") }}
+              </span>
+            </div>
+          </div>
+
+          <div class="transaction-amount" [class]="transaction.type">
+            {{ transaction.type === "credit" ? "+" : "-"
+            }}{{ formatCurrency(transaction.amount) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="transactions.length === 0">
+        <div class="empty-icon">
+          <i class="fa fa-clock-rotate-left"></i>
+        </div>
+        <h4 class="empty-title">No Transactions Yet</h4>
+        <p class="empty-description">
+          This account doesn't have any transaction history yet.
+        </p>
+      </div>
+    </div>
+    }
+  </div>
+</div>

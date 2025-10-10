@@ -17,6 +17,7 @@ import { AppComponent } from '../../app.component';
 import { LoadingKeys, ModalResponseTypes } from '@common/enums';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UbAccountModalComponent } from './account-modal';
+import { UbAccountViewModalComponent } from './account-view-modal';
 import { ModalResponse } from '@common/types/modal-response.type';
 
 @UntilDestroy({ checkProperties: true })
@@ -176,7 +177,20 @@ export class UbAccountsComponent {
   }
 
   onViewDetails(account: Account): void {
-    this.toastService.info('Info', 'View details for account.');
+    this.ref = this.dialogService.open(UbAccountViewModalComponent, {
+      data: {
+        account: account,
+      },
+      modal: true,
+      width: '60vw',
+      closable: true,
+      baseZIndex: 6000,
+      breakpoints: {
+        '1700px': '70vw',
+        '1400px': '85vw',
+        '960px': '95vw',
+      },
+    });
   }
 
   onEditAccount(account: Account): void {

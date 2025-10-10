@@ -18,6 +18,7 @@ import { AppComponent } from '../../app.component';
 import { LoadingKeys, ModalResponseTypes } from '@common/enums';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UbPaymentModalComponent } from './payment-modal';
+import { UbPaymentViewModalComponent } from './payment-view-modal';
 import { ModalResponse } from '@common/types/modal-response.type';
 
 @UntilDestroy({ checkProperties: true })
@@ -272,7 +273,21 @@ export class UbPaymentsComponent {
   }
 
   onViewDetails(payment: Payment): void {
-    console.log('View payment details:', payment);
+    this.ref = this.dialogService.open(UbPaymentViewModalComponent, {
+      data: {
+        payment: payment,
+        accounts: this.accounts,
+      },
+      modal: true,
+      width: '50vw',
+      closable: true,
+      baseZIndex: 6000,
+      breakpoints: {
+        '1700px': '65vw',
+        '1400px': '80vw',
+        '960px': '90vw',
+      },
+    });
   }
 
   async onCancelPayment(payment: Payment): Promise<void> {
