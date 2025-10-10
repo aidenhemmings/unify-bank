@@ -211,3 +211,9 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--primary-color) var(--gray-100);
 }
+
+@media (max-width: 768px) {
+  .p-toast {
+    width: 70% !important;
+  }
+}

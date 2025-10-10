@@ -5,6 +5,8 @@ import { UbBreadcrumbService, UbUserService } from '@common/services';
 import { Breadcrumb, User } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { UbButtonComponent } from '../button';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { UbUserSettingsModalComponent } from '../user-settings-modal/user-settings-modal.component';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
@@ -12,15 +14,19 @@ import { UbButtonComponent } from '../button';
   imports: [CommonModule, RouterLink, UbButtonComponent],
   templateUrl: './header-bar.component.html',
   styleUrl: './header-bar.component.scss',
+  providers: [DialogService],
 })
 export class UbHeaderBarComponent implements OnInit {
   private breadcrumbService = inject(UbBreadcrumbService);
   private userService = inject(UbUserService);
   private router = inject(Router);
+  private dialogService = inject(DialogService);
 
   breadcrumbs: Breadcrumb[] = [];
   currentUser: User | null = null;
   showProfileMenu = false;
+
+  ref!: DynamicDialogRef | null;
 
   ngOnInit() {
     this.breadcrumbService.breadcrumbs$
@@ -50,6 +56,21 @@ export class UbHeaderBarComponent implements OnInit {
 
   toggleProfileMenu() {
     this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  openSettings(): void {
+    this.closeProfileMenu();
+    this.ref = this.dialogService.open(UbUserSettingsModalComponent, {
+      modal: true,
+      width: '60vw',
+      closable: true,
+      baseZIndex: 6000,
+      breakpoints: {
+        '1700px': '70vw',
+        '1400px': '85vw',
+        '960px': '95vw',
+      },
+    });
   }
 
   async logout(): Promise<void> {

@@ -84,7 +84,7 @@ export class AppComponent implements OnInit {
         const { user } = await this.supabaseService.getUserById(userId);
 
         if (user) {
-          this.userService.setCurrentUser(user);
+          await this.userService.setCurrentUser(user);
           this.loadingService.hide(this.loaderKey);
           return;
         } else {

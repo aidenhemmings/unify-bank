@@ -58,7 +58,7 @@
         <div class="profile-menu-divider"></div>
         <nav class="profile-menu-nav">
           <a
-            routerLink="/profile"
+            routerLink="/user-profile"
             class="profile-menu-item"
             (click)="closeProfileMenu()"
           >
@@ -68,11 +68,7 @@
               <span class="item-description">View and edit your profile</span>
             </div>
           </a>
-          <a
-            routerLink="/settings"
-            class="profile-menu-item"
-            (click)="closeProfileMenu()"
-          >
+          <a class="profile-menu-item" (click)="openSettings()">
             <i class="fa fa-cog"></i>
             <div class="item-content">
               <span class="item-label">Settings</span>

@@ -6,3 +6,4 @@ export * from './loader';
 export * from './modal-footer';
 export * from './select';
 export * from './user-profile';
+export * from './user-settings-modal';
