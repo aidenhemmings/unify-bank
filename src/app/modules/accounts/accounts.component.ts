@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   UbAccountsService,
   UbLoadingService,
+  UbToastService,
   UbUserService,
 } from '@common/services';
 import { Account, User } from '@common/types';
@@ -31,6 +32,7 @@ export class UbAccountsComponent {
   private accountsService = inject(UbAccountsService);
   private loadingService = inject(UbLoadingService);
   private dialogService = inject(DialogService);
+  private toastService = inject(UbToastService);
 
   readonly currencyConfig = AppComponent.CURRENCY_CONFIG;
 
@@ -66,7 +68,7 @@ export class UbAccountsComponent {
     );
 
     if (error) {
-      console.error('Error loading accounts:', error);
+      this.toastService.error('Error', 'Failed to load accounts.');
       this.loadingService.hide(this.loaderKey);
       return;
     }
@@ -164,17 +166,17 @@ export class UbAccountsComponent {
     });
 
     if (error) {
-      console.error('Error creating account:', error);
+      this.toastService.error('Error', 'Failed to create account.');
       this.loadingService.hide(this.loaderKey);
       return;
     }
 
-    console.log('Account created successfully:', account);
+    this.toastService.success('Success', 'Account created successfully.');
     await this.loadAccounts();
   }
 
   onViewDetails(account: Account): void {
-    console.log('View details for account:', account);
+    this.toastService.info('Info', 'View details for account.');
   }
 
   onEditAccount(account: Account): void {
@@ -218,12 +220,12 @@ export class UbAccountsComponent {
     });
 
     if (error) {
-      console.error('Error updating account:', error);
+      this.toastService.error('Error', 'Failed to update account.');
       this.loadingService.hide(this.loaderKey);
       return;
     }
 
-    console.log('Account updated successfully:', account);
+    this.toastService.info('Success', 'Account updated successfully.');
     await this.loadAccounts();
   }
 
@@ -233,7 +235,7 @@ export class UbAccountsComponent {
     });
 
     if (error) {
-      console.error('Error updating account status:', error);
+      this.toastService.error('Error', 'Failed to update account status.');
       return;
     }
 

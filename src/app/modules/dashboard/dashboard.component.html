@@ -23,7 +23,12 @@
         <span>Total Balance</span>
       </div>
       <div class="balance-actions">
-        <button class="icon-btn" title="Refresh">
+        <button
+          class="icon-btn"
+          pTooltip="Refresh"
+          tooltipPosition="top"
+          (click)="loadDashboardData()"
+        >
           <i class="fa fa-rotate"></i>
         </button>
       </div>
@@ -49,7 +54,7 @@
         *ngFor="let action of quickActions"
         class="quick-action-card"
         [class]="'action-' + action.color"
-        (click)="navigateTo(action.route)"
+        (click)="handleQuickAction(action)"
       >
         <div class="action-icon">
           <i class="fa" [class]="action.icon"></i>
@@ -148,8 +153,15 @@
             <div class="transaction-description">
               {{ transaction.description }}
             </div>
-            <div class="transaction-date">
-              {{ formatDate(transaction.date) }}
+            <div class="transaction-meta">
+              <span class="transaction-account">
+                <i class="fa fa-building-columns"></i>
+                {{ getAccountName(transaction.account_id) }}
+              </span>
+              <span class="transaction-separator">•</span>
+              <span class="transaction-date">
+                {{ formatDate(transaction.date) }}
+              </span>
             </div>
           </div>
           <div class="transaction-amount" [class]="transaction.type">

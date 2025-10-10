@@ -108,4 +108,38 @@ export class UbAccountsService {
     );
     return { balance, error: null };
   }
+
+  async updateAccountBalance(
+    accountId: string,
+    amount: number,
+    type: 'credit' | 'debit'
+  ): Promise<{ account: Account | null; error: any }> {
+    const client = this.supabaseService.getSupabaseClient();
+
+    const { account, error: fetchError } = await this.getAccountById(accountId);
+
+    if (fetchError || !account) {
+      return {
+        account: null,
+        error: fetchError || new Error('Account not found'),
+      };
+    }
+
+    const currentBalance = account.balance || 0;
+    const newBalance =
+      type === 'credit' ? currentBalance + amount : currentBalance - amount;
+
+    const { data, error } = await client
+      .from('accounts')
+      .update({ balance: newBalance })
+      .eq('id', accountId)
+      .select()
+      .single();
+
+    if (error) {
+      return { account: null, error };
+    }
+
+    return { account: data as Account, error: null };
+  }
 }

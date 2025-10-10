@@ -647,9 +647,41 @@
                 }
               }
 
-              .transaction-date {
+              .transaction-meta {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
                 font-size: 0.8125rem;
                 color: var(--gray-970);
+
+                @media (max-width: 640px) {
+                  flex-direction: column;
+                  align-items: flex-start;
+                  gap: 0.25rem;
+                }
+
+                .transaction-account {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.25rem;
+
+                  i {
+                    font-size: 0.75rem;
+                    color: var(--primary-color);
+                  }
+                }
+
+                .transaction-separator {
+                  @media (max-width: 640px) {
+                    display: none;
+                  }
+                }
+
+                .transaction-date {
+                  @media (max-width: 640px) {
+                    font-size: 0.75rem;
+                  }
+                }
               }
             }
 

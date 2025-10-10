@@ -56,11 +56,9 @@ export class UbPaymentsService {
       .single();
 
     if (error) {
-      console.error('[PaymentsService] Insert error:', error);
       return { payment: null, error };
     }
 
-    console.log('[PaymentsService] Payment created:', data);
     return { payment: data as Payment, error: null };
   }
 
@@ -139,18 +137,14 @@ export class UbPaymentsService {
   ): Promise<{ result: any; error: any }> {
     const client = this.supabaseService.getSupabaseClient();
 
-    console.log('[PaymentsService] Processing payment:', paymentId);
-
     const { data, error } = await client.rpc('process_payment', {
       payment_id_param: paymentId,
     });
 
     if (error) {
-      console.error('[PaymentsService] Process payment error:', error);
       return { result: null, error };
     }
 
-    console.log('[PaymentsService] Payment processed:', data);
     return { result: data, error: null };
   }
 

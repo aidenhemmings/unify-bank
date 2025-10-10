@@ -4,6 +4,7 @@ import {
   UbLoadingService,
   UbPaymentsService,
   UbSupabaseService,
+  UbToastService,
   UbTransactionsService,
   UbUserService,
 } from '@common/services';
@@ -11,16 +12,25 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Account, QuickAction, Transaction, User } from '@common/types';
-import { UbButtonComponent, UbLoaderComponent } from '@common/ui';
+import {
+  UbButtonComponent,
+  UbLoaderComponent,
+  UbModalFooterComponent,
+} from '@common/ui';
 import { AppComponent } from '../../app.component';
-import { LoadingKeys } from '@common/enums';
+import { LoadingKeys, ModalResponseTypes } from '@common/enums';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { UbPaymentModalComponent } from '../payments/payment-modal';
+import { ModalResponse } from '@common/types/modal-response.type';
+import { TooltipModule } from 'primeng/tooltip';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [CommonModule, UbButtonComponent, UbLoaderComponent],
+  imports: [CommonModule, UbButtonComponent, UbLoaderComponent, TooltipModule],
+  providers: [DialogService],
 })
 export class UbDashboardComponent {
   private userService = inject(UbUserService);
@@ -30,8 +40,12 @@ export class UbDashboardComponent {
   private transactionsService = inject(UbTransactionsService);
   private paymentsService = inject(UbPaymentsService);
   private router = inject(Router);
+  private toastService = inject(UbToastService);
+  private dialogService = inject(DialogService);
 
   readonly currencyConfig = AppComponent.CURRENCY_CONFIG;
+
+  ref: DynamicDialogRef | undefined;
 
   user!: User;
   accounts: Account[] = [];
@@ -61,7 +75,7 @@ export class UbDashboardComponent {
       });
   }
 
-  private async loadDashboardData(): Promise<void> {
+  async loadDashboardData(): Promise<void> {
     this.loadingService.show(this.loaderKey);
 
     try {
@@ -74,7 +88,7 @@ export class UbDashboardComponent {
 
       this.setupQuickActions();
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      this.toastService.error('Error', 'Failed to load dashboard data.');
     } finally {
       this.loadingService.hide(this.loaderKey);
     }
@@ -86,7 +100,7 @@ export class UbDashboardComponent {
     );
 
     if (error) {
-      console.error('Error loading accounts:', error);
+      this.toastService.error('Error', 'Failed to load accounts.');
       return;
     }
 
@@ -102,7 +116,7 @@ export class UbDashboardComponent {
       await this.transactionsService.getAllTransactionsForUser(this.user.id, 5);
 
     if (error) {
-      console.error('Error loading transactions:', error);
+      this.toastService.error('Error', 'Failed to load transactions.');
       return;
     }
 
@@ -119,7 +133,7 @@ export class UbDashboardComponent {
       );
 
     if (error) {
-      console.error('Error loading monthly stats:', error);
+      this.toastService.error('Error', 'Failed to load monthly stats.');
       return;
     }
 
@@ -133,7 +147,7 @@ export class UbDashboardComponent {
     );
 
     if (error) {
-      console.error('Error loading pending payments:', error);
+      this.toastService.error('Error', 'Failed to load pending payments.');
       return;
     }
 
@@ -145,7 +159,6 @@ export class UbDashboardComponent {
       {
         icon: 'fa-paper-plane',
         label: 'Send Payment',
-        route: '/payments',
         color: 'primary',
       },
       {
@@ -194,16 +207,120 @@ export class UbDashboardComponent {
     this.router.navigate([route]);
   }
 
+  handleQuickAction(action: QuickAction): void {
+    if (action.label === 'Send Payment') {
+      this.onAddPayment();
+    } else {
+      this.router.navigate([action.route]);
+    }
+  }
+
+  onAddPayment(): void {
+    this.ref = this.dialogService.open(UbPaymentModalComponent, {
+      data: {
+        accounts: this.accounts,
+      },
+      modal: true,
+      width: '50vw',
+      closable: true,
+      baseZIndex: 6000,
+      breakpoints: {
+        '1700px': '65vw',
+        '1400px': '80vw',
+        '960px': '90vw',
+      },
+      templates: {
+        footer: UbModalFooterComponent,
+      },
+    });
+
+    this.ref.onClose
+      .pipe(untilDestroyed(this))
+      .subscribe((response: ModalResponse) => {
+        if (response) {
+          if (response.type === ModalResponseTypes.CONFIRM) {
+            this.handlePaymentCreation(response.form);
+          }
+        }
+      });
+  }
+
+  async handlePaymentCreation(form: any): Promise<void> {
+    const payload = form.getRawValue();
+
+    this.loadingService.show(this.loaderKey);
+
+    const isScheduled = !!payload.scheduledDate;
+
+    const { payment, error } = await this.paymentsService.createPayment({
+      user_id: this.user.id,
+      from_account_id: payload.fromAccountId,
+      recipient_name: payload.recipientName,
+      to_account_number: payload.toAccountNumber,
+      amount: payload.amount,
+      currency: this.currencyConfig.code,
+      payment_type: payload.paymentType,
+      frequency: payload.frequency || undefined,
+      scheduled_date: payload.scheduledDate || undefined,
+      description: payload.description || undefined,
+      status: isScheduled ? 'pending' : 'processing',
+    });
+
+    if (error) {
+      this.toastService.error('Error', 'Failed to create payment.');
+      this.loadingService.hide(this.loaderKey);
+      return;
+    }
+
+    this.toastService.success('Success', 'Payment created successfully!');
+
+    if (!isScheduled && payment) {
+      const { result, error: processError } =
+        await this.paymentsService.processPayment(payment.id);
+
+      if (processError) {
+        this.toastService.error('Error', 'Payment processing failed.');
+      } else {
+        if (!result.success) {
+          this.toastService.error('Error', `Payment failed.`);
+        } else {
+          this.toastService.success(
+            'Success',
+            'Payment completed successfully!'
+          );
+        }
+      }
+    } else {
+      this.toastService.success('Success', 'Payment scheduled successfully!');
+    }
+
+    await this.loadDashboardData();
+    this.loadingService.hide(this.loaderKey);
+  }
+
   getTransactionIcon(category: string): string {
     const icons: { [key: string]: string } = {
       Shopping: 'fa-cart-shopping',
+      shopping: 'fa-cart-shopping',
       Income: 'fa-money-bill-trend-up',
+      income: 'fa-money-bill-trend-up',
       Entertainment: 'fa-tv',
+      entertainment: 'fa-tv',
       Utilities: 'fa-bolt',
+      utilities: 'fa-bolt',
       Transfer: 'fa-arrow-right-arrow-left',
+      transfer: 'fa-arrow-right-arrow-left',
       Business: 'fa-briefcase',
+      business: 'fa-briefcase',
+      Payment: 'fa-paper-plane',
+      payment: 'fa-paper-plane',
     };
-    return icons[category] || 'fa-circle';
+    return icons[category] || 'fa-circle-dollar';
+  }
+
+  getAccountName(accountId: string): string {
+    const account = this.accounts.find((a) => a.id === accountId);
+    return account?.name || 'Unknown Account';
   }
 
   async logout(): Promise<void> {

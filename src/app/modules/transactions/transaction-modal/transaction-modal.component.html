@@ -1,0 +1,261 @@
+<div class="transaction-modal">
+  <div class="modal-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fa fa-clock-rotate-left"></i>
+      </div>
+      <div class="header-text">
+        <h2 class="modal-title">
+          {{
+            isViewMode
+              ? "Transaction Details"
+              : isEditMode
+              ? "Edit Transaction"
+              : "Add New Transaction"
+          }}
+        </h2>
+        <p class="modal-subtitle">
+          {{
+            isViewMode
+              ? "View transaction information"
+              : isEditMode
+              ? "Update transaction details"
+              : "Record a new transaction manually"
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="transactionForm" class="modal-body">
+    <div class="form-section">
+      <h3 class="section-title">Transaction Details</h3>
+
+      <div class="form-group">
+        <label for="accountId" class="form-label">
+          Account <span class="required" *ngIf="!isViewMode">*</span>
+        </label>
+        <ub-select
+          inputId="accountId"
+          [options]="accountOptions"
+          [control]="transactionForm | getControl : 'accountId'"
+          placeholder="Select account"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('accountId')"
+          [disabled]="isViewMode"
+        >
+        </ub-select>
+        <div class="field-hint" *ngIf="!isViewMode">
+          Choose which account this transaction belongs to
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('accountId')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("accountId") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="type" class="form-label">
+          Transaction Type <span class="required" *ngIf="!isViewMode">*</span>
+        </label>
+        <ub-select
+          inputId="type"
+          [options]="transactionTypes"
+          [control]="transactionForm | getControl : 'type'"
+          placeholder="Select transaction type"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('type')"
+          [disabled]="isViewMode"
+        >
+        </ub-select>
+        <div class="error-message" *ngIf="isFieldInvalid('type')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("type") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amount" class="form-label">
+          Amount <span class="required" *ngIf="!isViewMode">*</span>
+        </label>
+        <ub-input-number
+          id="amount"
+          [control]="transactionForm | getControl : 'amount'"
+          [prefix]="currencyConfig.symbol + ' '"
+          minFractionDigits="2"
+          maxFractionDigits="2"
+          min="0.01"
+          [useGrouping]="true"
+          placeholder="0.00"
+          [class.invalid]="isFieldInvalid('amount')"
+          [disabled]="isViewMode"
+        ></ub-input-number>
+        <div class="field-hint" *ngIf="!isViewMode">
+          Enter the transaction amount
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('amount')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("amount") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="category" class="form-label">
+          Category <span class="required" *ngIf="!isViewMode">*</span>
+        </label>
+        <ub-select
+          inputId="category"
+          [options]="categories"
+          [control]="transactionForm | getControl : 'category'"
+          placeholder="Select category"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('category')"
+          [disabled]="isViewMode"
+        >
+        </ub-select>
+        <div class="field-hint" *ngIf="!isViewMode">
+          Categorize this transaction
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('category')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("category") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">
+          Description <span class="required" *ngIf="!isViewMode">*</span>
+        </label>
+        <ub-input-text
+          id="description"
+          [control]="transactionForm | getControl : 'description'"
+          placeholder="Enter transaction description"
+          [class.invalid]="isFieldInvalid('description')"
+          [disabled]="isViewMode"
+        ></ub-input-text>
+        <div class="field-hint" *ngIf="!isViewMode">
+          Brief description of the transaction
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("description") }}
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="!isViewMode || transaction?.status">
+        <label for="status" class="form-label">
+          Status <span class="required" *ngIf="!isViewMode">*</span>
+        </label>
+        <ub-select
+          inputId="status"
+          [options]="statuses"
+          [control]="transactionForm | getControl : 'status'"
+          placeholder="Select status"
+          optionLabel="label"
+          optionValue="value"
+          [class.invalid]="isFieldInvalid('status')"
+          [disabled]="isViewMode"
+        >
+        </ub-select>
+        <div class="error-message" *ngIf="isFieldInvalid('status')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("status") }}
+        </div>
+      </div>
+
+      <div
+        class="form-group"
+        *ngIf="!isViewMode || transaction?.reference_number"
+      >
+        <label for="referenceNumber" class="form-label">
+          Reference Number
+        </label>
+        <ub-input-text
+          id="referenceNumber"
+          [control]="transactionForm | getControl : 'referenceNumber'"
+          placeholder="Optional reference number"
+          [class.invalid]="isFieldInvalid('referenceNumber')"
+          [disabled]="isViewMode"
+        ></ub-input-text>
+        <div class="field-hint" *ngIf="!isViewMode">
+          Optional reference or transaction ID
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('referenceNumber')">
+          <i class="fa fa-circle-exclamation"></i>
+          {{ getErrorMessage("referenceNumber") }}
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="transaction-summary"
+      *ngIf="transactionForm.valid && !isViewMode"
+    >
+      <div class="summary-header">
+        <i class="fa fa-circle-info"></i>
+        <span>Transaction Summary</span>
+      </div>
+      <div class="summary-content">
+        <div class="summary-row">
+          <span class="summary-label">Type:</span>
+          <span class="summary-value">
+            {{ getTransactionTypeLabel() }}
+          </span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Amount:</span>
+          <span
+            class="summary-value amount"
+            [class.credit]="transactionForm.get('type')?.value === 'credit'"
+            [class.debit]="transactionForm.get('type')?.value === 'debit'"
+          >
+            {{ formatCurrency(transactionForm.get("amount")?.value || 0) }}
+          </span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Category:</span>
+          <span class="summary-value">
+            <i
+              class="fa"
+              [class]="getCategoryIcon(transactionForm.get('category')?.value)"
+            ></i>
+            {{ transactionForm.get("category")?.value }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="transaction-info" *ngIf="isViewMode && transaction">
+      <div class="info-section">
+        <h3 class="section-title">Additional Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Transaction ID:</span>
+            <span class="info-value">{{ transaction.id }}</span>
+          </div>
+          <div class="info-item" *ngIf="transaction.created_at">
+            <span class="info-label">Created:</span>
+            <span class="info-value">{{
+              transaction.created_at | date : "medium"
+            }}</span>
+          </div>
+          <div class="info-item" *ngIf="transaction.updated_at">
+            <span class="info-label">Last Updated:</span>
+            <span class="info-value">{{
+              transaction.updated_at | date : "medium"
+            }}</span>
+          </div>
+          <div class="info-item" *ngIf="transaction.balance_after">
+            <span class="info-label">Balance After:</span>
+            <span class="info-value">{{
+              formatCurrency(transaction.balance_after)
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

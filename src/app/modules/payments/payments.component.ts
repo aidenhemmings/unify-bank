@@ -5,6 +5,7 @@ import {
   UbUserService,
   UbAccountsService,
   UbLoadingService,
+  UbToastService,
 } from '@common/services';
 import { Payment, User, Account } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -33,6 +34,7 @@ export class UbPaymentsComponent {
   private accountsService = inject(UbAccountsService);
   private loadingService = inject(UbLoadingService);
   private dialogService = inject(DialogService);
+  private toastService = inject(UbToastService);
 
   readonly currencyConfig = AppComponent.CURRENCY_CONFIG;
 
@@ -77,7 +79,7 @@ export class UbPaymentsComponent {
     );
 
     if (error) {
-      console.error('Error loading payments:', error);
+      this.toastService.error('Error', 'Failed to load payments.');
       return;
     }
 
@@ -90,7 +92,7 @@ export class UbPaymentsComponent {
     );
 
     if (error) {
-      console.error('Error loading accounts:', error);
+      this.toastService.error('Error', 'Failed to load accounts.');
       return;
     }
 
@@ -221,9 +223,6 @@ export class UbPaymentsComponent {
   async handlePaymentCreation(form: any): Promise<void> {
     const payload = form.getRawValue();
 
-    console.log('Creating payment with payload:', payload);
-    console.log('User ID:', this.user.id);
-
     this.loadingService.show(this.loaderKey);
 
     const isScheduled = !!payload.scheduledDate;
@@ -243,32 +242,29 @@ export class UbPaymentsComponent {
     });
 
     if (error) {
-      console.error('Error creating payment:', error);
-      console.error('Full error details:', JSON.stringify(error, null, 2));
+      this.toastService.error('Error', 'Failed to create payment.');
       this.loadingService.hide(this.loaderKey);
       return;
     }
 
-    console.log('Payment created successfully:', payment);
+    this.toastService.success('Success', 'Payment created successfully!');
 
     if (!isScheduled && payment) {
-      console.log('Processing payment immediately...');
       const { result, error: processError } =
         await this.paymentsService.processPayment(payment.id);
 
       if (processError) {
-        console.error('Error processing payment:', processError);
+        this.toastService.error('Error', 'Payment processing failed.');
       } else {
-        console.log('Payment processed:', result);
         if (!result.success) {
-          console.error('Payment processing failed:', result.error);
-          alert(`Payment failed: ${result.error}`);
+          this.toastService.error('Error', `Payment failed.`);
         } else {
-          alert('Payment completed successfully!');
+          this.toastService.success(
+            'Success',
+            'Payment completed successfully!'
+          );
         }
       }
-    } else {
-      alert('Payment scheduled successfully!');
     }
 
     await this.loadData();
@@ -287,7 +283,7 @@ export class UbPaymentsComponent {
     const { error } = await this.paymentsService.cancelPayment(payment.id);
 
     if (error) {
-      console.error('Error cancelling payment:', error);
+      this.toastService.error('Error', 'Failed to cancel payment.');
       return;
     }
 
