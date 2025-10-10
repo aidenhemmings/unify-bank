@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { BehaviorSubject, filter } from 'rxjs';
 import { Breadcrumb } from '@common/types';
@@ -7,10 +7,12 @@ import { Breadcrumb } from '@common/types';
   providedIn: 'root',
 })
 export class UbBreadcrumbService {
+  private router = inject(Router);
+
   private breadcrumbsSubject = new BehaviorSubject<Breadcrumb[]>([]);
   breadcrumbs$ = this.breadcrumbsSubject.asObservable();
 
-  constructor(private router: Router) {
+  constructor() {
     this.updateBreadcrumbs();
 
     this.router.events

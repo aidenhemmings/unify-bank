@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MenuItem } from '@common/types';
 import { Permission } from '@common/enums';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { Permission } from '@common/enums';
 export class UbMenuService {
   private menuItemsSubject = new BehaviorSubject<MenuItem[]>([
     {
-      id: '1',
+      id: uuidv4(),
       label: 'Dashboard',
       permission: Permission.DASHBOARD_VIEW,
       icon: 'fa-home',
@@ -18,7 +19,7 @@ export class UbMenuService {
       visible: true,
     },
     {
-      id: '2',
+      id: uuidv4(),
       label: 'Payments',
       permission: Permission.PAYMENTS_VIEW,
       icon: 'fa-credit-card',
@@ -27,7 +28,7 @@ export class UbMenuService {
       visible: true,
     },
     {
-      id: '3',
+      id: uuidv4(),
       label: 'Accounts',
       permission: Permission.ACCOUNTS_VIEW,
       icon: 'fa-bank',
@@ -36,7 +37,7 @@ export class UbMenuService {
       visible: true,
     },
     {
-      id: '4',
+      id: uuidv4(),
       label: 'Transactions',
       permission: Permission.TRANSACTIONS_VIEW,
       icon: 'fa-exchange-alt',
