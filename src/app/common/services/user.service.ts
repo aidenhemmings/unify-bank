@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class UbUserService {
   private userSubject = new BehaviorSubject<User | null>(null);
+  private readonly TOKEN_KEY = 'user_token';
 
   get currentUser(): Observable<User | null> {
     return this.userSubject.asObservable();
@@ -16,11 +17,20 @@ export class UbUserService {
     return this.userSubject.value;
   }
 
-  setCurrentUser(user: User): void {
+  setCurrentUser(user: User | null): void {
     this.userSubject.next(user);
   }
 
-  clearUser(): void {
+  setToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  clearSession(): void {
     this.userSubject.next(null);
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 }

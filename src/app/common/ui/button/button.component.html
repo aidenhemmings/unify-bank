@@ -1,0 +1,15 @@
+<button
+  pButton
+  [disabled]="disabled"
+  [loading]="loading"
+  [class]="variantClass"
+  [ngClass]="{
+    'btn-lg': size === 'lg',
+    'btn-md': size === 'md',
+    'btn-sm': size === 'sm',
+    fluid: fluid,
+    'btn-disabled': disabled
+  }"
+>
+  <ng-content></ng-content>
+</button>

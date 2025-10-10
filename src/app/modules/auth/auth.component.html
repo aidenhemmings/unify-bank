@@ -1,23 +1,65 @@
-<form [formGroup]="form" class="login-form">
-  <ub-input-text
-    type="text"
-    placeholder="Username"
-    [control]="form | getControl : 'username'"
-    [class.invalid]="
-      form.get('username')?.invalid && form.get('username')?.touched
-    "
-  />
-  <ub-input-text
-    type="password"
-    placeholder="Password"
-    [control]="form | getControl : 'password'"
-    [class.invalid]="
-      form.get('password')?.invalid && form.get('password')?.touched
-    "
-  />
-  <button (click)="login()">Login</button>
-</form>
+<div class="auth-container">
+  <div class="auth-left">
+    <div class="logo-container">
+      <img
+        src="/UnifyBanking-Logo-Transparent.png"
+        alt="Unify Banking Logo"
+        class="logo"
+      />
+    </div>
+  </div>
 
-<div *ngIf="loginError" class="error">
-  {{ loginError }}
+  <div class="auth-right">
+    <div class="form-wrapper">
+      <div class="form-header">
+        <h1 class="form-title">Welcome Back</h1>
+        <p class="form-subtitle">Sign in to your account to continue</p>
+      </div>
+
+      <form [formGroup]="form" class="login-form">
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <ub-input-text
+            type="text"
+            placeholder="Enter your username"
+            [control]="form | getControl : 'username'"
+            [class.invalid]="
+              form.get('username')?.invalid && form.get('username')?.touched
+            "
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <ub-input-text
+            type="password"
+            placeholder="Enter your password"
+            [control]="form | getControl : 'password'"
+            [class.invalid]="
+              form.get('password')?.invalid && form.get('password')?.touched
+            "
+          />
+        </div>
+
+        <div *ngIf="loginError" class="error-message">
+          <i class="fa fa-exclamation-circle"></i>
+          {{ loginError }}
+        </div>
+
+        <ub-button
+          variant="primary"
+          [fluid]="true"
+          (click)="login()"
+          class="login-button"
+        >
+          <i class="fa fa-right-to-bracket"></i>
+          Sign In
+        </ub-button>
+      </form>
+
+      <div class="form-footer">
+        <p class="footer-text">Secure banking at your fingertips</p>
+      </div>
+    </div>
+  </div>
 </div>

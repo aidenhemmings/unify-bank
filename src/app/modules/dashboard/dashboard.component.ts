@@ -1,16 +1,21 @@
 import { Component, inject } from '@angular/core';
-import { UbUserService } from '@common/services';
-import { User } from '@common/types';
+import { UbSupabaseService, UbUserService } from '@common/services';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { User } from '@common/types';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
+  imports: [CommonModule],
 })
 export class UbDashboardComponent {
   private userService = inject(UbUserService);
+  private supabaseService = inject(UbSupabaseService);
+  private router = inject(Router);
 
   user!: User;
 
@@ -22,5 +27,16 @@ export class UbDashboardComponent {
           this.user = user;
         }
       });
+  }
+
+  async logout(): Promise<void> {
+    const token = this.userService.getToken();
+
+    if (token) {
+      await this.supabaseService.invalidateToken(token);
+    }
+
+    this.userService.clearSession();
+    this.router.navigate(['/auth/login']);
   }
 }

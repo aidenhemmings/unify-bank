@@ -1,3 +1,6 @@
-<h1>Unify Bank Dashboard</h1>
+<div class="dashboard-header">
+  <span>Unify Bank Dashboard</span>
+</div>
 <br />
-<p>{{ user.FirstName }} {{ user.LastName }}</p>
+<p *ngIf="user">Welcome, {{ user.first_name }} {{ user.last_name }}</p>
+<p *ngIf="user">Username: {{ user.username }}</p>

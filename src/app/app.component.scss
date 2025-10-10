@@ -1,3 +1,35 @@
 .error {
   color: red;
 }
+
+.app-container {
+  display: flex;
+  min-height: calc(var(--vh, 1vh) * 100);
+  background-color: var(--background);
+
+  .main-content {
+    flex: 1;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: calc(var(--vh, 1vh) * 100);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 768px) {
+      margin-left: 70px !important;
+    }
+
+    .content-wrapper {
+      flex: 1;
+
+      &.authorized {
+        padding: 2rem;
+        overflow-y: auto;
+      }
+
+      @media (max-width: 768px) {
+        padding: 1rem;
+      }
+    }
+  }
+}

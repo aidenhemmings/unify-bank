@@ -1,0 +1,23 @@
+.input-text {
+  width: 100%;
+  border: 1px solid var(--gray-2100);
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 6px;
+  outline: none;
+  font-family: "Inter", sans-serif;
+  background: var(--gray-3000);
+
+  &:disabled {
+    background: var(--gray-200) !important;
+    color: var(--gray-970) !important;
+  }
+
+  &:hover {
+    border-color: var(--primary-light-color) !important;
+  }
+
+  &:focus {
+    border-color: var(--primary-color) !important;
+  }
+}
