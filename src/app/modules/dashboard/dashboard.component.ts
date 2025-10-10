@@ -4,14 +4,13 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { User } from '@common/types';
-import { UbUserProfileComponent } from '@common/ui';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [CommonModule, UbUserProfileComponent],
+  imports: [CommonModule],
 })
 export class UbDashboardComponent {
   private userService = inject(UbUserService);
