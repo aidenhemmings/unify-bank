@@ -1,12 +1,15 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment/environment';
 import * as bcrypt from 'bcryptjs';
+import { UbUserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbSupabaseService {
+  private userService = inject(UbUserService);
+
   private supabase: SupabaseClient;
   private currentToken: string | null = null;
 
@@ -125,6 +128,31 @@ export class UbSupabaseService {
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
     return await bcrypt.hash(password, saltRounds);
+  }
+
+  async updateUser(form: any): Promise<boolean> {
+    if (!form) return false;
+
+    const user = form.value;
+
+    const { data, error } = await this.supabase
+      .from('users')
+      .update({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username,
+        email: user.email,
+      })
+      .eq('id', user.id)
+      .select()
+      .single();
+
+    if (!error && data) {
+      this.userService.setCurrentUser(data);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   getSupabaseClient(): SupabaseClient {

@@ -12,6 +12,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Account, QuickAction, Transaction, User } from '@common/types';
+import { UbUserProfileComponent } from '@common/ui';
 import {
   UbButtonComponent,
   UbLoaderComponent,
@@ -30,7 +31,7 @@ import { TooltipModule } from 'primeng/tooltip';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   imports: [CommonModule, UbButtonComponent, UbLoaderComponent, TooltipModule],
-  providers: [DialogService],
+  providers: [DialogService, UbUserProfileComponent],
 })
 export class UbDashboardComponent {
   private userService = inject(UbUserService);

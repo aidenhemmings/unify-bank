@@ -1,0 +1,85 @@
+.ub-profile-card {
+  background: var(--gray-3000);
+  border: 1px solid var(--gray-2100);
+  border-radius: 10px;
+  padding: 1rem;
+  max-width: 840px;
+  margin: 0 auto 1.25rem auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+  .ub-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--gray-2400);
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-main);
+      color: var(--natural-white);
+      font-weight: 700;
+      font-size: 20px;
+      flex: 0 0 72px;
+    }
+
+    .profile-meta {
+      flex: 1 1 auto;
+
+      .name {
+        margin: 0 0 4px 0;
+        font-size: 18px;
+        color: var(--gray-1000);
+      }
+
+      .email {
+        font-size: 13px;
+        color: var(--gray-970);
+      }
+
+      .member-since {
+        font-size: 12px;
+        color: var(--gray-1200);
+        margin-top: 6px;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .ub-profile-body {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem 1.5rem;
+    padding-top: 1rem;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--gray-1200);
+      margin-bottom: 6px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .ub-profile-body {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    flex-direction: column;
+  }
+}
