@@ -5,6 +5,8 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  width: 100%;
+  overflow-x: hidden;
 
   ub-loader {
     height: calc(calc(var(--vh, 1vh) * 100) - 134px);
@@ -294,6 +296,8 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    width: 100%;
+    max-width: 100%;
 
     @media (max-width: 1024px) {
       grid-template-columns: 1fr;
@@ -306,6 +310,9 @@
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       border: 1px solid var(--gray-200);
+      overflow: hidden;
+      max-width: 100%;
+      min-width: 0;
 
       @media (max-width: 768px) {
         padding: 1.25rem;
@@ -361,6 +368,9 @@
           display: flex;
           flex-direction: column;
           gap: 1rem;
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
 
           .empty-state {
             display: flex;
@@ -428,6 +438,8 @@
             border-radius: 12px;
             transition: all 0.2s ease;
             cursor: pointer;
+            max-width: 100%;
+            overflow: hidden;
 
             &:hover {
               background: var(--gray-100);
@@ -474,12 +486,16 @@
             .account-details {
               flex: 1;
               min-width: 0;
+              overflow: hidden;
 
               .account-name {
                 font-size: 0.9375rem;
                 font-weight: 600;
                 color: var(--gray-900);
                 margin-bottom: 0.25rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
                 @media (max-width: 480px) {
                   font-size: 0.875rem;
@@ -489,17 +505,22 @@
               .account-number {
                 font-size: 0.8125rem;
                 color: var(--gray-970);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
               }
             }
 
             .account-balance {
               text-align: right;
+              flex-shrink: 0;
 
               .balance {
                 font-size: 1rem;
                 font-weight: 700;
                 color: var(--gray-900);
                 margin-bottom: 0.25rem;
+                white-space: nowrap;
 
                 @media (max-width: 480px) {
                   font-size: 0.9375rem;
@@ -511,6 +532,7 @@
                 color: var(--gray-970);
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                white-space: nowrap;
               }
             }
           }
@@ -522,6 +544,9 @@
           display: flex;
           flex-direction: column;
           gap: 0.75rem;
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
 
           .empty-state {
             display: flex;
@@ -587,6 +612,8 @@
             padding: 1rem;
             border-bottom: 1px solid var(--gray-100);
             transition: background 0.2s ease;
+            max-width: 100%;
+            overflow: hidden;
 
             &:last-child {
               border-bottom: none;
@@ -632,6 +659,7 @@
             .transaction-details {
               flex: 1;
               min-width: 0;
+              overflow: hidden;
 
               .transaction-description {
                 font-size: 0.9375rem;
@@ -653,6 +681,7 @@
                 gap: 0.5rem;
                 font-size: 0.8125rem;
                 color: var(--gray-970);
+                overflow: hidden;
 
                 @media (max-width: 640px) {
                   flex-direction: column;
@@ -664,10 +693,14 @@
                   display: flex;
                   align-items: center;
                   gap: 0.25rem;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
 
                   i {
                     font-size: 0.75rem;
                     color: var(--primary-color);
+                    flex-shrink: 0;
                   }
                 }
 
@@ -689,6 +722,7 @@
               font-size: 1rem;
               font-weight: 700;
               white-space: nowrap;
+              flex-shrink: 0;
 
               &.credit {
                 color: var(--green-dark);

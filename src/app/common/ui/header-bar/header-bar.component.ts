@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { UbBreadcrumbService, UbUserService } from '@common/services';
+import {
+  UbBreadcrumbService,
+  UbUserService,
+  UbSidebarService,
+} from '@common/services';
 import { Breadcrumb, User } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { UbButtonComponent } from '../button';
@@ -19,12 +23,14 @@ import { UbUserSettingsModalComponent } from '../user-settings-modal/user-settin
 export class UbHeaderBarComponent implements OnInit {
   private breadcrumbService = inject(UbBreadcrumbService);
   private userService = inject(UbUserService);
+  private sidebarService = inject(UbSidebarService);
   private router = inject(Router);
   private dialogService = inject(DialogService);
 
   breadcrumbs: Breadcrumb[] = [];
   currentUser: User | null = null;
   showProfileMenu = false;
+  isMobile = false;
 
   ref!: DynamicDialogRef | null;
 
@@ -40,6 +46,17 @@ export class UbHeaderBarComponent implements OnInit {
       .subscribe((user) => {
         this.currentUser = user;
       });
+
+    this.checkIfMobile();
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
+
+  checkIfMobile() {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  toggleSidebar() {
+    this.sidebarService.toggle();
   }
 
   getUserInitials(): string {

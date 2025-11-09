@@ -1,5 +1,14 @@
 <header class="header-bar">
   <div class="header-content">
+    <button
+      *ngIf="isMobile && currentUser"
+      class="mobile-menu-btn"
+      (click)="toggleSidebar()"
+      aria-label="Toggle Menu"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+
     <nav class="breadcrumb-nav" *ngIf="breadcrumbs.length > 0">
       <ol class="breadcrumb-list">
         <li class="breadcrumb-item">

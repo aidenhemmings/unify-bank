@@ -2,6 +2,8 @@
   display: flex;
   min-height: calc(var(--vh, 1vh) * 100);
   background-color: var(--background);
+  overflow-x: hidden;
+  max-width: 100vw;
 
   .main-content {
     flex: 1;
@@ -9,13 +11,17 @@
     height: calc(var(--vh, 1vh) * 100);
     display: flex;
     flex-direction: column;
+    max-width: 100%;
+    overflow-x: hidden;
 
     @media (max-width: 768px) {
-      margin-left: 70px !important;
+      margin-left: 0 !important;
     }
 
     .content-wrapper {
       flex: 1;
+      overflow-x: hidden;
+      max-width: 100%;
 
       &.authorized {
         padding: 0;
