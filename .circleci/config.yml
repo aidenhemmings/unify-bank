@@ -11,6 +11,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
+          cache-key: v1-npm-{{ checksum "package-lock.json" }}
       - run:
           name: Build Angular App
           command: npm run build -- --configuration=production
@@ -29,6 +30,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
+          cache-key: v1-npm-{{ checksum "package-lock.json" }}
       - run:
           name: Install SonarQube Scanner
           command: npm install -g sonarqube-scanner
