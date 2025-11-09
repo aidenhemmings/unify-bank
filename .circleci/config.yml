@@ -43,7 +43,7 @@ jobs:
           command: |
             npx sonar-scanner \
               -Dsonar.projectKey=aidenhemmings_unify-bank \
-              -Dsonar.organization=aiden-hemmings \
+              -Dsonar.organization=aidenhemmings \
               -Dsonar.sources=src \
               -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.login=$SONAR_TOKEN
