@@ -1,5 +1,4 @@
 <div class="ub-profile-container">
-  <!-- Profile Information Card -->
   <div class="ub-profile-card">
     <div class="ub-profile-header">
       <div class="avatar" aria-hidden="true">{{ initials }}</div>
@@ -118,7 +117,6 @@
     </div>
   </div>
 
-  <!-- Security Card -->
   <div class="ub-profile-card security-card">
     <div class="card-section">
       <div class="section-header">
@@ -161,14 +159,43 @@
               placeholder="Enter new password"
               [control]="passwordForm | getControl : 'new_password'"
             ></ub-input-text>
+
+            <div
+              *ngIf="passwordForm.get('new_password')?.value"
+              class="password-strength"
+            >
+              <div class="strength-header">
+                <span class="strength-label">Password Strength:</span>
+                <span
+                  class="strength-value"
+                  [style.color]="getPasswordStrength().color"
+                >
+                  {{ getPasswordStrength().label }}
+                </span>
+              </div>
+              <div class="strength-bar">
+                <div
+                  class="strength-fill"
+                  [style.width.%]="getPasswordStrength().percentage"
+                  [style.background-color]="getPasswordStrength().color"
+                ></div>
+              </div>
+            </div>
+
             <div class="password-requirements">
               <small class="requirement-title">Password must contain:</small>
               <ul class="requirements-list">
-                <li>At least 8 characters</li>
-                <li>One uppercase letter</li>
-                <li>One lowercase letter</li>
-                <li>One number</li>
-                <li>One special character (&#64;$!%*?&)</li>
+                <li
+                  *ngFor="let req of getPasswordRequirements()"
+                  [class.met]="req.met"
+                >
+                  <i
+                    class="fas"
+                    [class.fa-check-circle]="req.met"
+                    [class.fa-circle]="!req.met"
+                  ></i>
+                  {{ req.label }}
+                </li>
               </ul>
             </div>
             <div class="error-messages">

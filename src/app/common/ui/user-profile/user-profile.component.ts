@@ -212,4 +212,77 @@ export class UbUserProfileComponent {
 
     return errors;
   }
+
+  getPasswordStrength(): {
+    level: number;
+    label: string;
+    color: string;
+    percentage: number;
+  } {
+    const password = this.passwordForm.get('new_password')?.value || '';
+    if (!password) {
+      return { level: 0, label: '', color: '', percentage: 0 };
+    }
+
+    let strength = 0;
+    const requirements = this.getPasswordRequirements();
+
+    requirements.forEach((req) => {
+      if (req.met) strength++;
+    });
+
+    const percentage = (strength / requirements.length) * 100;
+
+    if (strength <= 2) {
+      return {
+        level: 1,
+        label: 'Weak',
+        color: 'var(--danger)',
+        percentage,
+      };
+    } else if (strength <= 4) {
+      return {
+        level: 2,
+        label: 'Fair',
+        color: 'var(--warning)',
+        percentage,
+      };
+    } else if (strength === 5) {
+      return {
+        level: 3,
+        label: 'Strong',
+        color: 'var(--success)',
+        percentage,
+      };
+    }
+
+    return { level: 0, label: '', color: '', percentage: 0 };
+  }
+
+  getPasswordRequirements(): Array<{ label: string; met: boolean }> {
+    const password = this.passwordForm.get('new_password')?.value || '';
+
+    return [
+      {
+        label: 'At least 8 characters',
+        met: password.length >= 8,
+      },
+      {
+        label: 'One uppercase letter',
+        met: /[A-Z]/.test(password),
+      },
+      {
+        label: 'One lowercase letter',
+        met: /[a-z]/.test(password),
+      },
+      {
+        label: 'One number',
+        met: /[0-9]/.test(password),
+      },
+      {
+        label: 'One special character (@$!%*?&)',
+        met: /[@$!%*?&]/.test(password),
+      },
+    ];
+  }
 }
