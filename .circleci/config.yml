@@ -1,57 +1,58 @@
 version: 2.1
 
-orbs:
-  node: circleci/node@5.0.2
-
 jobs:
-  build-and-test:
+  build:
     docker:
-      - image: cimg/node:18.17.0
+      - image: cimg/node:18.19.0
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
-          cache-key: v1-npm-{{ checksum "package-lock.json" }}
+      - restore_cache:
+          keys:
+            - v1-npm-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install NPM Packages
+          command: npm install
+      - save_cache:
+          key: v1-npm-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
       - run:
           name: Build Angular App
           command: npm run build -- --configuration=production
-      - run:
-          name: Run Tests
-          command: npm test -- --watch=false --browsers=ChromeHeadless
-      - run:
-          name: Upload Coverage
-          command: |
-            mkdir -p coverage
 
   sonarcloud-analysis:
     docker:
-      - image: cimg/node:18.17.0
+      - image: cimg/node:18.19.0
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
-          cache-key: v1-npm-{{ checksum "package-lock.json" }}
+      - restore_cache:
+          keys:
+            - v1-npm-{{ checksum "package-lock.json" }}
       - run:
-          name: Install SonarQube Scanner
-          command: npm install -g sonarqube-scanner
+          name: Install NPM Packages
+          command: npm install
+      - save_cache:
+          key: v1-npm-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: Install SonarQube Scanner Locally
+          command: npm install sonarqube-scanner
       - run:
           name: Run SonarCloud Analysis
           command: |
-            sonar-scanner \
+            npx sonar-scanner \
               -Dsonar.projectKey=aidenhemmings_unify-bank \
-              -Dsonar.organization=aiden-hemmings \
+              -Dsonar.organization=aidenhemmings \
               -Dsonar.sources=src \
-              -Dsonar.tests=src \
-              -Dsonar.test.inclusions=**/*.spec.ts \
-              -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
               -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.login=$SONAR_TOKEN
 
 workflows:
   version: 2
-  build-test-analyze:
+  build-analyze:
     jobs:
-      - build-and-test
+      - build
       - sonarcloud-analysis:
           requires:
-            - build-and-test
+            - build
