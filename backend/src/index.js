@@ -63,7 +63,9 @@ app.use((req, res) => {
 });
 
 if (process.env.NODE_ENV === "production") {
-  app.listen(PORT, () => {});
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 } else {
   const sslKeyPath = path.join(__dirname, "../../ssl/localhost.key");
   const sslCertPath = path.join(__dirname, "../../ssl/localhost.crt");
@@ -74,9 +76,17 @@ if (process.env.NODE_ENV === "production") {
       cert: fs.readFileSync(sslCertPath),
     };
 
-    https.createServer(httpsOptions, app).listen(PORT, () => {});
+    https.createServer(httpsOptions, app).listen(PORT, () => {
+      console.log(`HTTPS Server running on https://localhost:${PORT}`);
+      console.log(`SSL/TLS encryption enabled`);
+    });
   } else {
-    app.listen(PORT, () => {});
+    app.listen(PORT, () => {
+      console.log(
+        `Running on http://localhost:${PORT} (SSL certificates not found)`
+      );
+      console.log(`Generate SSL certificates for HTTPS support`);
+    });
   }
 }
 
