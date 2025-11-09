@@ -12,11 +12,14 @@ import {
   FormControl,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
 import { UbButtonComponent, UbInputTextComponent } from '@common/ui';
 import { User } from '@common/types';
 import { UbGetFormControlPipe } from '@common/pipes';
 import { LoadingKeys } from '@common/enums';
+import { CustomValidators } from '@common/validators';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
@@ -40,14 +43,50 @@ export class UbUserProfileComponent {
 
   profile!: User;
   isEditing = false;
+  isChangingPassword = false;
+
+  private passwordMatchValidator(
+    control: AbstractControl
+  ): ValidationErrors | null {
+    const newPassword = control.get('new_password')?.value;
+    const confirmPassword = control.get('confirm_password')?.value;
+
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+      control.get('confirm_password')?.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+
+    return null;
+  }
 
   form = new FormGroup({
     id: new FormControl('', [Validators.required]),
-    first_name: new FormControl('', [Validators.required]),
-    last_name: new FormControl('', [Validators.required]),
-    username: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
+    first_name: new FormControl('', [
+      Validators.required,
+      CustomValidators.noSpecialChars(),
+    ]),
+    last_name: new FormControl('', [
+      Validators.required,
+      CustomValidators.noSpecialChars(),
+    ]),
+    username: new FormControl('', [
+      Validators.required,
+      CustomValidators.username(),
+    ]),
+    email: new FormControl('', [Validators.required, CustomValidators.email()]),
   });
+
+  passwordForm = new FormGroup(
+    {
+      current_password: new FormControl('', [Validators.required]),
+      new_password: new FormControl('', [
+        Validators.required,
+        CustomValidators.strongPassword(),
+      ]),
+      confirm_password: new FormControl('', [Validators.required]),
+    },
+    { validators: this.passwordMatchValidator.bind(this) }
+  );
 
   constructor() {
     this.userService.currentUser
@@ -97,16 +136,153 @@ export class UbUserProfileComponent {
   }
 
   async saveProfile(): Promise<void> {
+    if (this.form.invalid) {
+      this.toastService.error('Error', 'Please fix validation errors');
+      return;
+    }
+
     this.loadingService.show(LoadingKeys.USER_PROFILE);
     const result = await this.supabaseService.updateUser(this.form);
 
     if (result.success && result.data) {
       await this.userService.setCurrentUser(result.data);
       this.toastService.info('Success', 'Profile updated successfully');
+      this.isEditing = false;
     } else {
       this.toastService.error('Error', 'Failed to update profile');
     }
-    this.isEditing = false;
     this.loadingService.hide(LoadingKeys.USER_PROFILE);
+  }
+
+  togglePasswordChange(): void {
+    this.isChangingPassword = !this.isChangingPassword;
+    if (!this.isChangingPassword) {
+      this.passwordForm.reset();
+    }
+  }
+
+  async changePassword(): Promise<void> {
+    if (this.passwordForm.invalid) {
+      this.toastService.error('Error', 'Please fix validation errors');
+      return;
+    }
+
+    this.loadingService.show(LoadingKeys.USER_PROFILE);
+
+    const currentPassword = this.passwordForm.value.current_password!;
+    const newPassword = this.passwordForm.value.new_password!;
+
+    const result = await this.supabaseService.changePassword(
+      currentPassword,
+      newPassword
+    );
+
+    if (result.success) {
+      this.toastService.info('Success', 'Password changed successfully');
+      this.passwordForm.reset();
+      this.isChangingPassword = false;
+    } else {
+      this.toastService.error(
+        'Error',
+        result.error?.message || 'Failed to change password'
+      );
+    }
+
+    this.loadingService.hide(LoadingKeys.USER_PROFILE);
+  }
+
+  getPasswordErrors(controlName: string): string[] {
+    const control = this.passwordForm.get(controlName);
+    if (!control || !control.errors || !control.touched) return [];
+
+    const errors: string[] = [];
+    if (control.errors['required']) errors.push('This field is required');
+    if (control.errors['minLength'])
+      errors.push('Password must be at least 8 characters');
+    if (control.errors['uppercase'])
+      errors.push('Must contain at least one uppercase letter');
+    if (control.errors['lowercase'])
+      errors.push('Must contain at least one lowercase letter');
+    if (control.errors['number'])
+      errors.push('Must contain at least one number');
+    if (control.errors['special'])
+      errors.push('Must contain at least one special character (@$!%*?&)');
+    if (control.errors['passwordMismatch'])
+      errors.push('Passwords do not match');
+
+    return errors;
+  }
+
+  getPasswordStrength(): {
+    level: number;
+    label: string;
+    color: string;
+    percentage: number;
+  } {
+    const password = this.passwordForm.get('new_password')?.value || '';
+    if (!password) {
+      return { level: 0, label: '', color: '', percentage: 0 };
+    }
+
+    let strength = 0;
+    const requirements = this.getPasswordRequirements();
+
+    requirements.forEach((req) => {
+      if (req.met) strength++;
+    });
+
+    const percentage = (strength / requirements.length) * 100;
+
+    if (strength <= 2) {
+      return {
+        level: 1,
+        label: 'Weak',
+        color: 'var(--danger)',
+        percentage,
+      };
+    } else if (strength <= 4) {
+      return {
+        level: 2,
+        label: 'Fair',
+        color: 'var(--warning)',
+        percentage,
+      };
+    } else if (strength === 5) {
+      return {
+        level: 3,
+        label: 'Strong',
+        color: 'var(--success)',
+        percentage,
+      };
+    }
+
+    return { level: 0, label: '', color: '', percentage: 0 };
+  }
+
+  getPasswordRequirements(): Array<{ label: string; met: boolean }> {
+    const password = this.passwordForm.get('new_password')?.value || '';
+
+    return [
+      {
+        label: 'At least 8 characters',
+        met: password.length >= 8,
+      },
+      {
+        label: 'One uppercase letter',
+        met: /[A-Z]/.test(password),
+      },
+      {
+        label: 'One lowercase letter',
+        met: /[a-z]/.test(password),
+      },
+      {
+        label: 'One number',
+        met: /[0-9]/.test(password),
+      },
+      {
+        label: 'One special character (@$!%*?&)',
+        met: /[@$!%*?&]/.test(password),
+      },
+    ];
   }
 }

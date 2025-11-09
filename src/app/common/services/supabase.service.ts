@@ -1,130 +1,103 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
-import * as bcrypt from 'bcryptjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbSupabaseService {
-  private supabase: SupabaseClient;
+  private http = inject(HttpClient);
   private currentToken: string | null = null;
+  private apiUrl = environment.apiUrl;
 
   constructor() {
     const token = localStorage.getItem('user_token');
-
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-          detectSessionInUrl: false,
-        },
-        global: {
-          headers: token
-            ? {
-                'X-User-Token': token,
-              }
-            : {},
-        },
-      }
-    );
-
     if (token) {
       this.currentToken = token;
-      this.setToken(token);
     }
   }
 
   async signIn(username: string, password: string) {
-    const { data: user, error } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
-      .single();
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ user: any; token: string }>(
+          `${this.apiUrl}/auth/login`,
+          { username, password }
+        )
+      );
 
-    if (error || !user) {
+      return { user: response.user, token: response.token, error: null };
+    } catch (error: any) {
       return {
         user: null,
         token: null,
-        error: { message: 'Invalid username or password' },
+        error: { message: error.error?.error || 'Login failed' },
       };
     }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return {
-        user: null,
-        token: null,
-        error: { message: 'Invalid username or password' },
-      };
-    }
-
-    const token = crypto.randomUUID();
-
-    const { error: tokenError } = await this.supabase
-      .from('user_tokens')
-      .insert({
-        user_id: user.id,
-        user_token: token,
-        is_valid: true,
-      });
-
-    if (tokenError) {
-      return {
-        user: null,
-        token: null,
-        error: { message: 'Failed to create session' },
-      };
-    }
-
-    return { user, token, error: null };
   }
 
   async validateToken(token: string) {
-    const { data: tokenData, error } = await this.supabase
-      .from('user_tokens')
-      .select('user_id, is_valid')
-      .eq('user_token', token)
-      .eq('is_valid', true)
-      .single();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ valid: boolean; user: any }>(
+          `${this.apiUrl}/auth/validate`,
+          {
+            headers: new HttpHeaders({
+              'X-User-Token': token,
+            }),
+          }
+        )
+      );
 
-    if (error || !tokenData) {
-      return { userId: null, error };
+      return { userId: response.user?.id, user: response.user, error: null };
+    } catch (error) {
+      return { userId: null, user: null, error };
     }
-
-    return { userId: tokenData.user_id, error: null };
   }
 
   async getUserById(userId: string) {
-    const { data: user, error } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      const headers = this.getAuthHeaders();
 
-    if (error || !user) {
+      if (!this.currentToken) {
+        return { user: null, error: { message: 'No authentication token' } };
+      }
+
+      const response = await firstValueFrom(
+        this.http.get<{ user: any }>(`${this.apiUrl}/users/profile`, {
+          headers: headers,
+        })
+      );
+
+      return { user: response.user, error: null };
+    } catch (error) {
       return { user: null, error };
     }
-
-    return { user, error: null };
   }
 
   async invalidateToken(token: string) {
-    const { error } = await this.supabase
-      .from('user_tokens')
-      .update({ is_valid: false })
-      .eq('user_token', token);
+    try {
+      await firstValueFrom(
+        this.http.post(
+          `${this.apiUrl}/auth/logout`,
+          {},
+          {
+            headers: new HttpHeaders({
+              'X-User-Token': token,
+            }),
+          }
+        )
+      );
 
-    return { error };
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
   }
 
   async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    return await bcrypt.hash(password, saltRounds);
+    return password;
   }
 
   async updateUser(form: any): Promise<{ success: boolean; data?: any }> {
@@ -132,54 +105,66 @@ export class UbSupabaseService {
 
     const user = form.value;
 
-    const { data, error } = await this.supabase
-      .from('users')
-      .update({
-        first_name: user.first_name,
-        last_name: user.last_name,
-        username: user.username,
-        email: user.email,
-      })
-      .eq('id', user.id)
-      .select()
-      .single();
+    try {
+      const response = await firstValueFrom(
+        this.http.put<{ user: any }>(
+          `${this.apiUrl}/users/profile`,
+          {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            username: user.username,
+            email: user.email,
+          },
+          {
+            headers: this.getAuthHeaders(),
+          }
+        )
+      );
 
-    if (!error && data) {
-      return { success: true, data };
-    } else {
+      return { success: true, data: response.user };
+    } catch (error) {
       return { success: false };
     }
   }
 
-  getSupabaseClient(): SupabaseClient {
-    return this.supabase;
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ success: boolean; error?: any }> {
+    try {
+      await firstValueFrom(
+        this.http.put(
+          `${this.apiUrl}/users/change-password`,
+          {
+            current_password: currentPassword,
+            new_password: newPassword,
+          },
+          {
+            headers: this.getAuthHeaders(),
+          }
+        )
+      );
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: { message: error.error?.error || 'Failed to change password' },
+      };
+    }
+  }
+
+  getSupabaseClient(): any {
+    return null;
   }
 
   async setToken(token: string): Promise<void> {
     this.currentToken = token;
+  }
 
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-          detectSessionInUrl: false,
-        },
-        global: {
-          headers: {
-            'X-User-Token': token,
-          },
-        },
-      }
-    );
-
-    const { error } = await this.supabase.rpc('set_user_token', { token });
-
-    if (error) {
-      console.error('Error setting token for RLS:', error);
-      throw error;
-    }
+  getAuthHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'X-User-Token': this.currentToken || '',
+    });
   }
 }

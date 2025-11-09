@@ -1,101 +1,255 @@
-<div class="ub-profile-card">
-  <div class="ub-profile-header">
-    <div class="avatar" aria-hidden="true">{{ initials }}</div>
+<div class="ub-profile-container">
+  <div class="ub-profile-card">
+    <div class="ub-profile-header">
+      <div class="avatar" aria-hidden="true">{{ initials }}</div>
 
-    <div class="profile-meta">
-      <h3 class="name">{{ displayName }}</h3>
-      <div class="email">{{ profile.username }}</div>
-      <div class="member-since">
-        Member since {{ memberSince | date : "mediumDate" }}
+      <div class="profile-meta">
+        <h3 class="name">{{ displayName }}</h3>
+        <div class="email">{{ "@" + profile.username }}</div>
+        <div class="member-since">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Member since {{ memberSince | date : "mediumDate" }}</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <ng-container *ngIf="!isEditing; else editingActions">
+          <ub-button variant="primary" size="sm" (click)="startEditing()">
+            <i class="fas fa-edit"></i> Edit Profile
+          </ub-button>
+        </ng-container>
+        <ng-template #editingActions>
+          <ub-button variant="primary" size="sm" (click)="saveProfile()">
+            <i class="fas fa-save"></i> Save
+          </ub-button>
+          <ub-button variant="outline" size="sm" (click)="cancelEditing()">
+            Cancel
+          </ub-button>
+        </ng-template>
       </div>
     </div>
 
-    <div class="header-actions">
-      <ng-container *ngIf="!isEditing; else editingActions">
-        <ub-button variant="secondary" size="sm" (click)="startEditing()"
-          >Edit</ub-button
-        >
-      </ng-container>
-      <ng-template #editingActions>
-        <ub-button variant="primary" size="sm" (click)="saveProfile()"
-          >Save</ub-button
-        >
-        <ub-button variant="outline" size="sm" (click)="cancelEditing()"
-          >Cancel</ub-button
-        >
-      </ng-template>
+    <div class="card-section">
+      <h4 class="section-title">
+        <i class="fas fa-user"></i> Personal Information
+      </h4>
+      <form [formGroup]="form" class="ub-profile-body">
+        <div class="field-row">
+          <div class="field">
+            <label>First Name</label>
+            <div class="value">
+              <ng-container *ngIf="!isEditing; else firstInput">
+                {{ profile.first_name || "Not set" }}
+              </ng-container>
+              <ng-template #firstInput>
+                <ub-input-text
+                  placeholder="Enter first name"
+                  [control]="form | getControl : 'first_name'"
+                ></ub-input-text>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Last Name</label>
+            <div class="value">
+              <ng-container *ngIf="!isEditing; else lastInput">
+                {{ profile.last_name || "Not set" }}
+              </ng-container>
+              <ng-template #lastInput>
+                <ub-input-text
+                  placeholder="Enter last name"
+                  [control]="form | getControl : 'last_name'"
+                ></ub-input-text>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Username</label>
+            <div class="value">
+              <ng-container *ngIf="!isEditing; else usernameInput">
+                {{ profile.username }}
+              </ng-container>
+              <ng-template #usernameInput>
+                <ub-input-text
+                  placeholder="Enter username"
+                  [control]="form | getControl : 'username'"
+                ></ub-input-text>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Email Address</label>
+            <div class="value">
+              <ng-container *ngIf="!isEditing; else emailInput">
+                {{ profile.email || "Not set" }}
+              </ng-container>
+              <ng-template #emailInput>
+                <ub-input-text
+                  placeholder="Enter email"
+                  [control]="form | getControl : 'email'"
+                ></ub-input-text>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>User ID</label>
+            <div class="value read-only">
+              <span class="mono">{{ profile.id }}</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Account Created</label>
+            <div class="value read-only">
+              {{ memberSince | date : "medium" }}
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 
-  <form [formGroup]="form" class="ub-profile-body">
-    <div class="field">
-      <label>User ID</label>
-      <div class="value">{{ profile.id }}</div>
-    </div>
+  <div class="ub-profile-card security-card">
+    <div class="card-section">
+      <div class="section-header">
+        <h4 class="section-title">
+          <i class="fas fa-lock"></i> Security Settings
+        </h4>
+        <ub-button
+          *ngIf="!isChangingPassword"
+          variant="outline"
+          size="sm"
+          (click)="togglePasswordChange()"
+        >
+          <i class="fas fa-key"></i> Change Password
+        </ub-button>
+      </div>
 
-    <div class="field">
-      <label>Created</label>
-      <div class="value">{{ memberSince | date : "mediumDate" }}</div>
-    </div>
+      <div *ngIf="isChangingPassword" class="password-change-section">
+        <form [formGroup]="passwordForm" class="password-form">
+          <div class="field">
+            <label>Current Password</label>
+            <ub-input-text
+              type="password"
+              placeholder="Enter current password"
+              [control]="passwordForm | getControl : 'current_password'"
+            ></ub-input-text>
+            <div class="error-messages">
+              <small
+                *ngFor="let error of getPasswordErrors('current_password')"
+                class="error-text"
+              >
+                {{ error }}
+              </small>
+            </div>
+          </div>
 
-    <div class="field">
-      <label>Username</label>
-      <div class="value">
-        <ng-container *ngIf="!isEditing; else usernameInput">{{
-          profile.username
-        }}</ng-container>
-        <ng-template #usernameInput>
-          <ub-input-text
-            placeholder="Username"
-            [control]="form | getControl : 'username'"
-          ></ub-input-text>
-        </ng-template>
+          <div class="field">
+            <label>New Password</label>
+            <ub-input-text
+              type="password"
+              placeholder="Enter new password"
+              [control]="passwordForm | getControl : 'new_password'"
+            ></ub-input-text>
+
+            <div
+              *ngIf="passwordForm.get('new_password')?.value"
+              class="password-strength"
+            >
+              <div class="strength-header">
+                <span class="strength-label">Password Strength:</span>
+                <span
+                  class="strength-value"
+                  [style.color]="getPasswordStrength().color"
+                >
+                  {{ getPasswordStrength().label }}
+                </span>
+              </div>
+              <div class="strength-bar">
+                <div
+                  class="strength-fill"
+                  [style.width.%]="getPasswordStrength().percentage"
+                  [style.background-color]="getPasswordStrength().color"
+                ></div>
+              </div>
+            </div>
+
+            <div class="password-requirements">
+              <small class="requirement-title">Password must contain:</small>
+              <ul class="requirements-list">
+                <li
+                  *ngFor="let req of getPasswordRequirements()"
+                  [class.met]="req.met"
+                >
+                  <i
+                    class="fas"
+                    [class.fa-check-circle]="req.met"
+                    [class.fa-circle]="!req.met"
+                  ></i>
+                  {{ req.label }}
+                </li>
+              </ul>
+            </div>
+            <div class="error-messages">
+              <small
+                *ngFor="let error of getPasswordErrors('new_password')"
+                class="error-text"
+              >
+                {{ error }}
+              </small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Confirm New Password</label>
+            <ub-input-text
+              type="password"
+              placeholder="Confirm new password"
+              [control]="passwordForm | getControl : 'confirm_password'"
+            ></ub-input-text>
+            <div class="error-messages">
+              <small
+                *ngFor="let error of getPasswordErrors('confirm_password')"
+                class="error-text"
+              >
+                {{ error }}
+              </small>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <ub-button
+              variant="primary"
+              (click)="changePassword()"
+              [disabled]="passwordForm.invalid"
+            >
+              <i class="fas fa-check"></i> Update Password
+            </ub-button>
+            <ub-button variant="outline" (click)="togglePasswordChange()">
+              Cancel
+            </ub-button>
+          </div>
+        </form>
+      </div>
+
+      <div *ngIf="!isChangingPassword" class="security-info">
+        <div class="info-item">
+          <i class="fas fa-check-circle info-icon"></i>
+          <span>Password is encrypted and secure</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-check-circle info-icon"></i>
+          <span>Account protected with authentication tokens</span>
+        </div>
       </div>
     </div>
-
-    <div class="field">
-      <label>First Name</label>
-      <div class="value">
-        <ng-container *ngIf="!isEditing; else firstInput">{{
-          profile.first_name
-        }}</ng-container>
-        <ng-template #firstInput>
-          <ub-input-text
-            placeholder="First Name"
-            [control]="form | getControl : 'first_name'"
-          ></ub-input-text>
-        </ng-template>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Last Name</label>
-      <div class="value">
-        <ng-container *ngIf="!isEditing; else lastInput">{{
-          profile.last_name
-        }}</ng-container>
-        <ng-template #lastInput>
-          <ub-input-text
-            placeholder="Last Name"
-            [control]="form | getControl : 'last_name'"
-          ></ub-input-text>
-        </ng-template>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Account Email</label>
-      <div class="value">
-        <ng-container *ngIf="!isEditing; else emailInput">{{
-          profile.email
-        }}</ng-container>
-        <ng-template #emailInput>
-          <ub-input-text
-            placeholder="Account Email"
-            [control]="form | getControl : 'email'"
-          ></ub-input-text>
-        </ng-template>
-      </div>
-    </div>
-  </form>
+  </div>
 </div>

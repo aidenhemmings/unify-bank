@@ -1,112 +1,125 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { UbSupabaseService } from './supabase.service';
 import { Account } from '@common/types';
+import { environment } from '../../../environment/environment';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbAccountsService {
+  private http = inject(HttpClient);
   private supabaseService = inject(UbSupabaseService);
+  private apiUrl = environment.apiUrl;
 
   async getAccounts(
     userId: string
   ): Promise<{ accounts: Account[]; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ accounts: Account[] }>(`${this.apiUrl}/accounts`, {
+          headers: this.supabaseService.getAuthHeaders(),
+        })
+      );
 
-    const { data, error } = await client
-      .from('accounts')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: true });
-
-    if (error) {
+      return { accounts: response.accounts, error: null };
+    } catch (error: any) {
       return { accounts: [], error };
     }
-
-    return { accounts: data as Account[], error: null };
   }
 
   async getAccountById(
     accountId: string
   ): Promise<{ account: Account | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ account: Account }>(
+          `${this.apiUrl}/accounts/${accountId}`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('accounts')
-      .select('*')
-      .eq('id', accountId)
-      .single();
-
-    if (error) {
+      return { account: response.account, error: null };
+    } catch (error: any) {
       return { account: null, error };
     }
-
-    return { account: data as Account, error: null };
   }
 
   async createAccount(
     account: Partial<Account>
   ): Promise<{ account: Account | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ account: Account }>(
+          `${this.apiUrl}/accounts`,
+          account,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('accounts')
-      .insert(account)
-      .select()
-      .single();
-
-    if (error) {
+      return { account: response.account, error: null };
+    } catch (error: any) {
       return { account: null, error };
     }
-
-    return { account: data as Account, error: null };
   }
 
   async updateAccount(
     accountId: string,
     updates: Partial<Account>
   ): Promise<{ account: Account | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.put<{ account: Account }>(
+          `${this.apiUrl}/accounts/${accountId}`,
+          updates,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('accounts')
-      .update(updates)
-      .eq('id', accountId)
-      .select()
-      .single();
-
-    if (error) {
+      return { account: response.account, error: null };
+    } catch (error: any) {
       return { account: null, error };
     }
-
-    return { account: data as Account, error: null };
   }
 
   async deleteAccount(accountId: string): Promise<{ error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      await firstValueFrom(
+        this.http.delete(`${this.apiUrl}/accounts/${accountId}`, {
+          headers: this.supabaseService.getAuthHeaders(),
+        })
+      );
 
-    const { error } = await client
-      .from('accounts')
-      .update({ is_active: false })
-      .eq('id', accountId);
-
-    return { error };
+      return { error: null };
+    } catch (error: any) {
+      return { error };
+    }
   }
 
   async getTotalBalance(
     userId: string
   ): Promise<{ balance: number; error: any }> {
-    const { accounts, error } = await this.getAccounts(userId);
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ balance: number }>(
+          `${this.apiUrl}/accounts/total-balance`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    if (error) {
+      return { balance: response.balance, error: null };
+    } catch (error: any) {
       return { balance: 0, error };
     }
-
-    const balance = accounts.reduce(
-      (sum, account) => sum + (account.balance || 0),
-      0
-    );
-    return { balance, error: null };
   }
 
   async updateAccountBalance(
@@ -114,32 +127,20 @@ export class UbAccountsService {
     amount: number,
     type: 'credit' | 'debit'
   ): Promise<{ account: Account | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.patch<{ account: Account }>(
+          `${this.apiUrl}/accounts/${accountId}/balance`,
+          { amount, type },
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { account, error: fetchError } = await this.getAccountById(accountId);
-
-    if (fetchError || !account) {
-      return {
-        account: null,
-        error: fetchError || new Error('Account not found'),
-      };
-    }
-
-    const currentBalance = account.balance || 0;
-    const newBalance =
-      type === 'credit' ? currentBalance + amount : currentBalance - amount;
-
-    const { data, error } = await client
-      .from('accounts')
-      .update({ balance: newBalance })
-      .eq('id', accountId)
-      .select()
-      .single();
-
-    if (error) {
+      return { account: response.account, error: null };
+    } catch (error: any) {
       return { account: null, error };
     }
-
-    return { account: data as Account, error: null };
   }
 }

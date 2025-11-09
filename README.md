@@ -1,39 +1,130 @@
 # UnifyBank
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.5.
+A modern banking application with a secure three-tier architecture.
 
-## Development server
+## Architecture
 
-## Getting started
+- **Frontend**: Angular 19.2.5 (Port 4200)
+- **Backend**: Node.js/Express REST API (Port 3000)
+- **Database**: Supabase (PostgreSQL)
 
-Prerequisites:
-- Node.js
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
 - npm
-- Angular (npm install -g @angular/cli)
+- Angular CLI (`npm install -g @angular/cli`)
 
-Install dependencies:
+### Installation
+
+1. **Install Frontend Dependencies**:
 
 ```bash
 npm install
 ```
 
-Run the dev server:
+2. **Install Backend Dependencies**:
 
 ```bash
-npm run start
+cd backend
+npm install
 ```
 
-Open https://localhost:4200/ in your browser.
+3. **Configure Environment**:
+   The backend `.env` file is already configured with Supabase credentials. If you need to update them:
+
+```bash
+cd backend
+# Edit .env file with your Supabase URL and Key
+```
+
+### Running the Application
+
+You need to run both the backend and frontend servers:
+
+**Terminal 1 - Backend API Server:**
+
+```bash
+cd backend
+npm run dev
+```
+
+Backend will run on `http://localhost:3000`
+
+**Terminal 2 - Frontend Development Server:**
+
+```bash
+npm start
+```
+
+Frontend will run on `https://localhost:4200`
+
+Open your browser and navigate to https://localhost:4200/
 
 ## Features
-- User authentication (username/password backed by Supabase table).
-- User Profile view and inline editing (reactive forms).
-- Dashboard layout with reusable components and guards to protect routes.
-- Small set of shared UI components (buttons, inputs, profile card) and pipes for form handling.
-- Transfering of funds between 2 accounts.
-- Viewing past transactions (sending and recieving).
 
-## Tech stack
-- Framework: Angular 19.2.5
-- Component Library: PrimeNG
-- Database + Auth: Supabase + Supabase Auth
+- User authentication with secure token-based sessions
+- User profile view and inline editing (reactive forms)
+- Dashboard layout with reusable components
+- Route guards for protected pages
+- Account management (create, view, update, delete)
+- Payment processing and scheduling
+- Transaction history and analytics
+- Fund transfers between accounts
+- Monthly income/expense statistics
+- Dark/Light theme toggle
+- Shared UI components (buttons, inputs, modals, etc.)
+
+## Tech Stack
+
+### Frontend
+
+- **Framework**: Angular 19.2.5
+- **Component Library**: PrimeNG
+- **HTTP Client**: Angular HttpClient
+- **State Management**: RxJS BehaviorSubjects
+- **Forms**: Reactive Forms
+
+### Backend
+
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database Client**: @supabase/supabase-js
+- **Authentication**: bcryptjs + custom token management
+- **CORS**: Configured for Angular frontend
+
+### Database
+
+- **Provider**: Supabase
+- **Type**: PostgreSQL
+- **Features**: Row Level Security (RLS), Stored Procedures
+
+## Project Structure
+
+```
+unify-bank/
+├── src/                          # Angular frontend
+│   ├── app/
+│   │   ├── common/
+│   │   │   ├── services/        # API services
+│   │   │   ├── guards/          # Route guards
+│   │   │   ├── ui/              # Shared components
+│   │   │   └── types/           # TypeScript interfaces
+│   │   └── modules/             # Feature modules
+│   └── environment/             # Environment config
+│
+├── backend/                      # Express backend
+│   ├── src/
+│   │   ├── config/              # Configuration
+│   │   ├── middleware/          # Auth middleware
+│   │   ├── controllers/         # Business logic
+│   │   ├── routes/              # API routes
+│   │   └── index.js             # Server entry point
+│   ├── .env                     # Environment variables
+│   └── package.json
+│
+├── SETUP_GUIDE.md               # Detailed setup instructions
+├── MIGRATION_SUMMARY.md         # Architecture migration details
+└── README.md                    # This file
+```

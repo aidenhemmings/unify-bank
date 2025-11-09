@@ -26,7 +26,6 @@ export class UbGetFormControlPipe implements PipeTransform {
   }
 
   throwError(error: string, form?: FormGroup): void {
-    console.error(error, form);
     throw new Error(error);
   }
 }

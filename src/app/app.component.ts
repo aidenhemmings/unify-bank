@@ -1,11 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {
-  UbSupabaseService,
   UbUserService,
   UbSidebarService,
   UbLoadingService,
-  UbToastService,
 } from '@common/services';
 import {
   UbSidebarComponent,
@@ -39,10 +37,8 @@ import { ConfirmationService } from 'primeng/api';
 })
 export class AppComponent implements OnInit {
   private userService = inject(UbUserService);
-  private supabaseService = inject(UbSupabaseService);
   private sidebarService = inject(UbSidebarService);
   private loadingService = inject(UbLoadingService);
-  private toastService = inject(UbToastService);
 
   static readonly CURRENCY_CONFIG = APP_CURRENCY_CONFIG;
 
@@ -68,38 +64,6 @@ export class AppComponent implements OnInit {
       .subscribe((collapsed) => {
         this.isCollapsed = collapsed;
       });
-
-    this.validateSession();
-  }
-
-  async validateSession() {
-    this.loadingService.show(this.loaderKey, true);
-
-    const token = this.userService.getToken();
-
-    if (token) {
-      const { userId, error } = await this.supabaseService.validateToken(token);
-
-      if (userId && !error) {
-        const { user } = await this.supabaseService.getUserById(userId);
-
-        if (user) {
-          await this.userService.setCurrentUser(user);
-          this.loadingService.hide(this.loaderKey);
-          return;
-        } else {
-          this.userService.clearSession();
-          this.loadingService.hide(this.loaderKey);
-          return;
-        }
-      } else {
-        this.userService.clearSession();
-        this.loadingService.hide(this.loaderKey);
-        return;
-      }
-    }
-
-    this.loadingService.hide(this.loaderKey);
   }
 
   get mainContentMargin(): string {

@@ -1,193 +1,204 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { UbSupabaseService } from './supabase.service';
 import { Transaction } from '@common/types';
+import { environment } from '../../../environment/environment';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbTransactionsService {
+  private http = inject(HttpClient);
   private supabaseService = inject(UbSupabaseService);
+  private apiUrl = environment.apiUrl;
 
   async getTransactions(
     accountId: string,
     limit?: number
   ): Promise<{ transactions: Transaction[]; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      let params = new HttpParams();
+      if (limit) {
+        params = params.set('limit', limit.toString());
+      }
 
-    let query = client
-      .from('transactions')
-      .select('*')
-      .eq('account_id', accountId)
-      .order('created_at', { ascending: false });
+      const response = await firstValueFrom(
+        this.http.get<{ transactions: Transaction[] }>(
+          `${this.apiUrl}/transactions/account/${accountId}`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+            params,
+          }
+        )
+      );
 
-    if (limit) {
-      query = query.limit(limit);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
+      return {
+        transactions: response.transactions.map((t) => ({
+          ...t,
+          date: t.created_at ? new Date(t.created_at) : new Date(),
+        })),
+        error: null,
+      };
+    } catch (error: any) {
       return { transactions: [], error };
     }
-
-    return {
-      transactions: data.map((t) => ({
-        ...t,
-        date: new Date(t.created_at),
-      })) as Transaction[],
-      error: null,
-    };
   }
 
   async getAllTransactionsForUser(
     userId: string,
     limit?: number
   ): Promise<{ transactions: Transaction[]; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      let params = new HttpParams();
+      if (limit) {
+        params = params.set('limit', limit.toString());
+      }
 
-    let query = client
-      .from('transactions')
-      .select('*, accounts!inner(user_id)')
-      .eq('accounts.user_id', userId)
-      .order('created_at', { ascending: false });
+      const response = await firstValueFrom(
+        this.http.get<{ transactions: Transaction[] }>(
+          `${this.apiUrl}/transactions`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+            params,
+          }
+        )
+      );
 
-    if (limit) {
-      query = query.limit(limit);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
+      return {
+        transactions: response.transactions.map((t: any) => ({
+          ...t,
+          date: t.created_at ? new Date(t.created_at) : new Date(),
+        })),
+        error: null,
+      };
+    } catch (error: any) {
       return { transactions: [], error };
     }
-
-    return {
-      transactions: data.map((t) => ({
-        id: t.id,
-        account_id: t.account_id,
-        description: t.description,
-        amount: t.amount,
-        type: t.type,
-        category: t.category,
-        status: t.status,
-        reference_number: t.reference_number,
-        date: new Date(t.created_at),
-        created_at: t.created_at,
-        updated_at: t.updated_at,
-      })) as Transaction[],
-      error: null,
-    };
   }
 
   async getTransactionById(
     transactionId: string
   ): Promise<{ transaction: Transaction | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ transaction: Transaction }>(
+          `${this.apiUrl}/transactions/${transactionId}`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('transactions')
-      .select('*')
-      .eq('id', transactionId)
-      .single();
-
-    if (error) {
+      return {
+        transaction: {
+          ...response.transaction,
+          date: response.transaction.created_at
+            ? new Date(response.transaction.created_at)
+            : new Date(),
+        },
+        error: null,
+      };
+    } catch (error: any) {
       return { transaction: null, error };
     }
-
-    return {
-      transaction: {
-        ...data,
-        date: new Date(data.created_at),
-      } as Transaction,
-      error: null,
-    };
   }
 
   async createTransaction(
     transaction: Partial<Transaction>
   ): Promise<{ transaction: Transaction | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ transaction: Transaction }>(
+          `${this.apiUrl}/transactions`,
+          transaction,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('transactions')
-      .insert(transaction)
-      .select()
-      .single();
-
-    if (error) {
+      return {
+        transaction: {
+          ...response.transaction,
+          date: response.transaction.created_at
+            ? new Date(response.transaction.created_at)
+            : new Date(),
+        },
+        error: null,
+      };
+    } catch (error: any) {
       return { transaction: null, error };
     }
-
-    return {
-      transaction: {
-        ...data,
-        date: new Date(data.created_at),
-      } as Transaction,
-      error: null,
-    };
   }
 
   async updateTransaction(
     transactionId: string,
     updates: Partial<Transaction>
   ): Promise<{ transaction: Transaction | null; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.put<{ transaction: Transaction }>(
+          `${this.apiUrl}/transactions/${transactionId}`,
+          updates,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('transactions')
-      .update(updates)
-      .eq('id', transactionId)
-      .select()
-      .single();
-
-    if (error) {
+      return {
+        transaction: {
+          ...response.transaction,
+          date: response.transaction.created_at
+            ? new Date(response.transaction.created_at)
+            : new Date(),
+        },
+        error: null,
+      };
+    } catch (error: any) {
       return { transaction: null, error };
     }
-
-    return {
-      transaction: {
-        ...data,
-        date: new Date(data.created_at),
-      } as Transaction,
-      error: null,
-    };
   }
 
   async deleteTransaction(transactionId: string): Promise<{ error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      await firstValueFrom(
+        this.http.delete(`${this.apiUrl}/transactions/${transactionId}`, {
+          headers: this.supabaseService.getAuthHeaders(),
+        })
+      );
 
-    const { error } = await client
-      .from('transactions')
-      .delete()
-      .eq('id', transactionId);
-
-    return { error };
+      return { error: null };
+    } catch (error: any) {
+      return { error };
+    }
   }
 
   async getTransactionsByCategory(
     userId: string,
     category: string
   ): Promise<{ transactions: Transaction[]; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ transactions: Transaction[] }>(
+          `${this.apiUrl}/transactions/category/${category}`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const { data, error } = await client
-      .from('transactions')
-      .select('*, accounts!inner(user_id)')
-      .eq('accounts.user_id', userId)
-      .eq('category', category)
-      .order('created_at', { ascending: false });
-
-    if (error) {
+      return {
+        transactions: response.transactions.map((t: any) => ({
+          ...t,
+          date: t.created_at ? new Date(t.created_at) : new Date(),
+        })),
+        error: null,
+      };
+    } catch (error: any) {
       return { transactions: [], error };
     }
-
-    return {
-      transactions: data.map((t) => ({
-        ...t,
-        date: new Date(t.created_at),
-      })) as Transaction[],
-      error: null,
-    };
   }
 
   async getMonthlyStats(
@@ -195,31 +206,23 @@ export class UbTransactionsService {
     year: number,
     month: number
   ): Promise<{ income: number; expenses: number; error: any }> {
-    const client = this.supabaseService.getSupabaseClient();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ income: number; expenses: number }>(
+          `${this.apiUrl}/transactions/stats/${year}/${month}`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59);
-
-    const { data, error } = await client
-      .from('transactions')
-      .select('amount, type, accounts!inner(user_id)')
-      .eq('accounts.user_id', userId)
-      .gte('created_at', startDate.toISOString())
-      .lte('created_at', endDate.toISOString())
-      .eq('status', 'completed');
-
-    if (error) {
+      return {
+        income: response.income,
+        expenses: response.expenses,
+        error: null,
+      };
+    } catch (error: any) {
       return { income: 0, expenses: 0, error };
     }
-
-    const income = data
-      .filter((t) => t.type === 'credit')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-    const expenses = data
-      .filter((t) => t.type === 'debit')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-    return { income, expenses, error: null };
   }
 }

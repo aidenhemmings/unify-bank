@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { UbGetFormControlPipe } from '@common/pipes';
 import { UbButtonComponent, UbInputTextComponent } from '@common/ui';
 import { UbSupabaseService, UbUserService } from '@common/services';
+import { CustomValidators } from '@common/validators';
 import { Router } from '@angular/router';
 
 @Component({
@@ -29,8 +30,15 @@ export class UbAuthComponent {
   private userService = inject(UbUserService);
 
   form = new FormGroup({
-    username: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+    username: new FormControl('', [
+      Validators.required,
+      CustomValidators.username(),
+      CustomValidators.noSpecialChars(),
+    ]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+    ]),
   });
 
   loginError = '';
@@ -61,8 +69,11 @@ export class UbAuthComponent {
       this.loginError = '';
       this.userService.setToken(token);
       await this.supabaseService.setToken(token);
+      await this.router.navigate(['dashboard']);
       await this.userService.setCurrentUser(user);
-      this.router.navigate(['dashboard']);
+      this.isLoading = false;
+    } else {
+      this.isLoading = false;
     }
   }
 }

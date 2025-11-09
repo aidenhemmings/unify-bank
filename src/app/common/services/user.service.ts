@@ -56,7 +56,6 @@ export class UbUserService {
 
     this.userSubject.next(null);
     this.userSettingsService.setCurrentSettings(null);
-    // Reset to default light mode on logout
     this.userSettingsService.applyTheme(true);
     localStorage.removeItem(this.TOKEN_KEY);
     this.loadingService.hide(LoadingKeys.GLOBAL);
