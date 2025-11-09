@@ -36,12 +36,12 @@ jobs:
           paths:
             - node_modules
       - run:
-          name: Install SonarQube Scanner
-          command: npm install -g sonarqube-scanner
+          name: Install SonarQube Scanner Locally
+          command: npm install sonarqube-scanner
       - run:
           name: Run SonarCloud Analysis
           command: |
-            sonar-scanner \
+            npx sonar-scanner \
               -Dsonar.projectKey=aidenhemmings_unify-bank \
               -Dsonar.organization=aiden-hemmings \
               -Dsonar.sources=src \
