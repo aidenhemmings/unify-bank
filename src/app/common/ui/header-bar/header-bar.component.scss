@@ -23,6 +23,33 @@
     }
   }
 
+  .mobile-menu-btn {
+    background: transparent;
+    border: none;
+    color: var(--gray-900);
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-right: 1rem;
+
+    &:hover {
+      background: var(--gray-100);
+      color: var(--primary-color);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    i {
+      font-size: 1.25rem;
+    }
+  }
+
   .breadcrumb-nav {
     flex: 1;
     overflow-x: auto;

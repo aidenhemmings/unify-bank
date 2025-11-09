@@ -1,4 +1,8 @@
-<aside class="sidebar" [class.collapsed]="isCollapsed">
+<aside
+  class="sidebar"
+  [class.collapsed]="isCollapsed"
+  [class.mobile-open]="isMobile && isCollapsed"
+>
   <div class="sidebar-header">
     <div class="logo-container">
       <img
@@ -11,8 +15,9 @@
       class="toggle-btn"
       (click)="toggleSidebar()"
       aria-label="Toggle Sidebar"
+      *ngIf="isMobile"
     >
-      <i class="fa" [ngClass]="isCollapsed ? 'fa-bars' : 'fa-times'"></i>
+      <i class="fa fa-times"></i>
     </button>
   </div>
 
@@ -34,10 +39,11 @@
           routerLinkActive="active"
           class="menu-link"
           tooltipPosition="right"
-          [pTooltip]="isCollapsed ? item.label : ''"
+          [pTooltip]="!isCollapsed || isMobile ? '' : item.label"
+          (click)="closeSidebarOnMobile()"
         >
           <i class="fa menu-icon" [ngClass]="item.icon"></i>
-          <span class="menu-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+          <span class="menu-label">{{ item.label }}</span>
         </a>
         } @if (item.children && item.children.length > 0) {
         <div class="menu-parent">
@@ -46,20 +52,17 @@
             (click)="toggleMenuItem(item.id)"
             [class.expanded]="isExpanded(item.id)"
             tooltipPosition="right"
-            [pTooltip]="item.label"
+            [pTooltip]="!isCollapsed || isMobile ? '' : item.label"
           >
             <i class="fa menu-icon" [ngClass]="item.icon"></i>
-            <span class="menu-label" *ngIf="!isCollapsed">{{
-              item.label
-            }}</span>
+            <span class="menu-label">{{ item.label }}</span>
             <i
               class="fa fa-chevron-down expand-icon"
-              *ngIf="!isCollapsed"
               [class.rotated]="isExpanded(item.id)"
             ></i>
           </button>
 
-          @if (isExpanded(item.id) && !isCollapsed) {
+          @if (isExpanded(item.id)) {
           <ul class="dropdown-menu">
             @for (child of item.children; track child.id) {
             <li *ngIf="child.visible !== false">
@@ -75,6 +78,7 @@
                 "
                 routerLinkActive="active"
                 class="dropdown-child"
+                (click)="closeSidebarOnMobile()"
               >
                 <i class="fa" [ngClass]="child.icon"></i>
                 <span>{{ child.label }}</span>
@@ -90,7 +94,13 @@
     </ul>
   </nav>
 
-  <div class="sidebar-footer" *ngIf="!isCollapsed">
+  <div class="sidebar-footer">
     <p class="footer-text">© 2025 Unify Banking</p>
   </div>
 </aside>
+
+<div
+  class="sidebar-overlay"
+  *ngIf="isMobile && isCollapsed"
+  (click)="toggleSidebar()"
+></div>

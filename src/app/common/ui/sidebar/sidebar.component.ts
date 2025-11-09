@@ -20,6 +20,7 @@ export class UbSidebarComponent implements OnInit {
   isCollapsed = false;
   menuItems: MenuItem[] = [];
   expandedItems = new Set<string>();
+  isMobile = false;
 
   ngOnInit() {
     this.menuItems = this.menuService.getMenuItems();
@@ -28,11 +29,33 @@ export class UbSidebarComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe((collapsed) => {
         this.isCollapsed = collapsed;
+        this.updateBodyClass();
       });
+
+    this.checkIfMobile();
+    window.addEventListener('resize', () => this.checkIfMobile());
+  }
+
+  checkIfMobile() {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  updateBodyClass() {
+    if (this.isMobile && this.isCollapsed) {
+      document.body.classList.add('sidebar-open');
+    } else {
+      document.body.classList.remove('sidebar-open');
+    }
   }
 
   toggleSidebar() {
     this.sidebarService.toggle();
+  }
+
+  closeSidebarOnMobile() {
+    if (this.isMobile && this.isCollapsed) {
+      this.sidebarService.toggle();
+    }
   }
 
   toggleMenuItem(itemId: string) {

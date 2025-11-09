@@ -180,6 +180,8 @@ body {
   min-height: calc(var(--vh, 1vh) * 100);
   background-color: var(--background);
   color: #2d3748;
+  overflow-x: hidden;
+  max-width: 100vw;
 
   &::-webkit-scrollbar {
     height: 8px;
