@@ -15,9 +15,11 @@
       class="toggle-btn"
       (click)="toggleSidebar()"
       aria-label="Toggle Sidebar"
-      *ngIf="isMobile"
     >
-      <i class="fa fa-times"></i>
+      <i
+        class="fa"
+        [ngClass]="isMobile ? 'fa-times' : isCollapsed ? 'fa-bars' : 'fa-times'"
+      ></i>
     </button>
   </div>
 
