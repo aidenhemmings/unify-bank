@@ -1,13 +1,18 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { UbSupabaseService } from './supabase.service';
 import { UserSettings } from '@common/types';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../../environment/environment';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UbUserSettingsService {
+  private http = inject(HttpClient);
   private supabaseService = inject(UbSupabaseService);
+  private apiUrl = environment.apiUrl;
 
   private settingsSubject = new BehaviorSubject<UserSettings | null>(null);
 
@@ -26,85 +31,79 @@ export class UbUserSettingsService {
   async getUserSettings(
     userId: string
   ): Promise<{ settings: UserSettings | null; error: any }> {
-    const { data, error } = await this.supabaseService
-      .getSupabaseClient()
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ settings: UserSettings }>(
+          `${this.apiUrl}/users/settings`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return this.createUserSettings(userId);
-      }
+      this.setCurrentSettings(response.settings);
+      return { settings: response.settings, error: null };
+    } catch (error: any) {
       return { settings: null, error };
     }
-
-    this.setCurrentSettings(data);
-    return { settings: data, error: null };
   }
 
   async createUserSettings(
     userId: string
   ): Promise<{ settings: UserSettings | null; error: any }> {
-    const { data, error } = await this.supabaseService
-      .getSupabaseClient()
-      .from('user_settings')
-      .insert({
-        user_id: userId,
-        is_light_mode: true,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return { settings: null, error };
-    }
-
-    this.setCurrentSettings(data);
-    return { settings: data, error: null };
+    return this.getUserSettings(userId);
   }
 
   async updateUserSettings(
     userId: string,
     updates: Partial<UserSettings>
   ): Promise<{ settings: UserSettings | null; error: any }> {
-    const { data, error } = await this.supabaseService
-      .getSupabaseClient()
-      .from('user_settings')
-      .update(updates)
-      .eq('user_id', userId)
-      .select()
-      .single();
+    try {
+      const response = await firstValueFrom(
+        this.http.put<{ settings: UserSettings }>(
+          `${this.apiUrl}/users/settings`,
+          updates,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
 
-    if (error) {
+      this.setCurrentSettings(response.settings);
+      return { settings: response.settings, error: null };
+    } catch (error: any) {
       return { settings: null, error };
     }
-
-    this.setCurrentSettings(data);
-    return { settings: data, error: null };
   }
 
   async toggleDarkMode(userId: string): Promise<{ success: boolean }> {
-    const currentSettings = this.getCurrentSettingsValue();
-    if (!currentSettings) {
+    try {
+      const response = await firstValueFrom(
+        this.http.patch<{ settings: UserSettings }>(
+          `${this.apiUrl}/users/settings/toggle-dark-mode`,
+          {},
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          }
+        )
+      );
+
+      this.setCurrentSettings(response.settings);
+      return { success: true };
+    } catch (error: any) {
       return { success: false };
     }
-
-    const { error } = await this.updateUserSettings(userId, {
-      is_light_mode: !currentSettings.is_light_mode,
-    });
-
-    return { success: !error };
   }
 
   applyTheme(isLightMode: boolean): void {
+    const htmlElement = document.documentElement;
+
     if (isLightMode) {
-      document.body.classList.remove('dark-mode');
-      document.body.classList.add('light-mode');
+      htmlElement.classList.remove('dark-mode');
+      htmlElement.classList.add('light-mode');
     } else {
-      document.body.classList.remove('light-mode');
-      document.body.classList.add('dark-mode');
+      htmlElement.classList.remove('light-mode');
+      htmlElement.classList.add('dark-mode');
     }
   }
 }

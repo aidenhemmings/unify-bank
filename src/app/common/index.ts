@@ -4,3 +4,4 @@ export * from './ui';
 export * from './pipes';
 export * from './types';
 export * from './enums';
+export * from './validators';
