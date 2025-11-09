@@ -32,7 +32,7 @@
   [(ngModel)]="value"
   (ngModelChange)="onChange($event)"
   (blur)="onBlur()"
-  (click)="click.emit($event)"
-  (focus)="focus.emit($event)"
+  (click)="clicked.emit($event)"
+  (focus)="focused.emit($event)"
 />
 }

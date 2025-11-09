@@ -35,10 +35,10 @@ export const DEFAULT_VALUE_ACCESSOR = {
   providers: [DEFAULT_VALUE_ACCESSOR],
 })
 export abstract class UbInputBaseComponent implements ControlValueAccessor {
-  @Output() public blur: EventEmitter<any> = new EventEmitter<any>();
-  @Output() public click = new EventEmitter();
-  @Output() public focus = new EventEmitter();
-  @Output() public valueChange = new EventEmitter<any>();
+  @Output() public blurred: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public clicked: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public focused: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public valueChanged: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() public placeholder = '';
   @Input() public id = '';
@@ -76,11 +76,11 @@ export abstract class UbInputBaseComponent implements ControlValueAccessor {
   }
 
   public onBlur(): void {
-    this.blur.emit();
+    this.blurred.emit();
   }
 
   onChange(value: any): void {
-    this.valueChange.emit(value);
+    this.valueChanged.emit(value);
   }
 
   onTouched(): void {}
