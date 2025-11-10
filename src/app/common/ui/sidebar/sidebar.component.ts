@@ -24,7 +24,7 @@ export class UbSidebarComponent implements OnInit {
 
   ngOnInit() {
     this.menuItems = this.menuService.getMenuItems();
-
+    console.log('Menu Items:', this.menuItems);
     this.sidebarService.isCollapsed$
       .pipe(untilDestroyed(this))
       .subscribe((collapsed) => {
