@@ -1,5 +1,12 @@
 const supabase = require("../config/supabase");
 
+/**
+ * Authenticates a user token.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @param {*} next - The next middleware function in the chain.
+ * @returns A JSON response indicating authentication success or failure.
+ */
 const authenticateToken = async (req, res, next) => {
   try {
     const token =

@@ -68,6 +68,9 @@ export class UbTransactionsComponent {
 
   loaderKey = LoadingKeys.TRANSACTIONS;
 
+  /**
+   * Defines all possible transaction categories for filtering.
+   */
   categories = [
     'All',
     'Shopping',
@@ -95,6 +98,9 @@ export class UbTransactionsComponent {
       });
   }
 
+  /**
+   * Asynchronously loads transactions and accounts for the current user.
+   */
   async loadData(): Promise<void> {
     this.loadingService.show(this.loaderKey);
 
@@ -115,6 +121,10 @@ export class UbTransactionsComponent {
     this.transactions = transactions;
   }
 
+  /**
+   * Loads all accounts for the current user from the supabase service.
+   * @returns A promise that resolves when accounts are loaded.
+   */
   async loadAccounts(): Promise<void> {
     const { accounts, error } = await this.accountsService.getAccounts(
       this.user.id
@@ -224,6 +234,10 @@ export class UbTransactionsComponent {
     this.selectedCategory = category.toLowerCase();
   }
 
+  /**
+   * Opens the payment creation modal dialog.
+   * Handles the response from the modal and initiates payment creation if confirmed.
+   */
   onAddTransaction(): void {
     this.ref = this.dialogService.open(UbTransactionModalComponent, {
       data: {
@@ -254,6 +268,11 @@ export class UbTransactionsComponent {
       });
   }
 
+  /**
+   * Asynchronously handles the creation of a new transaction based on form data.
+   * @param form - The form group containing the transaction creation data.
+   * @returns A promise that resolves when the transaction creation is complete.
+   */
   async handleTransactionCreation(form: any): Promise<void> {
     const payload = form.getRawValue();
 
@@ -317,6 +336,10 @@ export class UbTransactionsComponent {
     });
   }
 
+  /**
+   * Opens the transaction modal dialog in edit state.
+   * @param transaction - The transaction to be edited.
+   */
   onEditTransaction(transaction: Transaction): void {
     this.ref = this.dialogService.open(UbTransactionModalComponent, {
       data: {
@@ -349,6 +372,12 @@ export class UbTransactionsComponent {
       });
   }
 
+  /**
+   * Asynchronously handles the update of an existing transaction based on form data.
+   * @param transactionId - The unique identifier of the transaction to update.
+   * @param form - The form group containing the updated transaction data.
+   * @returns A promise that resolves when the transaction update is complete.
+   */
   async handleTransactionUpdate(
     transactionId: string,
     form: any
@@ -419,6 +448,9 @@ export class UbTransactionsComponent {
     this.loadingService.hide(this.loaderKey);
   }
 
+  /**
+   * Handles exporting transactions within a specified date range to an Excel file.
+   */
   onExportTransactions(): void {
     const fromDate = this.exportForm.get('fromDate')?.value;
     const toDate = this.exportForm.get('toDate')?.value;

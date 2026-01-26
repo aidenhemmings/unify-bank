@@ -16,6 +16,9 @@ const sanitizeInput = (value) => {
   return value.trim().replace(/[<>]/g, "").substring(0, 1000);
 };
 
+/**
+ * Validates login requests.
+ */
 const validateLogin = [
   body("username")
     .trim()
@@ -32,6 +35,9 @@ const validateLogin = [
     .withMessage("Password must be between 8 and 100 characters"),
 ];
 
+/**
+ * Validates registration requests.
+ */
 const validateRegistration = [
   body("username")
     .trim()
@@ -70,6 +76,9 @@ const validateRegistration = [
     .customSanitizer(sanitizeInput),
 ];
 
+/**
+ * Validates account creation requests.
+ */
 const validateAccountCreation = [
   body("account_name")
     .trim()
@@ -103,6 +112,9 @@ const validateAccountCreation = [
     .withMessage("Currency must be uppercase letters"),
 ];
 
+/**
+ * Validates payment creation requests.
+ */
 const validatePaymentCreation = [
   body("recipient_name")
     .trim()
@@ -142,6 +154,9 @@ const validatePaymentCreation = [
     .withMessage("Invalid frequency"),
 ];
 
+/**
+ * Validates transaction creation requests.
+ */
 const validateTransactionCreation = [
   body("account_id")
     .trim()
@@ -177,6 +192,9 @@ const validateTransactionCreation = [
     .customSanitizer(sanitizeInput),
 ];
 
+/**
+ * Validates UUID parameters.
+ */
 const validateUUID = [
   param("id")
     .optional()
@@ -190,6 +208,9 @@ const validateUUID = [
     .withMessage("Invalid account ID format"),
 ];
 
+/**
+ * Validates user update requests.
+ */
 const validateUserUpdate = [
   body("username")
     .optional()
@@ -217,6 +238,13 @@ const validateUserUpdate = [
     .customSanitizer(sanitizeInput),
 ];
 
+/**
+ * Handles validation errors from express-validator.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @param {*} next - The next middleware function.
+ * @returns A JSON response with validation errors or calls next().
+ */
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

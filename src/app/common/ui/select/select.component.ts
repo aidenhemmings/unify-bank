@@ -9,6 +9,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UbInputBaseComponent } from '../input';
 
+/**
+ * Select component for choosing options from a dropdown list.
+ */
 @Component({
   selector: 'ub-select',
   templateUrl: './select.component.html',

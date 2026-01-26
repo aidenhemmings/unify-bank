@@ -8,6 +8,10 @@ const {
   handleValidationErrors,
 } = require("../utils/validators");
 
+/**
+ * Authentication routes.
+ */
+
 router.post(
   "/login",
   loginRateLimiter,

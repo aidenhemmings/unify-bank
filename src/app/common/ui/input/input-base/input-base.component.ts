@@ -22,6 +22,9 @@ DefaultValueAccessor.prototype.registerOnChange = function (
   };
 };
 
+/**
+ * Default value accessor for input components.
+ */
 export const DEFAULT_VALUE_ACCESSOR = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef((): any => DefaultValueAccessor),

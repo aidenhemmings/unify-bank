@@ -21,6 +21,9 @@ import { UbGetFormControlPipe } from '@common/pipes';
 import { LoadingKeys } from '@common/enums';
 import { CustomValidators } from '@common/validators';
 
+/**
+ * User profile component that allows viewing and editing of user information and password.
+ */
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-user-profile',

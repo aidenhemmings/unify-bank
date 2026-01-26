@@ -8,6 +8,9 @@ import {
 import { UserSettings } from '@common/types';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
+/**
+ * User settings modal component for viewing and updating user preferences.
+ */
 @Component({
   selector: 'ub-user-settings-modal',
   templateUrl: './user-settings-modal.component.html',

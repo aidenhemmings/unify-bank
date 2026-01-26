@@ -8,6 +8,10 @@ const {
   handleValidationErrors,
 } = require("../utils/validators");
 
+/**
+ * Applies authentication middleware to all account routes.
+ */
+
 router.use(authenticateToken);
 
 router.get("/", accountsController.getAccounts);

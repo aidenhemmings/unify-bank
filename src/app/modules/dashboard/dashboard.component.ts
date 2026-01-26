@@ -76,6 +76,10 @@ export class UbDashboardComponent {
       });
   }
 
+  /**
+   * Asynchronously loads all dashboard data by executing multiple data fetching operations.
+   * Sets up quick actions after data is loaded and displays error toast if any operation fails.
+   */
   async loadDashboardData(): Promise<void> {
     this.loadingService.show(this.loaderKey);
 
@@ -95,6 +99,9 @@ export class UbDashboardComponent {
     }
   }
 
+  /**
+   * Loads all accounts for the current user and calculates total balance.
+   */
   private async loadAccounts(): Promise<void> {
     const { accounts, error } = await this.accountsService.getAccounts(
       this.user.id
@@ -112,6 +119,9 @@ export class UbDashboardComponent {
     );
   }
 
+  /**
+   * Private function that loads the most recent transactions for the current user (limited to 5 records).
+   */
   private async loadRecentTransactions(): Promise<void> {
     const { transactions, error } =
       await this.transactionsService.getAllTransactionsForUser(this.user.id, 5);
@@ -124,6 +134,9 @@ export class UbDashboardComponent {
     this.recentTransactions = transactions;
   }
 
+  /**
+   * Loads monthly income and expense statistics for the current month.
+   */
   private async loadMonthlyStats(): Promise<void> {
     const now = new Date();
     const { income, expenses, error } =
@@ -142,6 +155,9 @@ export class UbDashboardComponent {
     this.monthlyExpenses = expenses;
   }
 
+  /**
+   * Loads the count of pending payments for the current user.
+   */
   private async loadPendingPayments(): Promise<void> {
     const { count, error } = await this.paymentsService.getPendingPayments(
       this.user.id
@@ -155,6 +171,10 @@ export class UbDashboardComponent {
     this.pendingPaymentsCount = count;
   }
 
+  /**
+   * Initializes the quick actions array with predefined actions and their metadata.
+   * Each action includes icon, label, optional route, and color styling.
+   */
   private setupQuickActions(): void {
     this.quickActions = [
       {
@@ -218,6 +238,10 @@ export class UbDashboardComponent {
     }
   }
 
+  /**
+   * Opens the payment creation modal dialog.
+   * Passes available accounts and subscribes to form submission.
+   */
   onAddPayment(): void {
     this.ref = this.dialogService.open(UbPaymentModalComponent, {
       data: {
@@ -248,6 +272,11 @@ export class UbDashboardComponent {
       });
   }
 
+  /**
+   * Asynchronously handles payment creation by sending form data to the supabase service.
+   * Processes immediate payments or schedules future payments based on form data.
+   * @param form - The form group containing payment data to send to the service.
+   */
   async handlePaymentCreation(form: any): Promise<void> {
     const payload = form.getRawValue();
 
@@ -331,6 +360,11 @@ export class UbDashboardComponent {
       });
   }
 
+  /**
+   * Handles transaction creation by sending form data to the service.
+   * Updates account balance for completed transactions and displays appropriate messages.
+   * @param form - The form group containing transaction data.
+   */
   async handleTransactionCreation(form: any): Promise<void> {
     const payload = form.getRawValue();
 

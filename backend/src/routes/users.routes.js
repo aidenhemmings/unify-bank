@@ -8,6 +8,10 @@ const {
 } = require("../utils/validators");
 const { validatePasswordChange } = require("../utils/password-validators");
 
+/**
+ * Applies authentication middleware to all user routes.
+ */
+
 router.use(authenticateToken);
 
 router.get("/profile", usersController.getUserProfile);

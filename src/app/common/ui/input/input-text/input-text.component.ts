@@ -3,6 +3,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { UbInputBaseComponent } from '../input-base';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+/**
+ * Text input component for user text entry.
+ */
 @Component({
   selector: 'ub-input-text',
   templateUrl: './input-text.component.html',

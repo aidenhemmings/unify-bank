@@ -16,18 +16,34 @@ export class UbUserSettingsService {
 
   private settingsSubject = new BehaviorSubject<UserSettings | null>(null);
 
+  /**
+   * Retrieves current user settings
+   */
   get currentSettings(): Observable<UserSettings | null> {
     return this.settingsSubject.asObservable();
   }
 
+  /**
+   * Retrieves current user settings value
+   * @returns A UserSettings object or null
+   */
   getCurrentSettingsValue(): UserSettings | null {
     return this.settingsSubject.value;
   }
 
+  /**
+   * Sets the current user settings
+   * @param settings - The UserSettings object to set
+   */
   setCurrentSettings(settings: UserSettings | null): void {
     this.settingsSubject.next(settings);
   }
 
+  /**
+   * Retrieves user settings from the server.
+   * @param userId - The ID of the user.
+   * @returns A promise resolving to an object containing the settings and any error.
+   */
   async getUserSettings(
     userId: string
   ): Promise<{ settings: UserSettings | null; error: any }> {
@@ -48,12 +64,23 @@ export class UbUserSettingsService {
     }
   }
 
+  /**
+   * Creates user settings for a new user.
+   * @param userId - The ID of the user.
+   * @returns A promise resolving to an object containing the settings and any error.
+   */
   async createUserSettings(
     userId: string
   ): Promise<{ settings: UserSettings | null; error: any }> {
     return this.getUserSettings(userId);
   }
 
+  /**
+   * Updates existing user settings.
+   * @param userId - The ID of the user.
+   * @param updates - The updates to apply to the user settings.
+   * @returns A promise resolving to an object containing the updated settings and any error.
+   */
   async updateUserSettings(
     userId: string,
     updates: Partial<UserSettings>
@@ -76,6 +103,11 @@ export class UbUserSettingsService {
     }
   }
 
+  /**
+   * Toggles light/dark mode for the user.
+   * @param userId - The user ID to apply the toggle for.
+   * @returns A promise resolving to an object containing the settings and any error.
+   */
   async toggleDarkMode(userId: string): Promise<{ success: boolean }> {
     try {
       const response = await firstValueFrom(
@@ -95,6 +127,10 @@ export class UbUserSettingsService {
     }
   }
 
+  /**
+   * Applies the theme to the document based on user settings.
+   * @param isLightMode - Whether light mode is enabled.
+   */
   applyTheme(isLightMode: boolean): void {
     const htmlElement = document.documentElement;
 

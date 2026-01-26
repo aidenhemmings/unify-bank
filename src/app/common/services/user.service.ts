@@ -21,10 +21,18 @@ export class UbUserService {
     return this.userSubject.asObservable();
   }
 
+  /**
+   * Retrieves current user value
+   * @returns A User object or null
+   */
   getCurrentUser(): User | null {
     return this.userSubject.value;
   }
 
+  /**
+   * Sets the current user
+   * @param user - The User object to set
+   */
   async setCurrentUser(user: User | null): Promise<void> {
     this.userSubject.next(user);
 
@@ -38,14 +46,25 @@ export class UbUserService {
     }
   }
 
+  /**
+   * Sets the authentication token
+   * @param token - The authentication token to set
+   */
   setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
   }
 
+  /**
+   * Retrieves the authentication token
+   * @returns A string token or null
+   */
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  /**
+   * Clears the current user session, including token and user data.
+   */
   async clearSession(): Promise<void> {
     this.loadingService.show(LoadingKeys.GLOBAL, true);
     const token = this.getToken();

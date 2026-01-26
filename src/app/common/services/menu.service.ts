@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
   providedIn: 'root',
 })
 export class UbMenuService {
+  /**
+   * Declares the menu items subject with initial menu items.
+   */
   private menuItemsSubject = new BehaviorSubject<MenuItem[]>([
     {
       id: uuidv4(),
@@ -49,14 +52,27 @@ export class UbMenuService {
 
   menuItems$ = this.menuItemsSubject.asObservable();
 
+  /**
+   * Retrieves the current menu items.
+   * @returns The current menu items.
+   */
   getMenuItems() {
     return this.menuItemsSubject.value;
   }
 
+  /**
+   * Updates the menu items.
+   * @param items - The items to set as the current menu items.
+   */
   updateMenuItems(items: MenuItem[]) {
     this.menuItemsSubject.next(items);
   }
 
+  /**
+   * Filters the menu items based on user permissions.
+   * @param userPermissions - The permissions of the current user.
+   * @returns The filtered menu items.
+   */
   filterMenuByPermissions(userPermissions: Permission[]): MenuItem[] {
     return this.menuItemsSubject.value.filter((item) => {
       if (!item.permission) return true;

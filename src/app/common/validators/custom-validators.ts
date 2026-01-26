@@ -1,5 +1,8 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+/**
+ * Custom validators for form controls.
+ */
 export class CustomValidators {
   static strongPassword(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {

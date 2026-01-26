@@ -1,6 +1,12 @@
 const supabase = require("../config/supabase");
 const bcrypt = require("bcryptjs");
 
+/**
+ * Retrieves the profile information for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the user profile or an error message.
+ */
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -23,6 +29,12 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * Updates the profile information for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the updated user profile or an error message.
+ */
 const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -53,6 +65,12 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves the settings for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the user settings or an error message.
+ */
 const getUserSettings = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -89,6 +107,12 @@ const getUserSettings = async (req, res) => {
   }
 };
 
+/**
+ * Updates the user settings for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the updated user settings or an error message.
+ */
 const updateUserSettings = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -111,6 +135,12 @@ const updateUserSettings = async (req, res) => {
   }
 };
 
+/**
+ * Toggles the dark/light modes for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the mode (light/dark) in which the user selected or an error message.
+ */
 const toggleDarkMode = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -142,6 +172,12 @@ const toggleDarkMode = async (req, res) => {
   }
 };
 
+/**
+ * Handles password change for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating success or failure of the password change.
+ */
 const changePassword = async (req, res) => {
   try {
     const userId = req.user.id;

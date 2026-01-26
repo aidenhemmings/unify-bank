@@ -3,6 +3,9 @@ import { Component, Input } from '@angular/core';
 import { ButtonType } from './types';
 import { ButtonModule } from 'primeng/button';
 
+/**
+ * A reusable button component with various styles and sizes.
+ */
 @Component({
   selector: 'ub-button',
   templateUrl: 'button.component.html',

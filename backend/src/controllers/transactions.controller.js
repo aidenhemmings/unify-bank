@@ -1,5 +1,11 @@
 const supabase = require("../config/supabase");
 
+/**
+ * Retrieves transactions for a specific account.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the transactions or an error message.
+ */
 const getTransactionsByAccount = async (req, res) => {
   try {
     const { accountId } = req.params;
@@ -32,6 +38,12 @@ const getTransactionsByAccount = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all transactions for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the transactions or an error message.
+ */
 const getAllTransactions = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -73,6 +85,12 @@ const getAllTransactions = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a specific transaction by its ID.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the transaction or an error message.
+ */
 const getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -98,6 +116,12 @@ const getTransactionById = async (req, res) => {
   }
 };
 
+/**
+ * Creates a new transaction.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the created transaction or an error message.
+ */
 const createTransaction = async (req, res) => {
   try {
     const transactionData = req.body;
@@ -123,6 +147,12 @@ const createTransaction = async (req, res) => {
   }
 };
 
+/**
+ * Updates an existing transaction.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the updated transaction or an error message.
+ */
 const updateTransaction = async (req, res) => {
   try {
     const { id } = req.params;
@@ -150,6 +180,12 @@ const updateTransaction = async (req, res) => {
   }
 };
 
+/**
+ * Soft deletes a specific transaction by setting the is_deleted flag to true.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating success or failure.
+ */
 const deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params;
@@ -166,6 +202,12 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves transactions by their category for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the transactions or an error message.
+ */
 const getTransactionsByCategory = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -193,6 +235,12 @@ const getTransactionsByCategory = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves monthly statistics (total income and expenses) for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the monthly statistics or an error message.
+ */
 const getMonthlyStats = async (req, res) => {
   try {
     const userId = req.user.id;
