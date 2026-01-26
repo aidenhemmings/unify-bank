@@ -5,6 +5,9 @@ import { UbLoadingService } from '@common/services';
 import { Loader } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
+/**
+ * Loader component to display loading indicators based on loader state.
+ */
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-loader',

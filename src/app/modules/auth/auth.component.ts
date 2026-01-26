@@ -43,7 +43,16 @@ export class UbAuthComponent {
 
   loginError = '';
   isLoading = false;
+  showPassword = false;
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  /**
+   * Handles the login process by validating form input and authenticating the user.
+   * Sets authentication token, navigates to dashboard on success, and displays error messages on failure.
+   */
   async login(): Promise<void> {
     if (
       this.form.invalid ||

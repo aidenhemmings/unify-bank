@@ -66,6 +66,9 @@ export class UbPaymentsComponent {
       });
   }
 
+  /**
+   * Asynchronously loads payments and accounts for the current user.
+   */
   async loadData(): Promise<void> {
     this.loadingService.show(this.loaderKey);
 
@@ -74,6 +77,10 @@ export class UbPaymentsComponent {
     this.loadingService.hide(this.loaderKey);
   }
 
+  /**
+   * Loads all payments for the current user from the supabase service.
+   * @returns A promise that resolves when payments are loaded.
+   */
   async loadPayments(): Promise<void> {
     const { payments, error } = await this.paymentsService.getPayments(
       this.user.id
@@ -87,6 +94,10 @@ export class UbPaymentsComponent {
     this.payments = payments;
   }
 
+  /**
+   * Loads all accounts for the current user from the supabase service.
+   * @returns A promise that resolves when accounts are loaded.
+   */
   async loadAccounts(): Promise<void> {
     const { accounts, error } = await this.accountsService.getAccounts(
       this.user.id
@@ -191,6 +202,10 @@ export class UbPaymentsComponent {
     this.selectedType = type;
   }
 
+  /**
+   * Opens the payment creation modal dialog.
+   * Handles the response from the modal and initiates payment creation if confirmed.
+   */
   onAddPayment(): void {
     this.ref = this.dialogService.open(UbPaymentModalComponent, {
       data: {
@@ -221,6 +236,11 @@ export class UbPaymentsComponent {
       });
   }
 
+  /**
+   * Asynchronously handles the creation of a new payment based on form data.
+   * @param form - The form group containing the payment creation data.
+   * @returns A promise that resolves when the payment creation is complete.
+   */
   async handlePaymentCreation(form: any): Promise<void> {
     const payload = form.getRawValue();
 
@@ -290,6 +310,11 @@ export class UbPaymentsComponent {
     });
   }
 
+  /**
+   * Cancels a pending payment.
+   * @param payment - The payment to be cancelled.
+   * @returns A promise that resolves when the cancellation is complete.
+   */
   async onCancelPayment(payment: Payment): Promise<void> {
     if (payment.status !== 'pending') {
       return;

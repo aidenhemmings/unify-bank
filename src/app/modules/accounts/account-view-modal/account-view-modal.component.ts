@@ -43,6 +43,10 @@ export class UbAccountViewModalComponent implements OnInit {
     }
   }
 
+  /**
+   * Loads transactions for the current account from the supabase service.
+   * Displays error toast message if the request fails and manages loading state.
+   */
   async loadTransactions(): Promise<void> {
     this.loadingService.show(this.loaderKey);
 
@@ -82,6 +86,11 @@ export class UbAccountViewModalComponent implements OnInit {
     }).format(new Date(date));
   }
 
+  /**
+   * Returns the appropriate FontAwesome icon class name for a transaction category.
+   * @param category - The transaction category name.
+   * @returns A FontAwesome icon class string, defaults to 'fa-circle-dollar' if category not found.
+   */
   getTransactionIcon(category: string): string {
     const icons: { [key: string]: string } = {
       Shopping: 'fa-cart-shopping',
@@ -125,12 +134,20 @@ export class UbAccountViewModalComponent implements OnInit {
     return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
+  /**
+   * Calculates the total income from all completed credit transactions.
+   * @returns The sum of all completed incoming transactions.
+   */
   get totalIncome(): number {
     return this.transactions
       .filter((t) => t.type === 'credit' && t.status === 'completed')
       .reduce((sum, t) => sum + t.amount, 0);
   }
 
+  /**
+   * Calculates the total expenses from all completed debit transactions.
+   * @returns The sum of all completed outgoing transactions.
+   */
   get totalExpenses(): number {
     return this.transactions
       .filter((t) => t.type === 'debit' && t.status === 'completed')

@@ -78,6 +78,11 @@ export class UbPaymentModalComponent implements OnInit {
     this.initializeForm();
   }
 
+  /**
+   * Initializes the reactive form with form controls and validators.
+   * Sets up conditional validators for recurring payments and disables certain fields where necessary.
+   * Subscribes to payment type changes to dynamically update frequency validation.
+   */
   initializeForm(): void {
     this.paymentForm = this.fb.group({
       fromAccountId: [
@@ -166,6 +171,12 @@ export class UbPaymentModalComponent implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  /**
+   * Retrieves the appropriate error message for a form field based on its validation errors.
+   * Provides specific error messages for different validation types (required, length, pattern, etc).
+   * @param fieldName - The name of the form field to get the error message for.
+   * @returns A user-friendly error message string, or an empty string if no errors exist.
+   */
   getErrorMessage(fieldName: string): string {
     const field = this.paymentForm.get(fieldName);
 

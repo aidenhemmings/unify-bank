@@ -1,5 +1,11 @@
 const supabase = require("../config/supabase");
 
+/**
+ * Retrieves all payments for a specific user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the payments or an error message.
+ */
 const getPayments = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -20,6 +26,12 @@ const getPayments = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a specific payment by its ID.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the payment or an error message.
+ */
 const getPaymentById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -40,6 +52,12 @@ const getPaymentById = async (req, res) => {
   }
 };
 
+/**
+ * Creates a new payment for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the created payment or an error message.
+ */
 const createPayment = async (req, res) => {
   try {
     const paymentData = {
@@ -63,6 +81,12 @@ const createPayment = async (req, res) => {
   }
 };
 
+/**
+ * Updates an existing payment.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the updated payment or an error message.
+ */
 const updatePayment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,6 +109,12 @@ const updatePayment = async (req, res) => {
   }
 };
 
+/**
+ * Cancels a payment.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating success or failure.
+ */
 const cancelPayment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -104,6 +134,12 @@ const cancelPayment = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves pending payments for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the pending payments and their count or an error message.
+ */
 const getPendingPayments = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -125,6 +161,12 @@ const getPendingPayments = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves payments by their status for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the payments or an error message.
+ */
 const getPaymentsByStatus = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -147,6 +189,12 @@ const getPaymentsByStatus = async (req, res) => {
   }
 };
 
+/**
+ * Processes a payment.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the result of the payment processing or an error message.
+ */
 const processPayment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -165,6 +213,12 @@ const processPayment = async (req, res) => {
   }
 };
 
+/**
+ * Processes scheduled payments.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating success or failure.
+ */
 const processScheduledPayments = async (req, res) => {
   try {
     const { data, error } = await supabase.rpc("process_scheduled_payments");

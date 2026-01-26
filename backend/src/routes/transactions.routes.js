@@ -8,6 +8,10 @@ const {
   handleValidationErrors,
 } = require("../utils/validators");
 
+/**
+ * Applies authentication middleware to all transaction routes.
+ */
+
 router.use(authenticateToken);
 
 router.get("/", transactionsController.getAllTransactions);

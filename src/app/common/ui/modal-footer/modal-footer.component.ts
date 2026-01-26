@@ -8,6 +8,9 @@ import { UbModalFormService } from '@common/services';
 import { ModalResponse } from '@common/types/modal-response.type';
 import { Common, ModalResponseTypes } from '@common/enums';
 
+/**
+ * Modal footer component with configurable buttons and behavior.
+ */
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-modal-footer',

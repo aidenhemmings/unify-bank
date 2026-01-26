@@ -1,5 +1,11 @@
 const supabase = require("../config/supabase");
 
+/**
+ * Retrieves all accounts for a specific user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the accounts or an error message.
+ */
 const getAccounts = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -20,6 +26,12 @@ const getAccounts = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a specific account by its ID.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the account or an error message.
+ */
 const getAccountById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -40,6 +52,12 @@ const getAccountById = async (req, res) => {
   }
 };
 
+/**
+ * Creates a new account for the authenticated user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the created account or an error message.
+ */
 const createAccount = async (req, res) => {
   try {
     const accountData = {
@@ -63,6 +81,12 @@ const createAccount = async (req, res) => {
   }
 };
 
+/**
+ * Updates an existing account.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the updated account or an error message.
+ */
 const updateAccount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,6 +109,12 @@ const updateAccount = async (req, res) => {
   }
 };
 
+/**
+ * Deletes an account by setting its is_active flag to false.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating success or failure.
+ */
 const deleteAccount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -104,6 +134,12 @@ const deleteAccount = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves the total balance of all active accounts for a specific user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the total balance or an error message.
+ */
 const getTotalBalance = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -128,6 +164,12 @@ const getTotalBalance = async (req, res) => {
   }
 };
 
+/**
+ * Updates the balance of an account.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the updated account or an error message.
+ */
 const updateAccountBalance = async (req, res) => {
   try {
     const { id } = req.params;

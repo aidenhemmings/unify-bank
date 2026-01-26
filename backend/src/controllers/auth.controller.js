@@ -2,6 +2,12 @@ const supabase = require("../config/supabase");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
+/**
+ * Logs in a user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response containing the user and token or an error message.
+ */
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -51,6 +57,12 @@ const login = async (req, res) => {
   }
 };
 
+/**
+ * Logs out a user.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating success or failure.
+ */
 const logout = async (req, res) => {
   try {
     const token = req.token;
@@ -74,6 +86,12 @@ const logout = async (req, res) => {
   }
 };
 
+/**
+ * Validates a user token.
+ * @param {*} req - The request object.
+ * @param {*} res - The response object.
+ * @returns A JSON response indicating if the token is valid or an error message.
+ */
 const validateToken = async (req, res) => {
   try {
     const token =

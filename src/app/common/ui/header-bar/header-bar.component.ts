@@ -12,6 +12,9 @@ import { UbButtonComponent } from '../button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UbUserSettingsModalComponent } from '../user-settings-modal/user-settings-modal.component';
 
+/**
+ * Header bar component that displays breadcrumbs, user info, and navigation controls.
+ */
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-header-bar',

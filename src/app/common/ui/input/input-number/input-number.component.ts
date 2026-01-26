@@ -3,6 +3,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UbInputBaseComponent } from '../input-base';
 
+/**
+ * Numeric input component with formatting options.
+ */
 @Component({
   selector: 'ub-input-number',
   templateUrl: './input-number.component.html',

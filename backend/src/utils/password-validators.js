@@ -1,5 +1,8 @@
 const { body } = require("express-validator");
 
+/**
+ * Validates password change requests and validates password complexity.
+ */
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 

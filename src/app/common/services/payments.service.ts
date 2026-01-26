@@ -13,6 +13,11 @@ export class UbPaymentsService {
   private supabaseService = inject(UbSupabaseService);
   private apiUrl = environment.apiUrl;
 
+  /**
+   * Asynchronous function to get payments for a user.
+   * @param userId The ID of the user.
+   * @returns A promise resolving to an object containing payments and any error.
+   */
   async getPayments(
     userId: string
   ): Promise<{ payments: Payment[]; error: any }> {
@@ -29,6 +34,11 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Retrieves a specific payment by its ID.
+   * @param paymentId - The ID of the payment to retrieve.
+   * @returns A promise resolving to an object containing the payment and any error.
+   */
   async getPaymentById(
     paymentId: string
   ): Promise<{ payment: Payment | null; error: any }> {
@@ -48,6 +58,11 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Creates a new payment.
+   * @param payment - The payment data to create.
+   * @returns A promise resolving to an object containing the created payment and any error.
+   */
   async createPayment(
     payment: Partial<Payment>
   ): Promise<{ payment: Payment | null; error: any }> {
@@ -68,6 +83,12 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Updates a payment.
+   * @param paymentId - The ID of the payment to update.
+   * @param updates - The updated payment data.
+   * @returns A promise resolving to an object containing the updated payment and any error.
+   */
   async updatePayment(
     paymentId: string,
     updates: Partial<Payment>
@@ -89,6 +110,11 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Cancels a payment by its ID.
+   * @param paymentId - The ID of the payment to cancel.
+   * @returns A promise resolving to an object containing any error.
+   */
   async cancelPayment(paymentId: string): Promise<{ error: any }> {
     try {
       await firstValueFrom(
@@ -107,6 +133,11 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Retrieves pending payments for a user.
+   * @param userId - The ID of the user to retrieve pending payments for.
+   * @returns A promise resolving to an object containing the payments, count, and any error.
+   */
   async getPendingPayments(
     userId: string
   ): Promise<{ payments: Payment[]; count: number; error: any }> {
@@ -130,6 +161,12 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Retrieves payments by their status for a specific user.
+   * @param userId - The ID of the user to retrieve payments for.
+   * @param status - The status of the payments to retrieve.
+   * @returns A promise resolving to an object containing the payments and any error.
+   */
   async getPaymentsByStatus(
     userId: string,
     status: Payment['status']
@@ -150,6 +187,11 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Processes a payment by its ID.
+   * @param paymentId - The ID of the payment to process.
+   * @returns A promise resolving to an object containing the result and any error.
+   */
   async processPayment(
     paymentId: string
   ): Promise<{ result: any; error: any }> {
@@ -170,6 +212,10 @@ export class UbPaymentsService {
     }
   }
 
+  /**
+   * Processes scheduled payments.
+   * @returns A promise resolving to an object containing the result and any error.
+   */
   async processScheduledPayments(): Promise<{ result: any; error: any }> {
     try {
       const response = await firstValueFrom(

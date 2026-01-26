@@ -61,6 +61,10 @@ export class UbAccountsComponent {
       });
   }
 
+  /**
+   * Asynchronously loads all accounts for the current user from the supabase service.
+   * Calculates total balance and displays error toast message if the request fails.
+   */
   async loadAccounts(): Promise<void> {
     this.loadingService.show(this.loaderKey);
 
@@ -123,6 +127,10 @@ export class UbAccountsComponent {
     return isActive ? 'Active' : 'Inactive';
   }
 
+  /**
+   * Opens the account creation modal dialog.
+   * Subscribes to the modal close event and handles account creation if confirmed.
+   */
   onAddAccount(): void {
     this.ref = this.dialogService.open(UbAccountModalComponent, {
       data: {},
@@ -151,6 +159,11 @@ export class UbAccountsComponent {
       });
   }
 
+  /**
+   * Handles the creation of a new account by sending the form data to the supabase service.
+   * Reloads accounts on success and displays appropriate toast messages.
+   * @param form - The form group containing the account creation data.
+   */
   async handleAccountCreation(form: any): Promise<void> {
     const payload = form.value;
 
@@ -224,6 +237,12 @@ export class UbAccountsComponent {
       });
   }
 
+  /**
+   * Handles the update of an existing account by sending the form data to the service.
+   * Reloads accounts on success and displays appropriate toast messages.
+   * @param form - The form group containing the updated account data.
+   * @param id - The unique identifier of the account to update.
+   */
   async handleAccountEdit(form: any, id: string): Promise<void> {
     const payload = form.value;
 
@@ -243,6 +262,11 @@ export class UbAccountsComponent {
     await this.loadAccounts();
   }
 
+  /**
+   * Toggles the active status of an account.
+   * @param account - The account object whose status is to be toggled.
+   * @returns A promise that resolves when the operation is complete.
+   */
   async onToggleStatus(account: Account): Promise<void> {
     const { error } = await this.accountsService.updateAccount(account.id, {
       is_active: !account.is_active,

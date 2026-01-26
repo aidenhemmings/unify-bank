@@ -22,6 +22,9 @@ export class UbBreadcrumbService {
       });
   }
 
+  /**
+   * Private function to update the breadcrumbs based on the current route.
+   */
   private updateBreadcrumbs(): void {
     const breadcrumbs = this.createBreadcrumbs(
       this.router.routerState.snapshot.root
@@ -29,6 +32,13 @@ export class UbBreadcrumbService {
     this.breadcrumbsSubject.next(breadcrumbs);
   }
 
+  /**
+   * Private recursive function to create breadcrumbs from the activated route snapshot.
+   * @param route - The activated route snapshot.
+   * @param url - The base URL for the breadcrumb.
+   * @param breadcrumbs - The accumulated breadcrumbs.
+   * @returns The updated breadcrumbs array.
+   */
   private createBreadcrumbs(
     route: ActivatedRouteSnapshot,
     url: string = '',
@@ -59,6 +69,10 @@ export class UbBreadcrumbService {
     return breadcrumbs;
   }
 
+  /**
+   * Retrieves the current breadcrumbs.
+   * @returns The current breadcrumbs.
+   */
   getBreadcrumbs(): Breadcrumb[] {
     return this.breadcrumbsSubject.value;
   }

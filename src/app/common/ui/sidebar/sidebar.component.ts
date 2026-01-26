@@ -6,6 +6,9 @@ import { MenuItem } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { TooltipModule } from 'primeng/tooltip';
 
+/**
+ * Sidebar component that provides navigation links and collapsible behavior.
+ */
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'ub-sidebar',

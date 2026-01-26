@@ -13,6 +13,12 @@ export class UbTransactionsService {
   private supabaseService = inject(UbSupabaseService);
   private apiUrl = environment.apiUrl;
 
+  /**
+   * Retrieves transactions for a specific account.
+   * @param accountId - The ID of the account.
+   * @param limit - Optional limit on the number of transactions to retrieve.
+   * @returns A promise resolving to an object containing the transactions and any error.
+   */
   async getTransactions(
     accountId: string,
     limit?: number
@@ -45,6 +51,12 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Retrieves all transactions for a user.
+   * @param userId - The ID of the user.
+   * @param limit - Optional limit on the number of transactions to retrieve.
+   * @returns A promise resolving to an object containing the transactions and any error.
+   */
   async getAllTransactionsForUser(
     userId: string,
     limit?: number
@@ -77,6 +89,11 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Retrieves a transaction by its ID.
+   * @param transactionId - The ID of the transaction to retrieve.
+   * @returns A promise resolving to an object containing the transaction and any error.
+   */
   async getTransactionById(
     transactionId: string
   ): Promise<{ transaction: Transaction | null; error: any }> {
@@ -104,6 +121,11 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Creates a new transaction.
+   * @param transaction - The transaction data to create.
+   * @returns A promise resolving to an object containing the created transaction and any error.
+   */
   async createTransaction(
     transaction: Partial<Transaction>
   ): Promise<{ transaction: Transaction | null; error: any }> {
@@ -132,6 +154,12 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Updates an existing transaction.
+   * @param transactionId - The ID of the transaction to update.
+   * @param updates - The updated transaction data.
+   * @returns A promise resolving to an object containing the updated transaction and any error.
+   */
   async updateTransaction(
     transactionId: string,
     updates: Partial<Transaction>
@@ -161,6 +189,11 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Deletes a transaction by its ID.
+   * @param transactionId - The ID of the transaction to delete.
+   * @returns A promise resolving to an object containing any error.
+   */
   async deleteTransaction(transactionId: string): Promise<{ error: any }> {
     try {
       await firstValueFrom(
@@ -175,6 +208,12 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Retrieves transactions by category for a user.
+   * @param userId - The ID of the user.
+   * @param category - The category of transactions to retrieve.
+   * @returns A promise resolving to an object containing the transactions and any error.
+   */
   async getTransactionsByCategory(
     userId: string,
     category: string
@@ -201,6 +240,13 @@ export class UbTransactionsService {
     }
   }
 
+  /**
+   * Retrieves monthly statistics for a user.
+   * @param userId - The ID of the user.
+   * @param year - The year for which to retrieve stats.
+   * @param month - The month for which to retrieve stats.
+   * @returns A promise resolving to an object containing income, expenses, and any error.
+   */
   async getMonthlyStats(
     userId: string,
     year: number,

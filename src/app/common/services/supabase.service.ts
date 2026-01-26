@@ -18,6 +18,12 @@ export class UbSupabaseService {
     }
   }
 
+  /**
+   * Signs in a user.
+   * @param username The username of the user.
+   * @param password The password of the user.
+   * @returns A promise resolving to an object containing the user, token, and any error.
+   */
   async signIn(username: string, password: string) {
     try {
       const response = await firstValueFrom(
@@ -37,6 +43,11 @@ export class UbSupabaseService {
     }
   }
 
+  /**
+   * Validates a user token.
+   * @param token - The token to validate.
+   * @returns A promise resolving to an object containing the user ID, user, and any error.
+   */
   async validateToken(token: string) {
     try {
       const response = await firstValueFrom(
@@ -56,6 +67,11 @@ export class UbSupabaseService {
     }
   }
 
+  /**
+   * Retrieves a user by their ID.
+   * @param userId - The ID of the user to retrieve.
+   * @returns A promise resolving to an object containing the user and any error.
+   */
   async getUserById(userId: string) {
     try {
       const headers = this.getAuthHeaders();
@@ -76,6 +92,11 @@ export class UbSupabaseService {
     }
   }
 
+  /**
+   * Invalidates a user token.
+   * @param token - The token to invalidate.
+   * @returns A promise resolving to an object containing any error.
+   */
   async invalidateToken(token: string) {
     try {
       await firstValueFrom(
@@ -100,6 +121,11 @@ export class UbSupabaseService {
     return password;
   }
 
+  /**
+   * Updates a user.
+   * @param form - The form containing the user data to update.
+   * @returns A promise resolving to an object indicating success or failure.
+   */
   async updateUser(form: any): Promise<{ success: boolean; data?: any }> {
     if (!form) return { success: false };
 
@@ -127,6 +153,12 @@ export class UbSupabaseService {
     }
   }
 
+  /**
+   * Changes a user's password.
+   * @param currentPassword - The current password.
+   * @param newPassword - The new password.
+   * @returns A promise resolving to an object indicating success or failure.
+   */
   async changePassword(
     currentPassword: string,
     newPassword: string
@@ -162,6 +194,10 @@ export class UbSupabaseService {
     this.currentToken = token;
   }
 
+  /**
+   * Retrieves the authentication headers.
+   * @returns The HttpHeaders object.
+   */
   getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
       'X-User-Token': this.currentToken || '',

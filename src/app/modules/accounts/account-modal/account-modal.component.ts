@@ -66,6 +66,9 @@ export class UbAccountModalComponent implements OnInit {
     this.initializeForm();
   }
 
+  /**
+   * Initializes the reactive form with form controls and validators.
+   */
   initializeForm(): void {
     this.accountForm = this.fb.group({
       name: [
@@ -99,17 +102,31 @@ export class UbAccountModalComponent implements OnInit {
     this.modalFormService.setForm(this.accountForm);
   }
 
+  /**
+   * Generates a random 16-digit account number for new accounts.
+   * @returns A string representation of the generated account number.
+   */
   generateAccountNumber(): string {
     return Math.floor(
       Math.random() * 9000000000000000 + 1000000000000000
     ).toString();
   }
 
+  /**
+   * Checks if a form field is invalid and has been interacted with by the user.
+   * @param fieldName - The name of the form field to validate.
+   * @returns true if the field is invalid and either dirty or touched, false otherwise.
+   */
   isFieldInvalid(fieldName: string): boolean {
     const field = this.accountForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  /**
+   * Retrieves the appropriate error message for a form field based on its validation errors.
+   * @param fieldName - The name of the form field to get the error message for.
+   * @returns A user-friendly error message string, or an empty string if no errors exist.
+   */
   getErrorMessage(fieldName: string): string {
     const field = this.accountForm.get(fieldName);
 
