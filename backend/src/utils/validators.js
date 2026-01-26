@@ -39,7 +39,7 @@ const validateRegistration = [
     .withMessage("Username is required")
     .matches(USERNAME_REGEX)
     .withMessage(
-      "Username must be 3-20 characters and contain only letters, numbers, underscores, and hyphens"
+      "Username must be 3-20 characters and contain only letters, numbers, underscores, and hyphens",
     )
     .customSanitizer(sanitizeInput),
   body("password")
@@ -48,7 +48,7 @@ const validateRegistration = [
     .withMessage("Password is required")
     .matches(PASSWORD_REGEX)
     .withMessage(
-      "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character"
+      "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character",
     ),
   body("email")
     .optional()
@@ -178,7 +178,16 @@ const validateTransactionCreation = [
 ];
 
 const validateUUID = [
-  param("id").trim().matches(UUID_REGEX).withMessage("Invalid ID format"),
+  param("id")
+    .optional()
+    .trim()
+    .matches(UUID_REGEX)
+    .withMessage("Invalid ID format"),
+  param("accountId")
+    .optional()
+    .trim()
+    .matches(UUID_REGEX)
+    .withMessage("Invalid account ID format"),
 ];
 
 const validateUserUpdate = [
