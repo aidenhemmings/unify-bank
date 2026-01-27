@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   UbPaymentsService,
@@ -6,6 +6,7 @@ import {
   UbAccountsService,
   UbLoadingService,
   UbToastService,
+  UbRealtimeService,
 } from '@common/services';
 import { Payment, User, Account } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -29,11 +30,12 @@ import { ModalResponse } from '@common/types/modal-response.type';
   imports: [CommonModule, UbButtonComponent, UbLoaderComponent],
   providers: [DialogService],
 })
-export class UbPaymentsComponent {
+export class UbPaymentsComponent implements OnDestroy {
   private userService = inject(UbUserService);
   private paymentsService = inject(UbPaymentsService);
   private accountsService = inject(UbAccountsService);
   private loadingService = inject(UbLoadingService);
+  private realtimeService = inject(UbRealtimeService);
   private dialogService = inject(DialogService);
   private toastService = inject(UbToastService);
 
@@ -61,7 +63,64 @@ export class UbPaymentsComponent {
       .subscribe((user) => {
         if (user) {
           this.user = user;
-          this.loadData();
+          this.loadDataAndSetupRealtime();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.realtimeService.unsubscribeAll();
+  }
+
+  /**
+   * Loads data then sets up real-time subscriptions
+   */
+  private async loadDataAndSetupRealtime(): Promise<void> {
+    await this.loadData();
+    this.setupRealtimeSubscriptions();
+  }
+
+  /**
+   * Sets up real-time subscriptions for payment changes
+   */
+  private setupRealtimeSubscriptions(): void {
+    // Connect to Socket.io server with user info
+    const accountIds = this.accounts.map((a) => a.id);
+    this.realtimeService.connect(this.user.id, accountIds);
+
+    // Subscribe to outgoing payments (payments created by user)
+    this.realtimeService
+      .subscribeToOutgoingPayments()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Payment change detected:', payload);
+        const payment = payload.new as Payment;
+
+        if (payload.eventType === 'INSERT') {
+          this.payments = [payment, ...this.payments];
+        } else if (payload.eventType === 'UPDATE') {
+          const index = this.payments.findIndex((p) => p.id === payment.id);
+          if (index !== -1) {
+            this.payments[index] = { ...this.payments[index], ...payment };
+
+            // Show notifications for status changes
+            if (payment.status === 'declined') {
+              this.toastService.warn(
+                'Payment Declined',
+                `Your payment to ${payment.recipient_name} was declined.`,
+              );
+            } else if (payment.status === 'completed') {
+              this.toastService.success(
+                'Payment Completed',
+                `Your payment to ${payment.recipient_name} was approved!`,
+              );
+            }
+          }
+        } else if (payload.eventType === 'DELETE') {
+          const deletedPayment = payload.old as Payment;
+          this.payments = this.payments.filter(
+            (p) => p.id !== deletedPayment.id,
+          );
         }
       });
   }
@@ -83,7 +142,7 @@ export class UbPaymentsComponent {
    */
   async loadPayments(): Promise<void> {
     const { payments, error } = await this.paymentsService.getPayments(
-      this.user.id
+      this.user.id,
     );
 
     if (error) {
@@ -100,7 +159,7 @@ export class UbPaymentsComponent {
    */
   async loadAccounts(): Promise<void> {
     const { accounts, error } = await this.accountsService.getAccounts(
-      this.user.id
+      this.user.id,
     );
 
     if (error) {
@@ -193,7 +252,7 @@ export class UbPaymentsComponent {
   }
 
   setStatusFilter(
-    filter: 'all' | 'pending' | 'completed' | 'failed' | 'cancelled'
+    filter: 'all' | 'pending' | 'completed' | 'failed' | 'cancelled',
   ): void {
     this.selectedFilter = filter;
   }
@@ -248,7 +307,7 @@ export class UbPaymentsComponent {
 
     const isScheduled = !!payload.scheduledDate;
 
-    const { payment, error } = await this.paymentsService.createPayment({
+    const response = await this.paymentsService.createPayment({
       user_id: this.user.id,
       from_account_id: payload.fromAccountId,
       recipient_name: payload.recipientName,
@@ -262,8 +321,22 @@ export class UbPaymentsComponent {
       status: isScheduled ? 'pending' : 'processing',
     });
 
-    if (error) {
+    if (response.error) {
       this.toastService.error('Error', 'Failed to create payment.');
+      this.loadingService.hide(this.loaderKey);
+      return;
+    }
+
+    const payment = response.payment;
+    const requiresApproval = response.requires_approval;
+
+    // If the payment requires approval from the recipient, don't process it immediately
+    if (requiresApproval) {
+      this.toastService.success(
+        'Payment Sent',
+        'Your payment is pending approval from the recipient.',
+      );
+      await this.loadData();
       this.loadingService.hide(this.loaderKey);
       return;
     }
@@ -282,7 +355,7 @@ export class UbPaymentsComponent {
         } else {
           this.toastService.success(
             'Success',
-            'Payment completed successfully!'
+            'Payment completed successfully!',
           );
         }
       }

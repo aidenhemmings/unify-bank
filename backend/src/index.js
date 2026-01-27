@@ -1,8 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const https = require("https");
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const { Server } = require("socket.io");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth.routes");
@@ -12,6 +14,7 @@ const transactionsRoutes = require("./routes/transactions.routes");
 const usersRoutes = require("./routes/users.routes");
 const adminAuthRoutes = require("./routes/admin-auth.routes");
 const adminUsersRoutes = require("./routes/admin-users.routes");
+const RealtimeService = require("./services/realtime.service");
 
 const {
   securityHeaders,
@@ -71,8 +74,21 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
+// Socket.io CORS options
+const socketCorsOptions = {
+  origin: ["http://localhost:4200", "https://localhost:4200"],
+  credentials: true,
+};
+
 if (process.env.NODE_ENV === "production") {
-  app.listen(PORT, () => {
+  const server = http.createServer(app);
+  const io = new Server(server, { cors: socketCorsOptions });
+
+  // Initialize real-time service
+  const realtimeService = new RealtimeService(io);
+  realtimeService.initialize();
+
+  server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 } else {
@@ -85,12 +101,27 @@ if (process.env.NODE_ENV === "production") {
       cert: fs.readFileSync(sslCertPath),
     };
 
-    https.createServer(httpsOptions, app).listen(PORT, () => {
+    const server = https.createServer(httpsOptions, app);
+    const io = new Server(server, { cors: socketCorsOptions });
+
+    // Initialize real-time service
+    const realtimeService = new RealtimeService(io);
+    realtimeService.initialize();
+
+    server.listen(PORT, () => {
       console.log(`HTTPS Server running on https://localhost:${PORT}`);
       console.log(`SSL/TLS encryption enabled`);
+      console.log(`WebSocket real-time service initialized`);
     });
   } else {
-    app.listen(PORT, () => {
+    const server = http.createServer(app);
+    const io = new Server(server, { cors: socketCorsOptions });
+
+    // Initialize real-time service
+    const realtimeService = new RealtimeService(io);
+    realtimeService.initialize();
+
+    server.listen(PORT, () => {
       console.log(
         `Running on http://localhost:${PORT} (SSL certificates not found)`,
       );

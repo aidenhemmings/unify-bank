@@ -13,9 +13,7 @@ const getUserProfile = async (req, res) => {
 
     const { data, error } = await supabase
       .from("users")
-      .select(
-        "id, username, email, first_name, last_name, created_at, updated_at"
-      )
+      .select("id, username, email, first_name, last_name, created_at")
       .eq("id", userId)
       .single();
 
@@ -50,9 +48,7 @@ const updateUserProfile = async (req, res) => {
       .from("users")
       .update(updates)
       .eq("id", userId)
-      .select(
-        "id, username, email, first_name, last_name, created_at, updated_at"
-      )
+      .select("id, username, email, first_name, last_name, created_at")
       .single();
 
     if (error) {

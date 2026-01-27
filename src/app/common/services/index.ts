@@ -1,4 +1,5 @@
 export * from './supabase.service';
+export * from './realtime.service';
 export * from './user.service';
 export * from './menu.service';
 export * from './sidebar.service';

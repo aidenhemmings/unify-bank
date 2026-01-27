@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   UbTransactionsService,
@@ -6,7 +6,7 @@ import {
   UbAccountsService,
   UbLoadingService,
   UbToastService,
-  UbModalFormService,
+  UbRealtimeService,
 } from '@common/services';
 import { Transaction, User, Account, ModalResponse } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -41,7 +41,7 @@ import { DatePicker } from 'primeng/datepicker';
   ],
   providers: [DialogService],
 })
-export class UbTransactionsComponent {
+export class UbTransactionsComponent implements OnDestroy {
   @ViewChild('exportPopover') exportPopover!: Popover;
 
   private userService = inject(UbUserService);
@@ -49,6 +49,7 @@ export class UbTransactionsComponent {
   private accountsService = inject(UbAccountsService);
   private loadingService = inject(UbLoadingService);
   private toastService = inject(UbToastService);
+  private realtimeService = inject(UbRealtimeService);
   private dialogService = inject(DialogService);
 
   readonly currencyConfig = AppComponent.CURRENCY_CONFIG;
@@ -98,6 +99,59 @@ export class UbTransactionsComponent {
       });
   }
 
+  ngOnDestroy(): void {
+    this.realtimeService.unsubscribeAll();
+  }
+
+  /**
+   * Sets up real-time subscriptions for transaction changes
+   */
+  private setupRealtimeSubscriptions(): void {
+    if (this.accounts.length === 0) return;
+
+    const accountIds = this.accounts.map((a) => a.id);
+
+    // Connect to Socket.io server with user info
+    this.realtimeService.connect(this.user.id, accountIds);
+
+    this.realtimeService
+      .subscribeToUserTransactions()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Transaction change detected:', payload);
+        if (payload.eventType === 'INSERT') {
+          const newTransaction = payload.new as Transaction;
+          newTransaction.date = newTransaction.created_at
+            ? new Date(newTransaction.created_at)
+            : new Date();
+          this.transactions = [newTransaction, ...this.transactions];
+          this.toastService.info(
+            'New Transaction',
+            'A new transaction has been added.',
+          );
+        } else if (payload.eventType === 'UPDATE') {
+          const updatedTransaction = payload.new as Transaction;
+          const index = this.transactions.findIndex(
+            (t) => t.id === updatedTransaction.id,
+          );
+          if (index !== -1) {
+            this.transactions[index] = {
+              ...this.transactions[index],
+              ...updatedTransaction,
+              date: updatedTransaction.created_at
+                ? new Date(updatedTransaction.created_at)
+                : this.transactions[index].date,
+            };
+          }
+        } else if (payload.eventType === 'DELETE') {
+          const deletedTransaction = payload.old as Transaction;
+          this.transactions = this.transactions.filter(
+            (t) => t.id !== deletedTransaction.id,
+          );
+        }
+      });
+  }
+
   /**
    * Asynchronously loads transactions and accounts for the current user.
    */
@@ -105,6 +159,8 @@ export class UbTransactionsComponent {
     this.loadingService.show(this.loaderKey);
 
     await Promise.all([this.loadTransactions(), this.loadAccounts()]);
+
+    this.setupRealtimeSubscriptions();
 
     this.loadingService.hide(this.loaderKey);
   }
@@ -127,7 +183,7 @@ export class UbTransactionsComponent {
    */
   async loadAccounts(): Promise<void> {
     const { accounts, error } = await this.accountsService.getAccounts(
-      this.user.id
+      this.user.id,
     );
 
     if (error) {
@@ -300,13 +356,13 @@ export class UbTransactionsComponent {
         await this.accountsService.updateAccountBalance(
           payload.accountId,
           payload.amount,
-          payload.type
+          payload.type,
         );
 
       if (balanceError) {
         this.toastService.error(
           'Warning',
-          'Transaction created but failed to update account balance.'
+          'Transaction created but failed to update account balance.',
         );
       }
     }
@@ -380,14 +436,14 @@ export class UbTransactionsComponent {
    */
   async handleTransactionUpdate(
     transactionId: string,
-    form: any
+    form: any,
   ): Promise<void> {
     const payload = form.getRawValue();
 
     this.loadingService.show(this.loaderKey);
 
     const originalTransaction = this.transactions.find(
-      (t) => t.id === transactionId
+      (t) => t.id === transactionId,
     );
 
     if (!originalTransaction) {
@@ -421,7 +477,7 @@ export class UbTransactionsComponent {
         await this.accountsService.updateAccountBalance(
           originalTransaction.account_id,
           originalTransaction.amount,
-          reverseType
+          reverseType,
         );
       }
 
@@ -430,13 +486,13 @@ export class UbTransactionsComponent {
           await this.accountsService.updateAccountBalance(
             originalTransaction.account_id,
             payload.amount,
-            originalTransaction.type
+            originalTransaction.type,
           );
 
         if (balanceError) {
           this.toastService.error(
             'Warning',
-            'Transaction updated but failed to update account balance.'
+            'Transaction updated but failed to update account balance.',
           );
         }
       }
@@ -476,7 +532,7 @@ export class UbTransactionsComponent {
     if (filteredTransactions.length === 0) {
       this.toastService.error(
         'No Data',
-        'No transactions found in the selected date range.'
+        'No transactions found in the selected date range.',
       );
       return;
     }
@@ -518,7 +574,7 @@ export class UbTransactionsComponent {
 
     this.toastService.success(
       'Success',
-      `Exported ${filteredTransactions.length} transactions.`
+      `Exported ${filteredTransactions.length} transactions.`,
     );
 
     this.exportPopover.hide();

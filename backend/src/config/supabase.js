@@ -1,4 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
+const WebSocket = require("ws");
 require("dotenv").config();
 
 const supabase = createClient(
@@ -10,7 +11,13 @@ const supabase = createClient(
       persistSession: false,
       detectSessionInUrl: false,
     },
-  }
+    realtime: {
+      transport: WebSocket,
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  },
 );
 
 module.exports = supabase;
