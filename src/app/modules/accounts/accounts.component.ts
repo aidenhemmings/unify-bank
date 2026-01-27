@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   UbAccountsService,
   UbLoadingService,
+  UbRealtimeService,
   UbToastService,
   UbUserService,
 } from '@common/services';
@@ -28,10 +29,11 @@ import { ModalResponse } from '@common/types/modal-response.type';
   imports: [CommonModule, UbButtonComponent, UbLoaderComponent],
   providers: [DialogService],
 })
-export class UbAccountsComponent {
+export class UbAccountsComponent implements OnDestroy {
   private userService = inject(UbUserService);
   private accountsService = inject(UbAccountsService);
   private loadingService = inject(UbLoadingService);
+  private realtimeService = inject(UbRealtimeService);
   private dialogService = inject(DialogService);
   private toastService = inject(UbToastService);
 
@@ -56,6 +58,51 @@ export class UbAccountsComponent {
       .subscribe((user) => {
         if (user) {
           this.user = user;
+          this.loadAccountsAndSetupRealtime();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.realtimeService.unsubscribeAll();
+  }
+
+  /**
+   * Loads accounts then sets up real-time subscriptions
+   */
+  private async loadAccountsAndSetupRealtime(): Promise<void> {
+    await this.loadAccounts();
+    this.setupRealtimeSubscriptions();
+  }
+
+  /**
+   * Sets up real-time subscriptions for account changes
+   */
+  private setupRealtimeSubscriptions(): void {
+    // Connect to Socket.io server with user info
+    const accountIds = this.accounts.map((a) => a.id);
+    this.realtimeService.connect(this.user.id, accountIds);
+
+    this.realtimeService
+      .subscribeToUserAccounts()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Account change detected:', payload);
+        if (payload.eventType === 'UPDATE') {
+          // Update the specific account in place for real-time updates
+          const updatedAccount = payload.new as Account;
+          const index = this.accounts.findIndex(
+            (a) => a.id === updatedAccount.id,
+          );
+          if (index !== -1) {
+            this.accounts[index] = {
+              ...this.accounts[index],
+              ...updatedAccount,
+            };
+            this.calculateTotalBalance();
+          }
+        } else {
+          // For inserts and deletes, reload the full list
           this.loadAccounts();
         }
       });
@@ -69,7 +116,7 @@ export class UbAccountsComponent {
     this.loadingService.show(this.loaderKey);
 
     const { accounts, error } = await this.accountsService.getAccounts(
-      this.user.id
+      this.user.id,
     );
 
     if (error) {

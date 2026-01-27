@@ -8,7 +8,7 @@ const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
 const ACCOUNT_NUMBER_REGEX = /^[0-9]{8,16}$/;
-const NAME_REGEX = /^[a-zA-Z\s'-]{1,50}$/;
+const NAME_REGEX = /^[\p{L}\p{M}\s'.,-]{1,50}$/u;
 const DESCRIPTION_REGEX = /^[a-zA-Z0-9\s.,!?'-]{0,200}$/;
 
 const sanitizeInput = (value) => {
@@ -80,7 +80,7 @@ const validateRegistration = [
  * Validates account creation requests.
  */
 const validateAccountCreation = [
-  body("account_name")
+  body("name")
     .trim()
     .notEmpty()
     .withMessage("Account name is required")
@@ -93,11 +93,11 @@ const validateAccountCreation = [
     .withMessage("Account number is required")
     .matches(ACCOUNT_NUMBER_REGEX)
     .withMessage("Invalid account number format"),
-  body("account_type")
+  body("type")
     .trim()
     .notEmpty()
     .withMessage("Account type is required")
-    .isIn(["checking", "savings", "credit"])
+    .isIn(["Checking", "Savings", "Business"])
     .withMessage("Invalid account type"),
   body("balance")
     .optional()
@@ -123,7 +123,7 @@ const validatePaymentCreation = [
     .matches(NAME_REGEX)
     .withMessage("Invalid recipient name format")
     .customSanitizer(sanitizeInput),
-  body("recipient_account")
+  body("to_account_number")
     .trim()
     .notEmpty()
     .withMessage("Recipient account is required")

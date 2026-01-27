@@ -19,13 +19,13 @@ export class UbPaymentsService {
    * @returns A promise resolving to an object containing payments and any error.
    */
   async getPayments(
-    userId: string
+    userId: string,
   ): Promise<{ payments: Payment[]; error: any }> {
     try {
       const response = await firstValueFrom(
         this.http.get<{ payments: Payment[] }>(`${this.apiUrl}/payments`, {
           headers: this.supabaseService.getAuthHeaders(),
-        })
+        }),
       );
 
       return { payments: response.payments, error: null };
@@ -40,7 +40,7 @@ export class UbPaymentsService {
    * @returns A promise resolving to an object containing the payment and any error.
    */
   async getPaymentById(
-    paymentId: string
+    paymentId: string,
   ): Promise<{ payment: Payment | null; error: any }> {
     try {
       const response = await firstValueFrom(
@@ -48,8 +48,8 @@ export class UbPaymentsService {
           `${this.apiUrl}/payments/${paymentId}`,
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return { payment: response.payment, error: null };
@@ -61,25 +61,33 @@ export class UbPaymentsService {
   /**
    * Creates a new payment.
    * @param payment - The payment data to create.
-   * @returns A promise resolving to an object containing the created payment and any error.
+   * @returns A promise resolving to an object containing the created payment, requires_approval flag, and any error.
    */
   async createPayment(
-    payment: Partial<Payment>
-  ): Promise<{ payment: Payment | null; error: any }> {
+    payment: Partial<Payment>,
+  ): Promise<{
+    payment: Payment | null;
+    requires_approval: boolean;
+    error: any;
+  }> {
     try {
       const response = await firstValueFrom(
-        this.http.post<{ payment: Payment }>(
+        this.http.post<{ payment: Payment; requires_approval: boolean }>(
           `${this.apiUrl}/payments`,
           payment,
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
-      return { payment: response.payment, error: null };
+      return {
+        payment: response.payment,
+        requires_approval: response.requires_approval,
+        error: null,
+      };
     } catch (error: any) {
-      return { payment: null, error };
+      return { payment: null, requires_approval: false, error };
     }
   }
 
@@ -91,7 +99,7 @@ export class UbPaymentsService {
    */
   async updatePayment(
     paymentId: string,
-    updates: Partial<Payment>
+    updates: Partial<Payment>,
   ): Promise<{ payment: Payment | null; error: any }> {
     try {
       const response = await firstValueFrom(
@@ -100,8 +108,8 @@ export class UbPaymentsService {
           updates,
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return { payment: response.payment, error: null };
@@ -123,8 +131,8 @@ export class UbPaymentsService {
           {},
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return { error: null };
@@ -139,7 +147,7 @@ export class UbPaymentsService {
    * @returns A promise resolving to an object containing the payments, count, and any error.
    */
   async getPendingPayments(
-    userId: string
+    userId: string,
   ): Promise<{ payments: Payment[]; count: number; error: any }> {
     try {
       const response = await firstValueFrom(
@@ -147,8 +155,8 @@ export class UbPaymentsService {
           `${this.apiUrl}/payments/pending`,
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return {
@@ -169,7 +177,7 @@ export class UbPaymentsService {
    */
   async getPaymentsByStatus(
     userId: string,
-    status: Payment['status']
+    status: Payment['status'],
   ): Promise<{ payments: Payment[]; error: any }> {
     try {
       const response = await firstValueFrom(
@@ -177,8 +185,8 @@ export class UbPaymentsService {
           `${this.apiUrl}/payments/status/${status}`,
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return { payments: response.payments, error: null };
@@ -193,7 +201,7 @@ export class UbPaymentsService {
    * @returns A promise resolving to an object containing the result and any error.
    */
   async processPayment(
-    paymentId: string
+    paymentId: string,
   ): Promise<{ result: any; error: any }> {
     try {
       const response = await firstValueFrom(
@@ -202,8 +210,8 @@ export class UbPaymentsService {
           {},
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return { result: response.result, error: null };
@@ -224,13 +232,102 @@ export class UbPaymentsService {
           {},
           {
             headers: this.supabaseService.getAuthHeaders(),
-          }
-        )
+          },
+        ),
       );
 
       return { result: response.result, error: null };
     } catch (error: any) {
       return { result: null, error };
+    }
+  }
+
+  /**
+   * Retrieves incoming pending payments that require approval from the current user.
+   * @returns A promise resolving to an object containing the payments, count, and any error.
+   */
+  async getIncomingPendingPayments(): Promise<{
+    payments: Payment[];
+    count: number;
+    error: any;
+  }> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ payments: Payment[]; count: number }>(
+          `${this.apiUrl}/payments/incoming-pending`,
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          },
+        ),
+      );
+
+      return {
+        payments: response.payments,
+        count: response.count,
+        error: null,
+      };
+    } catch (error: any) {
+      return { payments: [], count: 0, error };
+    }
+  }
+
+  /**
+   * Approves an incoming payment.
+   * @param paymentId - The ID of the payment to approve.
+   * @returns A promise resolving to an object containing the result and any error.
+   */
+  async approvePayment(
+    paymentId: string,
+  ): Promise<{ success: boolean; payment: Payment | null; error: any }> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ success: boolean; payment: Payment }>(
+          `${this.apiUrl}/payments/${paymentId}/approve`,
+          {},
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          },
+        ),
+      );
+
+      return {
+        success: response.success,
+        payment: response.payment,
+        error: null,
+      };
+    } catch (error: any) {
+      return { success: false, payment: null, error };
+    }
+  }
+
+  /**
+   * Declines an incoming payment.
+   * @param paymentId - The ID of the payment to decline.
+   * @param reason - Optional reason for declining.
+   * @returns A promise resolving to an object containing the result and any error.
+   */
+  async declinePayment(
+    paymentId: string,
+    reason?: string,
+  ): Promise<{ success: boolean; payment: Payment | null; error: any }> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ success: boolean; payment: Payment }>(
+          `${this.apiUrl}/payments/${paymentId}/decline`,
+          { reason },
+          {
+            headers: this.supabaseService.getAuthHeaders(),
+          },
+        ),
+      );
+
+      return {
+        success: response.success,
+        payment: response.payment,
+        error: null,
+      };
+    } catch (error: any) {
+      return { success: false, payment: null, error };
     }
   }
 }

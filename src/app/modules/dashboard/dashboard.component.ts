@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import {
   UbAccountsService,
   UbLoadingService,
   UbPaymentsService,
+  UbRealtimeService,
   UbSupabaseService,
   UbToastService,
   UbTransactionsService,
@@ -11,7 +12,13 @@ import {
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Account, QuickAction, Transaction, User } from '@common/types';
+import {
+  Account,
+  Payment,
+  QuickAction,
+  Transaction,
+  User,
+} from '@common/types';
 import {
   UbButtonComponent,
   UbLoaderComponent,
@@ -33,10 +40,11 @@ import { UbTransactionModalComponent } from '../transactions';
   imports: [CommonModule, UbButtonComponent, UbLoaderComponent, TooltipModule],
   providers: [DialogService],
 })
-export class UbDashboardComponent {
+export class UbDashboardComponent implements OnDestroy {
   private userService = inject(UbUserService);
   private loadingService = inject(UbLoadingService);
   private supabaseService = inject(UbSupabaseService);
+  private realtimeService = inject(UbRealtimeService);
   private accountsService = inject(UbAccountsService);
   private transactionsService = inject(UbTransactionsService);
   private paymentsService = inject(UbPaymentsService);
@@ -57,8 +65,11 @@ export class UbDashboardComponent {
   monthlyIncome = 0;
   monthlyExpenses = 0;
   pendingPaymentsCount = 0;
+  incomingPendingPayments: Payment[] = [];
+  incomingPendingPaymentsCount = 0;
 
   loaderKey = LoadingKeys.DASHBOARD;
+  processingPaymentId: string | null = null;
 
   get loading(): boolean {
     const state = this.loadingService.getLoaderStateValue(this.loaderKey);
@@ -76,6 +87,80 @@ export class UbDashboardComponent {
       });
   }
 
+  ngOnDestroy(): void {
+    this.realtimeService.unsubscribeAll();
+  }
+
+  /**
+   * Sets up real-time subscriptions for accounts, transactions, and payments
+   */
+  private setupRealtimeSubscriptions(): void {
+    // First, connect to the Socket.io server with user info
+    const accountIds = this.accounts.map((a) => a.id);
+    this.realtimeService.connect(this.user.id, accountIds);
+
+    // Subscribe to account changes for the current user
+    this.realtimeService
+      .subscribeToUserAccounts()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Account change detected:', payload);
+        this.loadAccounts();
+      });
+
+    // Subscribe to incoming payments (payments where user is the recipient)
+    this.realtimeService
+      .subscribeToIncomingPayments()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Incoming payment change detected:', payload);
+        if (payload.eventType === 'INSERT') {
+          this.toastService.info(
+            'New Payment',
+            'You have a new incoming payment request!',
+          );
+        }
+        this.loadIncomingPendingPayments();
+        this.loadAccounts();
+        this.loadRecentTransactions();
+      });
+
+    // Subscribe to outgoing payments (payments created by user)
+    this.realtimeService
+      .subscribeToOutgoingPayments()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Outgoing payment change detected:', payload);
+        const newPayment = payload.new as Payment;
+        if (payload.eventType === 'UPDATE') {
+          if (newPayment.status === 'declined') {
+            this.toastService.warn(
+              'Payment Declined',
+              `Your payment to ${newPayment.recipient_name} was declined.`,
+            );
+          } else if (newPayment.status === 'completed') {
+            this.toastService.success(
+              'Payment Completed',
+              `Your payment to ${newPayment.recipient_name} was approved!`,
+            );
+          }
+        }
+        this.loadPendingPayments();
+        this.loadAccounts();
+        this.loadRecentTransactions();
+      });
+
+    // Subscribe to transactions
+    this.realtimeService
+      .subscribeToUserTransactions()
+      .pipe(untilDestroyed(this))
+      .subscribe((payload) => {
+        console.log('Transaction change detected:', payload);
+        this.loadRecentTransactions();
+        this.loadMonthlyStats();
+      });
+  }
+
   /**
    * Asynchronously loads all dashboard data by executing multiple data fetching operations.
    * Sets up quick actions after data is loaded and displays error toast if any operation fails.
@@ -89,9 +174,12 @@ export class UbDashboardComponent {
         this.loadRecentTransactions(),
         this.loadMonthlyStats(),
         this.loadPendingPayments(),
+        this.loadIncomingPendingPayments(),
       ]);
 
       this.setupQuickActions();
+      // Set up real-time subscriptions after accounts are loaded
+      this.setupRealtimeSubscriptions();
     } catch (error) {
       this.toastService.error('Error', 'Failed to load dashboard data.');
     } finally {
@@ -104,7 +192,7 @@ export class UbDashboardComponent {
    */
   private async loadAccounts(): Promise<void> {
     const { accounts, error } = await this.accountsService.getAccounts(
-      this.user.id
+      this.user.id,
     );
 
     if (error) {
@@ -115,7 +203,7 @@ export class UbDashboardComponent {
     this.accounts = accounts;
     this.totalBalance = accounts.reduce(
       (sum, acc) => sum + (acc.balance || 0),
-      0
+      0,
     );
   }
 
@@ -143,7 +231,7 @@ export class UbDashboardComponent {
       await this.transactionsService.getMonthlyStats(
         this.user.id,
         now.getFullYear(),
-        now.getMonth() + 1
+        now.getMonth() + 1,
       );
 
     if (error) {
@@ -160,7 +248,7 @@ export class UbDashboardComponent {
    */
   private async loadPendingPayments(): Promise<void> {
     const { count, error } = await this.paymentsService.getPendingPayments(
-      this.user.id
+      this.user.id,
     );
 
     if (error) {
@@ -169,6 +257,79 @@ export class UbDashboardComponent {
     }
 
     this.pendingPaymentsCount = count;
+  }
+
+  /**
+   * Loads incoming pending payments that require approval from the current user.
+   */
+  private async loadIncomingPendingPayments(): Promise<void> {
+    const { payments, count, error } =
+      await this.paymentsService.getIncomingPendingPayments();
+
+    if (error) {
+      console.error('Failed to load incoming pending payments:', error);
+      return;
+    }
+
+    this.incomingPendingPayments = payments;
+    this.incomingPendingPaymentsCount = count;
+  }
+
+  /**
+   * Approves an incoming payment.
+   * @param payment - The payment to approve.
+   */
+  async approvePayment(payment: Payment): Promise<void> {
+    this.processingPaymentId = payment.id;
+
+    const { success, error } = await this.paymentsService.approvePayment(
+      payment.id,
+    );
+
+    if (error || !success) {
+      this.toastService.error(
+        'Error',
+        error?.error?.error || 'Failed to approve payment.',
+      );
+      this.processingPaymentId = null;
+      return;
+    }
+
+    this.toastService.success('Success', 'Payment approved successfully!');
+    this.processingPaymentId = null;
+
+    // Reload data
+    await Promise.all([
+      this.loadAccounts(),
+      this.loadRecentTransactions(),
+      this.loadIncomingPendingPayments(),
+      this.loadMonthlyStats(),
+    ]);
+  }
+
+  /**
+   * Declines an incoming payment.
+   * @param payment - The payment to decline.
+   */
+  async declinePayment(payment: Payment): Promise<void> {
+    this.processingPaymentId = payment.id;
+
+    const { success, error } = await this.paymentsService.declinePayment(
+      payment.id,
+      'Declined by recipient',
+    );
+
+    if (error || !success) {
+      this.toastService.error('Error', 'Failed to decline payment.');
+      this.processingPaymentId = null;
+      return;
+    }
+
+    this.toastService.success('Success', 'Payment declined.');
+    this.processingPaymentId = null;
+
+    // Reload data
+    await this.loadIncomingPendingPayments();
   }
 
   /**
@@ -216,12 +377,13 @@ export class UbDashboardComponent {
       .trim();
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-    }).format(date);
+    }).format(dateObj);
   }
 
   navigateTo(route: string): void {
@@ -284,7 +446,7 @@ export class UbDashboardComponent {
 
     const isScheduled = !!payload.scheduledDate;
 
-    const { payment, error } = await this.paymentsService.createPayment({
+    const response = await this.paymentsService.createPayment({
       user_id: this.user.id,
       from_account_id: payload.fromAccountId,
       recipient_name: payload.recipientName,
@@ -298,8 +460,22 @@ export class UbDashboardComponent {
       status: isScheduled ? 'pending' : 'processing',
     });
 
-    if (error) {
+    if (response.error) {
       this.toastService.error('Error', 'Failed to create payment.');
+      this.loadingService.hide(this.loaderKey);
+      return;
+    }
+
+    const payment = response.payment;
+    const requiresApproval = response.requires_approval;
+
+    // If the payment requires approval from the recipient, don't process it immediately
+    if (requiresApproval) {
+      this.toastService.success(
+        'Payment Sent',
+        'Your payment is pending approval from the recipient.',
+      );
+      await this.loadDashboardData();
       this.loadingService.hide(this.loaderKey);
       return;
     }
@@ -318,7 +494,7 @@ export class UbDashboardComponent {
         } else {
           this.toastService.success(
             'Success',
-            'Payment completed successfully!'
+            'Payment completed successfully!',
           );
         }
       }
@@ -392,13 +568,13 @@ export class UbDashboardComponent {
         await this.accountsService.updateAccountBalance(
           payload.accountId,
           payload.amount,
-          payload.type
+          payload.type,
         );
 
       if (balanceError) {
         this.toastService.error(
           'Warning',
-          'Transaction created but failed to update account balance.'
+          'Transaction created but failed to update account balance.',
         );
       }
     }
