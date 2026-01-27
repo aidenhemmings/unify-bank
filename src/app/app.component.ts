@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import {
   UbUserService,
   UbSidebarService,
@@ -18,6 +18,7 @@ import { APP_CURRENCY_CONFIG } from './app.config.currency';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { filter } from 'rxjs/operators';
 
 @UntilDestroy({ checkProperties: true })
 @Component({
@@ -39,6 +40,7 @@ export class AppComponent implements OnInit {
   private userService = inject(UbUserService);
   private sidebarService = inject(UbSidebarService);
   private loadingService = inject(UbLoadingService);
+  private router = inject(Router);
 
   static readonly CURRENCY_CONFIG = APP_CURRENCY_CONFIG;
 
@@ -46,6 +48,7 @@ export class AppComponent implements OnInit {
 
   currentUser: User | null = null;
   isCollapsed = false;
+  isAdminRoute = false;
 
   get loading(): boolean {
     const state = this.loadingService.getLoaderStateValue(this.loaderKey);
@@ -53,6 +56,19 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Check initial route
+    this.isAdminRoute = this.router.url.startsWith('/admin');
+
+    // Listen for route changes
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        untilDestroyed(this),
+      )
+      .subscribe((event: NavigationEnd) => {
+        this.isAdminRoute = event.urlAfterRedirects.startsWith('/admin');
+      });
+
     this.userService.currentUser
       .pipe(untilDestroyed(this))
       .subscribe((user) => {
@@ -67,7 +83,7 @@ export class AppComponent implements OnInit {
   }
 
   get mainContentMargin(): string {
-    if (!this.currentUser) return '0px';
+    if (!this.currentUser || this.isAdminRoute) return '0px';
     return this.isCollapsed ? '70px' : '280px';
   }
 }

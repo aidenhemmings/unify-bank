@@ -1,0 +1,43 @@
+<div class="edit-modal">
+  <div class="user-header">
+    <div class="user-avatar">
+      {{ user.first_name[0] || user.username[0] | uppercase }}
+    </div>
+    <div class="user-info">
+      <span class="user-username">&#64;{{ user.username }}</span>
+      <span class="user-email">{{ user.email }}</span>
+    </div>
+  </div>
+
+  <form [formGroup]="form" class="edit-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <ub-input-text
+          type="text"
+          placeholder="Enter first name"
+          [control]="form | getControl: 'first_name'"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <ub-input-text
+          type="text"
+          placeholder="Enter last name"
+          [control]="form | getControl: 'last_name'"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <ub-select
+        [options]="roles"
+        [control]="form | getControl: 'role'"
+        optionLabel="label"
+        optionValue="value"
+      />
+    </div>
+  </form>
+</div>

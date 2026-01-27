@@ -2,16 +2,19 @@
 <p-toast [baseZIndex]="9000" />
 <div class="app-container">
   <ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
-  @if (currentUser && !loading) {
-  <ub-sidebar />
+  @if (currentUser && !loading && !isAdminRoute) {
+    <ub-sidebar />
   }
   <main class="main-content" [style.margin-left]="mainContentMargin">
-    @if (currentUser && !loading) {
-    <ub-header-bar />
+    @if (currentUser && !loading && !isAdminRoute) {
+      <ub-header-bar />
     }
-    <div class="content-wrapper" [ngClass]="{ authorized: currentUser }">
+    <div
+      class="content-wrapper"
+      [ngClass]="{ authorized: currentUser && !isAdminRoute }"
+    >
       @if (!loading) {
-      <router-outlet></router-outlet>
+        <router-outlet></router-outlet>
       }
     </div>
   </main>

@@ -8,3 +8,4 @@ export * from './quick-action.type';
 export * from './payment.type';
 export * from './modal-response.type';
 export * from './user-settings.type';
+export * from './admin.type';

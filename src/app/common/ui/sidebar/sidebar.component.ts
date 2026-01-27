@@ -1,8 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { UbMenuService, UbSidebarService } from '@common/services';
-import { MenuItem } from '@common/types';
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  UbMenuService,
+  UbSidebarService,
+  UbAdminAuthService,
+} from '@common/services';
+import { MenuItem, AdminUser } from '@common/types';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -19,14 +23,35 @@ import { TooltipModule } from 'primeng/tooltip';
 export class UbSidebarComponent implements OnInit {
   private menuService = inject(UbMenuService);
   private sidebarService = inject(UbSidebarService);
+  private adminAuthService = inject(UbAdminAuthService);
+  private router = inject(Router);
+
+  @Input() mode: 'user' | 'admin' = 'user';
+  @Input() routePrefix: string = '';
 
   isCollapsed = false;
   menuItems: MenuItem[] = [];
   expandedItems = new Set<string>();
   isMobile = false;
+  admin: AdminUser | null = null;
+
+  get isAdminMode(): boolean {
+    return this.mode === 'admin';
+  }
 
   ngOnInit() {
-    this.menuItems = this.menuService.getMenuItems();
+    if (this.isAdminMode) {
+      this.menuItems = this.menuService.getAdminMenuItems();
+      this.admin = this.adminAuthService.getCurrentAdmin();
+
+      this.adminAuthService.currentAdmin
+        .pipe(untilDestroyed(this))
+        .subscribe((admin) => {
+          this.admin = admin;
+        });
+    } else {
+      this.menuItems = this.menuService.getMenuItems();
+    }
 
     this.sidebarService.isCollapsed$
       .pipe(untilDestroyed(this))
@@ -71,5 +96,26 @@ export class UbSidebarComponent implements OnInit {
 
   isExpanded(itemId: string): boolean {
     return this.expandedItems.has(itemId);
+  }
+
+  getRouterLink(item: MenuItem): string[] {
+    if (this.routePrefix) {
+      return ['/' + this.routePrefix, item.routerLink];
+    }
+    if (item.prefix) {
+      return item.suffix
+        ? [item.prefix, item.routerLink, item.suffix]
+        : [item.prefix, item.routerLink];
+    }
+    return item.suffix
+      ? ['/', item.routerLink, item.suffix]
+      : ['/', item.routerLink];
+  }
+
+  async logout(): Promise<void> {
+    if (this.isAdminMode) {
+      await this.adminAuthService.logout();
+      await this.router.navigate(['/admin/login']);
+    }
   }
 }

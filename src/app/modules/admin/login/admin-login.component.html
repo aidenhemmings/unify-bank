@@ -1,0 +1,94 @@
+<div class="auth-container admin-auth">
+  <div class="auth-left">
+    <div class="logo-container">
+      <img
+        src="/UnifyBanking-Logo-Transparent.png"
+        alt="Unify Banking Logo"
+        class="logo"
+      />
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-wrapper">
+      <div class="form-header">
+        <div class="admin-badge">
+          <i class="fa fa-shield-alt"></i>
+          <span>Admin Portal</span>
+        </div>
+        <h1 class="form-title">Admin Login</h1>
+        <p class="form-subtitle">Access the administration panel</p>
+      </div>
+
+      <form [formGroup]="form" class="login-form">
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <ub-input-text
+            type="text"
+            placeholder="Enter your admin username"
+            [control]="form | getControl: 'username'"
+            [disabled]="isLoading"
+            [class.invalid]="
+              form.get('username')?.invalid && form.get('username')?.touched
+            "
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="password-input-wrapper">
+            <ub-input-text
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Enter your password"
+              [control]="form | getControl: 'password'"
+              [disabled]="isLoading"
+              [class.invalid]="
+                form.get('password')?.invalid && form.get('password')?.touched
+              "
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility()"
+              [disabled]="isLoading"
+              [attr.aria-label]="
+                showPassword ? 'Hide password' : 'Show password'
+              "
+            >
+              <i
+                class="fa"
+                [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+              ></i>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="loginError" class="error-message">
+          <i class="fa fa-exclamation-circle"></i>
+          {{ loginError }}
+        </div>
+
+        <ub-button
+          variant="primary"
+          [fluid]="true"
+          (click)="login()"
+          [disabled]="isLoading"
+          class="login-button"
+        >
+          <i
+            class="fa"
+            [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-right-to-bracket'"
+          ></i>
+          {{ isLoading ? "Signing In..." : "Sign In as Admin" }}
+        </ub-button>
+      </form>
+
+      <div class="form-footer">
+        <a routerLink="/auth/login" class="back-link">
+          <i class="fa fa-arrow-left"></i>
+          Back to User Login
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

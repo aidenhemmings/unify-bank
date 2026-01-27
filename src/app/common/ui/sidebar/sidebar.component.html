@@ -2,6 +2,7 @@
   class="sidebar"
   [class.collapsed]="isCollapsed"
   [class.mobile-open]="isMobile && isCollapsed"
+  [class.admin-mode]="isAdminMode"
 >
   <div class="sidebar-header">
     <div class="logo-container">
@@ -23,81 +24,95 @@
     </button>
   </div>
 
+  <div class="admin-badge-wrapper" *ngIf="isAdminMode">
+    <div class="admin-badge">
+      <i class="fa fa-shield-alt"></i>
+      <span *ngIf="!isCollapsed || isMobile">Admin Portal</span>
+    </div>
+  </div>
+
   <nav class="sidebar-nav">
     <ul class="menu-list">
       @for (item of menuItems; track item.id) {
-      <li class="menu-item" *ngIf="item.visible !== false">
-        @if (!item.children || item.children.length === 0) {
-        <a
-          [routerLink]="
-            item.prefix
-              ? item.suffix
-                ? [item.prefix, item.routerLink, item.suffix]
-                : [item.prefix, item.routerLink]
-              : item.suffix
-              ? ['/', item.routerLink, item.suffix]
-              : ['/', item.routerLink]
-          "
-          routerLinkActive="active"
-          class="menu-link"
-          tooltipPosition="right"
-          [pTooltip]="!isCollapsed || isMobile ? '' : item.label"
-          (click)="closeSidebarOnMobile()"
-        >
-          <i class="fa menu-icon" [ngClass]="item.icon"></i>
-          <span class="menu-label">{{ item.label }}</span>
-        </a>
-        } @if (item.children && item.children.length > 0) {
-        <div class="menu-parent">
-          <button
-            class="menu-link parent-link"
-            (click)="toggleMenuItem(item.id)"
-            [class.expanded]="isExpanded(item.id)"
-            tooltipPosition="right"
-            [pTooltip]="!isCollapsed || isMobile ? '' : item.label"
-          >
-            <i class="fa menu-icon" [ngClass]="item.icon"></i>
-            <span class="menu-label">{{ item.label }}</span>
-            <i
-              class="fa fa-chevron-down expand-icon"
-              [class.rotated]="isExpanded(item.id)"
-            ></i>
-          </button>
-
-          @if (isExpanded(item.id)) {
-          <ul class="dropdown-menu">
-            @for (child of item.children; track child.id) {
-            <li *ngIf="child.visible !== false">
-              <a
-                [routerLink]="
-                  child.prefix
-                    ? child.suffix
-                      ? [child.prefix, child.routerLink, child.suffix]
-                      : [child.prefix, child.routerLink]
-                    : child.suffix
-                    ? ['/', child.routerLink, child.suffix]
-                    : ['/', child.routerLink]
-                "
-                routerLinkActive="active"
-                class="dropdown-child"
-                (click)="closeSidebarOnMobile()"
-              >
-                <i class="fa" [ngClass]="child.icon"></i>
-                <span>{{ child.label }}</span>
-              </a>
-            </li>
-            }
-          </ul>
+        <li class="menu-item" *ngIf="item.visible !== false">
+          @if (!item.children || item.children.length === 0) {
+            <a
+              [routerLink]="getRouterLink(item)"
+              routerLinkActive="active"
+              class="menu-link"
+              tooltipPosition="right"
+              [pTooltip]="!isCollapsed || isMobile ? '' : item.label"
+              (click)="closeSidebarOnMobile()"
+            >
+              <i class="fa menu-icon" [ngClass]="item.icon"></i>
+              <span class="menu-label">{{ item.label }}</span>
+            </a>
           }
-        </div>
-        }
-      </li>
+          @if (item.children && item.children.length > 0) {
+            <div class="menu-parent">
+              <button
+                class="menu-link parent-link"
+                (click)="toggleMenuItem(item.id)"
+                [class.expanded]="isExpanded(item.id)"
+                tooltipPosition="right"
+                [pTooltip]="!isCollapsed || isMobile ? '' : item.label"
+              >
+                <i class="fa menu-icon" [ngClass]="item.icon"></i>
+                <span class="menu-label">{{ item.label }}</span>
+                <i
+                  class="fa fa-chevron-down expand-icon"
+                  [class.rotated]="isExpanded(item.id)"
+                ></i>
+              </button>
+
+              @if (isExpanded(item.id)) {
+                <ul class="dropdown-menu">
+                  @for (child of item.children; track child.id) {
+                    <li *ngIf="child.visible !== false">
+                      <a
+                        [routerLink]="getRouterLink(child)"
+                        routerLinkActive="active"
+                        class="dropdown-child"
+                        (click)="closeSidebarOnMobile()"
+                      >
+                        <i class="fa" [ngClass]="child.icon"></i>
+                        <span>{{ child.label }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </li>
       }
     </ul>
   </nav>
 
   <div class="sidebar-footer">
-    <p class="footer-text">© 2025 Unify Banking</p>
+    <ng-container *ngIf="isAdminMode && admin">
+      <div class="admin-info" *ngIf="!isCollapsed || isMobile">
+        <div class="admin-avatar">
+          {{ admin.first_name[0] || admin.username[0] | uppercase }}
+        </div>
+        <div class="admin-details">
+          <span class="admin-name">{{
+            admin.first_name || admin.username
+          }}</span>
+          <span class="admin-role">Admin</span>
+        </div>
+      </div>
+      <button
+        class="logout-btn"
+        (click)="logout()"
+        tooltipPosition="right"
+        [pTooltip]="!isCollapsed || isMobile ? '' : 'Logout'"
+      >
+        <i class="fa fa-sign-out-alt"></i>
+        <span *ngIf="!isCollapsed || isMobile">Logout</span>
+      </button>
+    </ng-container>
+    <p class="footer-text" *ngIf="!isAdminMode">© 2025 Unify Banking</p>
   </div>
 </aside>
 

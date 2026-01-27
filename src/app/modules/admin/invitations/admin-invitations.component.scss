@@ -1,0 +1,301 @@
+.admin-invitations {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .page-header {
+    margin-bottom: 2rem;
+
+    .header-content {
+      .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+      }
+
+      .page-subtitle {
+        font-size: 0.9375rem;
+        color: var(--gray-970);
+      }
+    }
+  }
+
+  .invite-section {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px var(--gray-2600);
+
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+    }
+
+    .invite-form {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .invite-input-wrapper {
+        flex: 1;
+        min-width: 280px;
+
+        ub-input-text {
+          width: 100%;
+        }
+      }
+    }
+
+    .invite-link-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-200);
+
+      .invite-link-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-900);
+        margin-bottom: 0.75rem;
+
+        i {
+          color: var(--primary-color);
+        }
+      }
+
+      .invite-link-wrapper {
+        display: flex;
+        gap: 0.5rem;
+
+        .invite-link-input {
+          flex: 1;
+          padding: 0.75rem 1rem;
+          border: 1px solid var(--gray-200);
+          border-radius: 8px;
+          font-size: 0.8125rem;
+          font-family: monospace;
+          background-color: var(--gray-100);
+          color: var(--gray-900);
+        }
+      }
+
+      .invite-link-note {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.8125rem;
+        color: var(--gray-970);
+
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+  }
+
+  .invitations-section {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--gray-2600);
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+      }
+
+      ub-select {
+        min-width: 150px;
+      }
+    }
+
+    .invitations-table-wrapper {
+      overflow-x: auto;
+
+      .invitations-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+          padding: 0.875rem 1rem;
+          text-align: left;
+          border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--gray-970);
+          background-color: var(--gray-100);
+        }
+
+        tr {
+          &:last-child td {
+            border-bottom: none;
+          }
+
+          &:hover td {
+            background-color: var(--gray-100);
+          }
+        }
+
+        .email-cell {
+          font-weight: 500;
+          color: var(--gray-900);
+        }
+
+        .inviter-cell {
+          color: var(--gray-970);
+          font-size: 0.875rem;
+
+          .unknown {
+            font-style: italic;
+          }
+        }
+
+        .date-cell {
+          font-size: 0.875rem;
+          color: var(--gray-970);
+
+          &.expired {
+            color: var(--danger);
+          }
+        }
+
+        .status-badge {
+          display: inline-flex;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 500;
+
+          &.badge-pending {
+            background-color: var(--warning-light);
+            color: var(--warning);
+          }
+
+          &.badge-accepted {
+            background-color: var(--success-light);
+            color: var(--success);
+          }
+
+          &.badge-expired {
+            background-color: var(--gray-100);
+            color: var(--gray-990);
+          }
+
+          &.badge-cancelled {
+            background-color: var(--danger-light);
+            color: var(--danger);
+          }
+        }
+
+        .actions-cell {
+          white-space: nowrap;
+
+          .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            transition: all 0.2s ease;
+
+            &.resend {
+              background-color: var(--success-light);
+              color: var(--success);
+
+              &:hover {
+                background-color: var(--success);
+                color: var(--natural-white);
+              }
+            }
+
+            &.cancel {
+              background-color: var(--danger-light);
+              color: var(--danger);
+
+              &:hover {
+                background-color: var(--danger);
+                color: var(--natural-white);
+              }
+            }
+          }
+
+          .no-actions {
+            color: var(--gray-970);
+          }
+        }
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+
+      .empty-icon {
+        font-size: 2.5rem;
+        color: var(--gray-970);
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        font-size: 1.125rem;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: var(--gray-970);
+        font-size: 0.9375rem;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .invite-section {
+      .invite-form {
+        flex-direction: column;
+        align-items: stretch;
+
+        .invite-input-wrapper {
+          min-width: auto;
+        }
+      }
+    }
+
+    .invitations-section {
+      .invitations-table-wrapper {
+        .invitations-table {
+          min-width: 600px;
+        }
+      }
+    }
+  }
+}

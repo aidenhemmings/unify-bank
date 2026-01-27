@@ -1,0 +1,7 @@
+<div class="admin-layout">
+  <ub-sidebar mode="admin" routePrefix="admin" />
+
+  <main class="admin-main" [class.sidebar-collapsed]="isCollapsed">
+    <router-outlet></router-outlet>
+  </main>
+</div>

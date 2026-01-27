@@ -1,0 +1,145 @@
+<ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+
+<div class="admin-users" *ngIf="!loading">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">User Management</h1>
+      <p class="page-subtitle">Manage all users and their accounts</p>
+    </div>
+    <div class="header-actions">
+      <ub-button variant="primary" (click)="navigateToInvitations()">
+        <i class="fa fa-plus"></i>
+        Invite User
+      </ub-button>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-box">
+      <ub-input-text
+        type="text"
+        [value]="searchTerm"
+        (valueChanged)="searchTerm = $event; onSearch()"
+        placeholder="Search by username, email, or name..."
+      />
+    </div>
+
+    <div class="filter-group">
+      <ub-select
+        [options]="roleOptions"
+        [value]="roleFilter"
+        (valueChanged)="roleFilter = $event; onFilterChange()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Roles"
+      />
+
+      <ub-select
+        [options]="statusOptions"
+        [value]="activeFilter"
+        (valueChanged)="activeFilter = $event; onFilterChange()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Status"
+      />
+    </div>
+  </div>
+
+  <div class="results-info">
+    <span class="total-count">{{ totalUsers }} users found</span>
+  </div>
+
+  <div class="users-table-wrapper">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" [class.inactive]="!user.is_active">
+          <td class="user-cell">
+            <div class="user-info">
+              <div class="user-avatar">
+                {{ user.first_name[0] || user.username[0] | uppercase }}
+              </div>
+              <div class="user-details">
+                <span class="user-name"
+                  >{{ user.first_name }} {{ user.last_name }}</span
+                >
+                <span class="user-username">&#64;{{ user.username }}</span>
+              </div>
+            </div>
+          </td>
+          <td class="email-cell">{{ user.email }}</td>
+          <td>
+            <span class="role-badge" [ngClass]="getRoleBadgeClass(user.role)">
+              {{ formatRole(user.role) }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="status-badge"
+              [class.active]="user.is_active"
+              [class.inactive]="!user.is_active"
+            >
+              <i
+                class="fa"
+                [ngClass]="
+                  user.is_active ? 'fa-check-circle' : 'fa-times-circle'
+                "
+              ></i>
+              {{ user.is_active ? "Active" : "Inactive" }}
+            </span>
+          </td>
+          <td class="date-cell">{{ user.created_at | date: "MMM d, yyyy" }}</td>
+          <td class="actions-cell">
+            <button
+              class="action-btn edit"
+              (click)="openEditModal(user)"
+              pTooltip="Edit user"
+              tooltipPosition="top"
+            >
+              <i class="fa fa-edit"></i>
+            </button>
+            <button
+              class="action-btn"
+              [ngClass]="user.is_active ? 'deactivate' : 'activate'"
+              (click)="toggleUserStatus(user)"
+              [pTooltip]="
+                user.is_active ? 'Deactivate user' : 'Reactivate user'
+              "
+              tooltipPosition="top"
+              [disabled]="user.id === currentAdminId"
+            >
+              <i
+                class="fa"
+                [ngClass]="user.is_active ? 'fa-user-times' : 'fa-user-check'"
+              ></i>
+            </button>
+            <button
+              class="action-btn delete"
+              (click)="deleteUser(user)"
+              pTooltip="Delete user permanently"
+              tooltipPosition="top"
+              [disabled]="user.id === currentAdminId"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty-state" *ngIf="users.length === 0">
+    <i class="fa fa-users empty-icon"></i>
+    <h3>No users found</h3>
+    <p>Try adjusting your search or filter criteria</p>
+  </div>
+</div>
