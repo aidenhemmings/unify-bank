@@ -45,11 +45,11 @@ jobs:
             - backend/node_modules
       - run:
           name: Install SonarQube Scanner
-          command: npm install -g sonarqube-scanner
+          command: npm install --no-save sonarqube-scanner
       - run:
           name: Run SonarCloud Analysis
           command: |
-            sonar-scanner \
+            npx sonar-scanner \
               -Dsonar.projectKey=aidenhemmings_unify-bank \
               -Dsonar.organization=aidenhemmings \
               -Dsonar.sources=src,backend/src \
