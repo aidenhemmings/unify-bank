@@ -40,3 +40,10 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# SSL Certificates
+# NOTE: Normally these would be ingored, but included for assignemnt marking purposes.
+# ssl/
+# *.key
+# *.crt
+# *.pem
