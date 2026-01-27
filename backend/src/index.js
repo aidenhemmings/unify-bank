@@ -10,6 +10,8 @@ const accountsRoutes = require("./routes/accounts.routes");
 const paymentsRoutes = require("./routes/payments.routes");
 const transactionsRoutes = require("./routes/transactions.routes");
 const usersRoutes = require("./routes/users.routes");
+const adminAuthRoutes = require("./routes/admin-auth.routes");
+const adminUsersRoutes = require("./routes/admin-users.routes");
 
 const {
   securityHeaders,
@@ -28,9 +30,14 @@ app.use(
     origin: ["http://localhost:4200", "https://localhost:4200"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-User-Token"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-User-Token",
+      "X-Admin-Token",
+    ],
     maxAge: 86400,
-  })
+  }),
 );
 
 app.use(express.json({ limit: "10kb" }));
@@ -50,6 +57,8 @@ app.use("/api/accounts", accountsRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/transactions", transactionsRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/admin/auth", adminAuthRoutes);
+app.use("/api/admin/users", adminUsersRoutes);
 
 app.use((err, req, res, next) => {
   res.status(500).json({
@@ -83,7 +92,7 @@ if (process.env.NODE_ENV === "production") {
   } else {
     app.listen(PORT, () => {
       console.log(
-        `Running on http://localhost:${PORT} (SSL certificates not found)`
+        `Running on http://localhost:${PORT} (SSL certificates not found)`,
       );
       console.log(`Generate SSL certificates for HTTPS support`);
     });

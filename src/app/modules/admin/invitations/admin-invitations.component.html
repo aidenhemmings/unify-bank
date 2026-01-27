@@ -1,0 +1,142 @@
+<ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+
+<div class="admin-invitations" *ngIf="!loading">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">User Invitations</h1>
+      <p class="page-subtitle">Invite new users to join the platform</p>
+    </div>
+  </div>
+
+  <div class="invite-section">
+    <h2 class="section-title">Send New Invitation</h2>
+    <div class="invite-form">
+      <div class="invite-input-wrapper">
+        <ub-input-text
+          type="email"
+          [value]="newEmail"
+          (valueChanged)="newEmail = $event"
+          placeholder="Enter email address..."
+          [disabled]="isInviting"
+        />
+      </div>
+      <ub-button
+        variant="primary"
+        (click)="inviteUser()"
+        [disabled]="isInviting || !newEmail"
+      >
+        <i
+          class="fa"
+          [ngClass]="isInviting ? 'fa-spinner fa-spin' : 'fa-paper-plane'"
+        ></i>
+        {{ isInviting ? "Sending..." : "Send Invitation" }}
+      </ub-button>
+    </div>
+
+    <div class="invite-link-section" *ngIf="lastInviteLink">
+      <div class="invite-link-label">
+        <i class="fa fa-link"></i>
+        Latest invitation link:
+      </div>
+      <div class="invite-link-wrapper">
+        <ub-input-text type="text" [value]="lastInviteLink" [readOnly]="true" />
+        <ub-button variant="secondary" size="sm" (click)="copyInviteLink()">
+          <i class="fa fa-copy"></i>
+        </ub-button>
+      </div>
+      <p class="invite-link-note">
+        <i class="fa fa-info-circle"></i>
+        Share this link with the invited user. It will expire in 7 days.
+      </p>
+    </div>
+  </div>
+
+  <div class="invitations-section">
+    <div class="section-header">
+      <h2 class="section-title">Invitation History</h2>
+      <ub-select
+        [options]="statusOptions"
+        [value]="statusFilter"
+        (valueChanged)="statusFilter = $event; onFilterChange()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Status"
+      />
+    </div>
+
+    <div class="invitations-table-wrapper">
+      <table class="invitations-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Invited By</th>
+            <th>Status</th>
+            <th>Expires</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invitation of invitations">
+            <td class="email-cell">{{ invitation.email }}</td>
+            <td class="inviter-cell">
+              <span *ngIf="invitation.inviter">
+                {{ invitation.inviter.first_name }}
+                {{ invitation.inviter.last_name }}
+              </span>
+              <span *ngIf="!invitation.inviter" class="unknown">Unknown</span>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="getStatusBadgeClass(invitation.status)"
+              >
+                {{ invitation.status | titlecase }}
+              </span>
+            </td>
+            <td
+              class="date-cell"
+              [class.expired]="
+                isExpired(invitation) && invitation.status === 'pending'
+              "
+            >
+              {{ invitation.expires_at | date: "MMM d, yyyy" }}
+            </td>
+            <td class="date-cell">
+              {{ invitation.created_at | date: "MMM d, yyyy" }}
+            </td>
+            <td class="actions-cell">
+              <ng-container *ngIf="invitation.status === 'pending'">
+                <button
+                  class="action-btn resend"
+                  (click)="resendInvitation(invitation)"
+                  pTooltip="Resend invitation"
+                  tooltipPosition="top"
+                >
+                  <i class="fa fa-redo"></i>
+                </button>
+                <button
+                  class="action-btn cancel"
+                  (click)="cancelInvitation(invitation)"
+                  pTooltip="Cancel invitation"
+                  tooltipPosition="top"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </ng-container>
+              <span *ngIf="invitation.status !== 'pending'" class="no-actions"
+                >-</span
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="invitations.length === 0">
+      <i class="fa fa-envelope-open empty-icon"></i>
+      <h3>No invitations found</h3>
+      <p>Start by sending an invitation to a new user above</p>
+    </div>
+  </div>
+</div>

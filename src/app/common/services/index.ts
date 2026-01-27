@@ -10,3 +10,5 @@ export * from './payments.service';
 export * from './modal-form.service';
 export * from './toast.service';
 export * from './user-settings.service';
+export * from './admin-auth.service';
+export * from './admin-users.service';

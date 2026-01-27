@@ -1,0 +1,144 @@
+<div class="accept-invite-container">
+  <div class="accept-invite-left">
+    <div class="logo-container">
+      <img
+        src="/UnifyBanking-Logo-Transparent.png"
+        alt="Unify Banking Logo"
+        class="logo"
+      />
+    </div>
+  </div>
+
+  <div class="accept-invite-right">
+    <div class="form-wrapper">
+      <div class="loading-state" *ngIf="isValidating">
+        <i class="fa fa-spinner fa-spin loading-icon"></i>
+        <p>Validating your invitation...</p>
+      </div>
+
+      <div class="error-state" *ngIf="!isValidating && !isValid && !isComplete">
+        <div class="error-icon-wrapper">
+          <i class="fa fa-exclamation-circle"></i>
+        </div>
+        <h2>Invalid Invitation</h2>
+        <p>{{ error }}</p>
+        <ub-button variant="primary" routerLink="/auth/login">
+          <i class="fa fa-arrow-left"></i>
+          Go to Login
+        </ub-button>
+      </div>
+
+      <div class="success-state" *ngIf="isComplete">
+        <div class="success-icon-wrapper">
+          <i class="fa fa-check-circle"></i>
+        </div>
+        <h2>Account Created!</h2>
+        <p>
+          Your account has been created successfully. You can now log in with
+          your credentials.
+        </p>
+        <ub-button variant="primary" (click)="navigateToLogin()">
+          <i class="fa fa-right-to-bracket"></i>
+          Go to Login
+        </ub-button>
+      </div>
+
+      <div *ngIf="!isValidating && isValid && !isComplete">
+        <div class="form-header">
+          <h1 class="form-title">Create Your Account</h1>
+          <p class="form-subtitle">You've been invited to join UnifyBank</p>
+          <div class="email-badge">
+            <i class="fa fa-envelope"></i>
+            {{ email }}
+          </div>
+        </div>
+
+        <form [formGroup]="form" class="register-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <ub-input-text
+                type="text"
+                placeholder="Enter your first name"
+                [control]="form | getControl: 'first_name'"
+                [disabled]="isSubmitting"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <ub-input-text
+                type="text"
+                placeholder="Enter your last name"
+                [control]="form | getControl: 'last_name'"
+                [disabled]="isSubmitting"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            <ub-input-text
+              type="text"
+              placeholder="Choose a username"
+              [control]="form | getControl: 'username'"
+              [disabled]="isSubmitting"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <div class="password-input-wrapper">
+              <ub-input-text
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Create a password (min. 8 characters)"
+                [control]="form | getControl: 'password'"
+                [disabled]="isSubmitting"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+                [disabled]="isSubmitting"
+              >
+                <i
+                  class="fa"
+                  [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                ></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm Password *</label>
+            <ub-input-text
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Confirm your password"
+              [control]="form | getControl: 'confirmPassword'"
+              [disabled]="isSubmitting"
+            />
+          </div>
+
+          <div *ngIf="error" class="error-message">
+            <i class="fa fa-exclamation-circle"></i>
+            {{ error }}
+          </div>
+
+          <ub-button
+            variant="primary"
+            [fluid]="true"
+            (click)="submit()"
+            [disabled]="isSubmitting || form.invalid"
+            class="submit-button"
+          >
+            <i
+              class="fa"
+              [ngClass]="isSubmitting ? 'fa-spinner fa-spin' : 'fa-user-plus'"
+            ></i>
+            {{ isSubmitting ? "Creating Account..." : "Create Account" }}
+          </ub-button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

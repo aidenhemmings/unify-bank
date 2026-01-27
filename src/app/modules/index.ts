@@ -4,3 +4,4 @@ export * from './accounts';
 export * from './transactions';
 export * from './payments';
 export * from './user-profile';
+export * from './admin';

@@ -7,15 +7,34 @@ import {
   UbTransactionsComponent,
   UbUserProfileDashboardComponent,
 } from './modules';
-import { UbAuthGuard, UbGuestGuard } from './common';
+import {
+  UbAuthGuard,
+  UbGuestGuard,
+  UbAdminAuthGuard,
+  UbAdminGuestGuard,
+} from './common';
+import { UbAdminLoginComponent } from './modules/admin/login';
+import { UbAdminLayoutComponent } from './modules/admin/layout';
+import { UbAdminDashboardComponent } from './modules/admin/dashboard';
+import { UbAdminUsersComponent } from './modules/admin/users';
+import { UbAdminInvitationsComponent } from './modules/admin/invitations';
+import { UbAcceptInviteComponent } from './modules/auth/accept-invite';
 
 export const routes: Routes = [
+  // User auth routes
   {
     path: 'auth/login',
     component: UbAuthComponent,
     canActivate: [UbGuestGuard],
     data: {
       breadcrumb: 'Auth',
+    },
+  },
+  {
+    path: 'auth/accept-invite',
+    component: UbAcceptInviteComponent,
+    data: {
+      breadcrumb: 'Accept Invitation',
     },
   },
   {
@@ -57,6 +76,47 @@ export const routes: Routes = [
     data: {
       breadcrumb: 'User Profile',
     },
+  },
+  {
+    path: 'admin/login',
+    component: UbAdminLoginComponent,
+    canActivate: [UbAdminGuestGuard],
+    data: {
+      breadcrumb: 'Admin Login',
+    },
+  },
+  {
+    path: 'admin',
+    component: UbAdminLayoutComponent,
+    canActivate: [UbAdminAuthGuard],
+    children: [
+      {
+        path: 'dashboard',
+        component: UbAdminDashboardComponent,
+        data: {
+          breadcrumb: 'Admin Dashboard',
+        },
+      },
+      {
+        path: 'users',
+        component: UbAdminUsersComponent,
+        data: {
+          breadcrumb: 'User Management',
+        },
+      },
+      {
+        path: 'invitations',
+        component: UbAdminInvitationsComponent,
+        data: {
+          breadcrumb: 'Invitations',
+        },
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: '**',

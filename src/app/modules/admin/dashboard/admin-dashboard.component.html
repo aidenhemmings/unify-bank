@@ -1,0 +1,238 @@
+<ub-loader *ngIf="loading" [loaderKey]="loaderKey"></ub-loader>
+
+<div class="admin-dashboard" *ngIf="!loading">
+  <div class="admin-content-container">
+    <div class="dashboard-hero">
+      <div class="hero-background"></div>
+      <div class="hero-content">
+        <div class="welcome-section">
+          <div class="greeting">
+            <span class="greeting-text">Welcome back,</span>
+          </div>
+          <h1 class="admin-name">{{ admin?.first_name || admin?.username }}</h1>
+          <p class="admin-subtitle">
+            <span class="role-badge">
+              <i class="fa fa-shield-alt"></i>
+              Administrator
+            </span>
+            <span class="divider">•</span>
+            <span class="current-date">
+              <i class="fa fa-calendar-alt"></i>
+              {{ currentDate | date: "EEEE, MMMM d, yyyy" }}
+            </span>
+          </p>
+        </div>
+        <div class="header-actions">
+          <ub-button variant="secondary" (click)="logout()">
+            <i class="fa fa-sign-out-alt"></i>
+            Logout
+          </ub-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-section" *ngIf="stats">
+      <div class="stats-grid">
+        <div class="stat-card featured users">
+          <div class="stat-card-header">
+            <div class="stat-icon-wrapper">
+              <i class="fa fa-users"></i>
+            </div>
+            <div class="stat-trend positive">
+              <i class="fa fa-arrow-up"></i>
+              <span>{{ stats.users.recentSignups }} this week</span>
+            </div>
+          </div>
+          <div class="stat-card-body">
+            <h3 class="stat-value">{{ stats.users.total }}</h3>
+            <p class="stat-label">Total Users</p>
+          </div>
+          <div class="stat-card-footer">
+            <div class="stat-breakdown">
+              <div class="breakdown-item active">
+                <span class="breakdown-dot"></span>
+                <span class="breakdown-value">{{ stats.users.active }}</span>
+                <span class="breakdown-label">Active</span>
+              </div>
+              <div class="breakdown-item inactive">
+                <span class="breakdown-dot"></span>
+                <span class="breakdown-value">{{ stats.users.inactive }}</span>
+                <span class="breakdown-label">Inactive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card admins">
+          <div class="stat-card-header">
+            <div class="stat-icon-wrapper">
+              <i class="fa fa-user-shield"></i>
+            </div>
+          </div>
+          <div class="stat-card-body">
+            <h3 class="stat-value">{{ stats.users.admins }}</h3>
+            <p class="stat-label">Administrators</p>
+          </div>
+          <div class="stat-card-footer">
+            <span class="stat-note">
+              <i class="fa fa-info-circle"></i>
+              System administrators
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card accounts">
+          <div class="stat-card-header">
+            <div class="stat-icon-wrapper">
+              <i class="fa fa-bank"></i>
+            </div>
+          </div>
+          <div class="stat-card-body">
+            <h3 class="stat-value">{{ stats.accounts.total }}</h3>
+            <p class="stat-label">Bank Accounts</p>
+          </div>
+          <div class="stat-card-footer">
+            <span class="stat-note">
+              <i class="fa fa-wallet"></i>
+              Active accounts
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card transactions">
+          <div class="stat-card-header">
+            <div class="stat-icon-wrapper">
+              <i class="fa fa-exchange-alt"></i>
+            </div>
+          </div>
+          <div class="stat-card-body">
+            <h3 class="stat-value">{{ stats.transactions.total }}</h3>
+            <p class="stat-label">Transactions</p>
+          </div>
+          <div class="stat-card-footer">
+            <span class="stat-note">
+              <i class="fa fa-chart-line"></i>
+              All time
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card payments">
+          <div class="stat-card-header">
+            <div class="stat-icon-wrapper">
+              <i class="fa fa-credit-card"></i>
+            </div>
+            <div class="stat-trend warning" *ngIf="stats.payments.pending > 0">
+              <i class="fa fa-clock"></i>
+              <span>{{ stats.payments.pending }} pending</span>
+            </div>
+          </div>
+          <div class="stat-card-body">
+            <h3 class="stat-value">{{ stats.payments.total }}</h3>
+            <p class="stat-label">Payments</p>
+          </div>
+          <div class="stat-card-footer">
+            <span class="stat-note">
+              <i class="fa fa-check-double"></i>
+              Processed
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="stat-card invitations"
+          [class.has-pending]="stats.invitations.pending > 0"
+        >
+          <div class="stat-card-header">
+            <div class="stat-icon-wrapper">
+              <i class="fa fa-envelope-open-text"></i>
+            </div>
+            <div class="stat-badge" *ngIf="stats.invitations.pending > 0">
+              <span>Pending</span>
+            </div>
+          </div>
+          <div class="stat-card-body">
+            <h3 class="stat-value">{{ stats.invitations.pending }}</h3>
+            <p class="stat-label">Pending Invites</p>
+          </div>
+          <div class="stat-card-footer">
+            <button class="card-action-btn" (click)="navigateToInvitations()">
+              <span>Manage Invites</span>
+              <i class="fa fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fa fa-bolt"></i>
+          Quick Actions
+        </h2>
+        <p class="section-subtitle">Manage your platform efficiently</p>
+      </div>
+
+      <div class="actions-grid">
+        <button class="action-card primary" (click)="navigateToUsers()">
+          <div class="action-icon-wrapper">
+            <div class="action-icon">
+              <i class="fa fa-users-cog"></i>
+            </div>
+          </div>
+          <div class="action-content">
+            <h3 class="action-title">Manage Users</h3>
+            <p class="action-description">
+              View, edit, and manage all registered users in the system
+            </p>
+          </div>
+          <div class="action-cta">
+            <span>Go to Users</span>
+            <i class="fa fa-arrow-right"></i>
+          </div>
+        </button>
+
+        <button class="action-card secondary" (click)="navigateToInvitations()">
+          <div class="action-icon-wrapper">
+            <div class="action-icon">
+              <i class="fa fa-paper-plane"></i>
+            </div>
+          </div>
+          <div class="action-content">
+            <h3 class="action-title">Send Invitations</h3>
+            <p class="action-description">
+              Invite new users to join the platform via email
+            </p>
+          </div>
+          <div class="action-cta">
+            <span>Send Invite</span>
+            <i class="fa fa-arrow-right"></i>
+          </div>
+        </button>
+
+        <button
+          class="action-card warning"
+          [routerLink]="['/admin/users']"
+          [queryParams]="{ filter: 'inactive' }"
+        >
+          <div class="action-icon-wrapper">
+            <div class="action-icon">
+              <i class="fa fa-user-clock"></i>
+            </div>
+          </div>
+          <div class="action-content">
+            <h3 class="action-title">Inactive Users</h3>
+            <p class="action-description">
+              Review and manage deactivated user accounts
+            </p>
+          </div>
+          <div class="action-cta">
+            <span>Review</span>
+            <i class="fa fa-arrow-right"></i>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
