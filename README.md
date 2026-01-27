@@ -8,6 +8,8 @@
 | Tristan Stavast | ST10144323 | Frontend Development, DevOps Architecture + CI/CD Architecture |
 | Alexi Giagas | ST10085311 | Frontend Development, Documentation |
 
+### YouTube Walkthrough Link: https://youtu.be/x9Hir9yHhaE&nbsp;
+
 ## Project Overview
 
 This project involves developing a comprehensive, secure banking application with separate portals for regular users and administrators. The application was built to demonstrate enterprise-level security practices, authentication mechanisms, and role-based access control in a banking context.
