@@ -1,0 +1,44 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: unify-bank-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/.env:/app/.env
+      - ./ssl:/app/ssl
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    networks:
+      - unify-bank-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: unify-bank-frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./angular.json:/app/angular.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.app.json:/app/tsconfig.app.json
+      - ./ssl:/app/ssl
+    environment:
+      - NODE_ENV=development
+    networks:
+      - unify-bank-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  unify-bank-network:
+    driver: bridge
