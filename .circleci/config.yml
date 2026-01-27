@@ -28,25 +28,35 @@ jobs:
       - restore_cache:
           keys:
             - v1-npm-{{ checksum "package-lock.json" }}
+            - v1-backend-npm-{{ checksum "backend/package-lock.json" }}
       - run:
-          name: Install NPM Packages
+          name: Install Frontend NPM Packages
           command: npm install
+      - run:
+          name: Install Backend NPM Packages
+          command: cd backend && npm install
       - save_cache:
           key: v1-npm-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
+      - save_cache:
+          key: v1-backend-npm-{{ checksum "backend/package-lock.json" }}
+          paths:
+            - backend/node_modules
       - run:
-          name: Install SonarQube Scanner Locally
-          command: npm install sonarqube-scanner
+          name: Install SonarQube Scanner
+          command: npm install -g sonarqube-scanner
       - run:
           name: Run SonarCloud Analysis
           command: |
-            npx sonar-scanner \
+            sonar-scanner \
               -Dsonar.projectKey=aidenhemmings_unify-bank \
               -Dsonar.organization=aidenhemmings \
-              -Dsonar.sources=src \
+              -Dsonar.sources=src,backend/src \
+              -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.spec.ts,**/ssl/** \
+              -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.login=$SONAR_TOKEN
+              -Dsonar.token=$SONAR_TOKEN
 
 workflows:
   version: 2
