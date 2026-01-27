@@ -1,399 +1,338 @@
-# UnifyBank
+# Unify Bank - Banking Application
 
-A modern, secure banking application built with Angular and Node.js featuring enterprise-grade security measures.
+## Team Members
+
+| Name | Student Number | Role |
+|------|----------------|------|
+| Aiden Hemmings | ST10144348 | Frontend + Backend Development, Database Design |
+| Tristan Stavast | ST10144323 | Frontend Development, DevOps Architecture + CI/CD Architecture |
+| Alexi Giagas | ST10085311 | Frontend Development, Documentation |
+
+## Project Overview
+
+This project involves developing a comprehensive, secure banking application with separate portals for regular users and administrators. The application was built to demonstrate enterprise-level security practices, authentication mechanisms, and role-based access control in a banking context.
+
+The system consists of:
+- **Frontend**: Angular-based single-page application with dual portals (User & Admin)
+- **Backend**: Node.js/Express RESTful API with secure authentication
+- **Database**: Supabase (PostgreSQL) for data persistence
+- **Deployment**: Docker containerization for consistent development and production environments
+
+The application simulates core banking operations including user authentication, account management, payment processing, transaction tracking, and administrative user management with proper security controls throughout.
 
 ## 🏗️ Architecture
 
 - **Frontend**: Angular 19.2.5 (Port 4200)
-- **Backend**: Node.js/Express REST API (Port 3000 - HTTPS)
+- **Backend**: Node.js/Express REST API (Port 3000)
 - **Database**: Supabase (PostgreSQL)
 - **Security**: SSL/TLS, CSRF Protection, Rate Limiting, Input Validation
 
+## Features
+
+### Backend API Features
+
+#### Authentication & Authorization
+- **User Authentication**: Secure login/logout with token-based authentication
+- **Admin Authentication**: Separate admin portal with role-based access control
+- **Token Management**: UUID-based session tokens with validation endpoints
+- **Password Security**: bcrypt hashing with configurable salt rounds
+
+#### User Management
+- **Profile Management**: View and update user information
+- **Password Management**: Secure password change with validation
+- **User Settings**: Customizable preferences including dark mode toggle
+- **Account Status**: Active/inactive user management
+
+#### Account Management
+- **Multiple Accounts**: Support for multiple accounts per user (Checking, Savings, Credit)
+- **Account Types**: Differentiation between account categories
+- **Balance Tracking**: Real-time account balance updates
+- **Account Creation**: Dynamic account creation with validation
+
+#### Payment Processing
+- **Payment Creation**: Initiate payments between accounts
+- **Payment Types**: Support for various payment categories (Utilities, Transfer, Bill Payment, etc.)
+- **Payment Validation**: Amount and account number validation
+- **Payment History**: Retrieve user payment history
+
+#### Transaction Management
+- **Transaction Tracking**: Complete transaction history for all accounts
+- **Transaction Types**: Deposits, Withdrawals, Transfers, Payments
+- **Transaction Filtering**: Query transactions by account, type, and date
+- **Balance Updates**: Automatic balance adjustments on transactions
+
+#### Admin Portal Features
+- **User Management**: View, search, and manage all system users
+- **User Invitations**: Generate and send user invitations with tokens
+- **Invitation Management**: Track and resend invitations
+- **Admin Dashboard**: Statistics and system overview
+- **Admin Profile**: Manage admin account settings
+
+### User Portal Features
+
+#### Dashboard
+- **Account Overview**: Visual display of all user accounts with balances
+- **Recent Transactions**: Quick view of latest account activity
+- **Quick Actions**: Fast access to common operations (Send Money, Pay Bills, etc.)
+- **Financial Summary**: Total balance across all accounts
+
+#### Accounts Module
+- **Account List**: View all accounts with detailed information
+- **Account Details**: Comprehensive view of individual account data
+- **Account Creation**: Create new accounts with different types
+- **Transaction History**: Per-account transaction listing
+
+#### Payments Module
+- **Payment Form**: Create new payments with validation
+- **Recipient Management**: Save and select frequent recipients
+- **Payment Categories**: Organize payments by type
+- **Payment Confirmation**: Review before submission
+- **Payment History**: Track all sent payments
+
+#### Transactions Module
+- **Transaction List**: Paginated view of all transactions
+- **Filtering**: Filter by account, date range, and transaction type
+- **Search**: Find specific transactions
+- **Export**: Download transaction history (XLSX format)
+- **Details View**: Comprehensive transaction information
+
+### Admin Portal Features
+
+#### Admin Dashboard
+- **System Statistics**: User counts, transaction volumes
+- **Recent Activity**: Latest system events
+- **User Analytics**: User growth and activity metrics
+
+#### User Management
+- **User List**: Comprehensive view of all system users
+- **User Search**: Find users by name, email, or username
+- **User Details**: View complete user information
+- **Status Management**: Activate/deactivate user accounts
+- **Role Assignment**: Assign admin privileges
+
+#### Invitation Management
+- **Create Invitations**: Generate invitation links for new users
+- **Invitation List**: Track all sent invitations
+- **Resend Invitations**: Regenerate expired invitation tokens
+- **Invitation Validation**: Verify invitation token validity
+- **Accept Invitation**: New admin onboarding flow
+
+## Security Overview
+
+This application implements comprehensive security measures to protect against common web vulnerabilities and attacks:
+
+### 1. SQL/NoSQL Injection Protection
+- **Input Sanitization**: All user inputs are sanitized using `express-mongo-sanitize`
+- **Parameterized Queries**: Supabase client uses prepared statements
+- **Validation**: Strict regex patterns for all input fields (usernames, emails, amounts, etc.)
+- **Character Filtering**: Removal of dangerous characters (`<`, `>`, SQL operators)
+
+### 2. Cross-Site Scripting (XSS) Prevention
+- **Security Headers**: Helmet.js implementation with Content Security Policy
+- **Input Sanitization**: Custom sanitization functions removing HTML tags
+- **Output Encoding**: Angular's built-in XSS protection via template sanitization
+- **CSP Directives**: Restricted script sources to `'self'` only
+
+### 3. Cross-Site Request Forgery (CSRF) Protection
+- **Token-Based Authentication**: Custom token validation instead of cookie-based sessions
+- **CORS Configuration**: Strict origin whitelisting (`localhost:4200` only)
+- **Custom Headers**: `X-User-Token` and `X-Admin-Token` headers prevent CSRF
+- **SameSite Cookies**: When cookies are used, configured with secure flags
+
+### 4. Brute Force Attack Prevention
+- **Rate Limiting**: Login attempts limited to 5 per 15 minutes
+- **API Rate Limiting**: General API requests limited to 100 per 15 minutes
+- **Account Lockout**: Failed login attempts tracked (can be extended)
+- **Token Expiration**: Session tokens can be configured to expire
+
+### 5. Authentication & Authorization
+- **Password Hashing**: bcrypt with configurable salt rounds (default: 10)
+- **Password Complexity**: Enforced requirements (min 8 chars, uppercase, lowercase, number, special character)
+- **Token-Based Sessions**: UUID tokens stored securely in database
+- **Role-Based Access Control**: Separate admin and user authentication paths
+- **Token Validation**: Middleware validates tokens on every protected route
+
+### 6. HTTP Parameter Pollution (HPP) Protection
+- **HPP Middleware**: `hpp` package prevents duplicate parameters
+- **Array Parameter Protection**: Whitelisting of allowed array parameters
+- **Parameter Validation**: Strict validation of all request parameters
+
+### 7. Man-in-the-Middle (MITM) Attack Prevention
+- **HTTPS/TLS**: SSL certificate support for encrypted communication
+- **HSTS Headers**: HTTP Strict Transport Security with 1-year max age
+- **Secure Flag**: Cookies (when used) marked as secure
+- **Certificate Validation**: Proper SSL/TLS certificate handling
+
+### 8. Clickjacking Prevention
+- **X-Frame-Options**: Set to `DENY` via Helmet.js
+- **Frame Guards**: Prevents application from being embedded in iframes
+- **CSP Frame Ancestors**: Additional frame embedding protection
+
+### 11. Session Management
+- **Token Invalidation**: Logout properly invalidates tokens
+- **Token Validation**: Every request validates token against database
+- **Session Expiry**: Tokens can be configured with expiration times
+- **Secure Storage**: Tokens stored in localStorage with proper scoping
+
+### 12. Input Validation
+- **Express Validator**: Comprehensive validation on all input fields
+- **Regex Patterns**: Strict patterns for usernames, emails, amounts, account numbers
+- **Length Limits**: Maximum input lengths enforced (max 1000 chars)
+- **Type Checking**: Validation of data types (strings, numbers, UUIDs)
+- **Whitelist Validation**: Only expected fields are processed
+
+### 13. CORS Security
+- **Origin Whitelisting**: Only `https://localhost:4200` allowed
+- **Credentials Support**: Controlled with `credentials: true`
+- **Method Restriction**: Only necessary HTTP methods allowed
+- **Header Control**: Specific headers whitelisted for cross-origin requests
+- **Preflight Caching**: CORS preflight requests cached for 24 hours
+
+### 14. Security Headers (via Helmet.js)
+- **X-Content-Type-Options**: `nosniff` prevents MIME type sniffing
+- **X-XSS-Protection**: Legacy XSS filter enabled
+- **Referrer-Policy**: Controlled referrer information leakage
+- **Permissions-Policy**: Restricted browser features
+- **Content-Security-Policy**: Prevents unauthorized resource loading
+
+### 15. Denial of Service (DoS) Prevention
+- **Request Size Limits**: JSON and URL-encoded payloads limited to 10kb
+- **Rate Limiting**: Multiple layers of rate limiting (login, API)
+- **Timeout Configuration**: Request timeouts prevent hanging connections
+- **Resource Limits**: Database query limits prevent excessive resource usage
+
+### 16. Database Security
+- **Row Level Security**: Supabase RLS policies (configurable)
+- **Least Privilege**: Database users have minimal required permissions
+- **Connection Pooling**: Managed connections prevent exhaustion
+- **Query Parameterization**: Prevents SQL injection via Supabase client
+
+### 17. Frontend Security
+- **Route Guards**: Authentication guards on all protected routes
+- **Token Storage**: Secure localStorage usage with proper scoping
+- **Auto Logout**: Token validation on route changes
+- **Permission-Based UI**: UI elements hidden based on user permissions
+- **Input Validation**: Client-side validation before API calls
+
+### 18. Admin Security
+- **Separate Authentication**: Distinct admin token prefix (`admin_`)
+- **Role Verification**: Backend validates admin role on every request
+- **Admin-Only Routes**: Separate route protection for admin endpoints
+- **Account Status Checks**: Inactive admins cannot access system
+- **Invitation System**: Controlled admin onboarding process
+
 ## 📋 Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js (v20 or higher)
 - npm (v8 or higher)
-- Angular CLI
+- Docker & Docker Compose (for containerized deployment, optional)
 
 ## 🚀 Installation
 
-### 1. Install Angular CLI Globally
+### 1. Install Dependencies
 
-```bash
-npm install -g @angular/cli
-```
-
-### 2. Install Root Dependencies
-
+**Root directory (Frontend):**
 ```bash
 npm install
 ```
 
-### 3. Install Backend Dependencies
-
+**Backend directory:**
 ```bash
 cd backend
 npm install
 cd ..
 ```
 
-### 4. Configure Environment
-
-The backend uses environment variables for configuration. A `.env` file should exist in the `backend` directory with your Supabase credentials.
-
-**Example `.env` structure:**
-
-```env
-PORT=3000
-NODE_ENV=development
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
-BCRYPT_ROUNDS=10
-SSL_KEY_PATH=./ssl/localhost.key
-SSL_CERT_PATH=./ssl/localhost.crt
-```
-
-### 5. Generate SSL Certificates (Optional for Development)
-
-For HTTPS support in development:
-
-```bash
-cd ssl
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt
-```
-
 ## 🎯 Running the Application
 
-### Option 1: Run Both Servers Simultaneously (Recommended)
+### Docker Deployment (Recommended)
+
+**Build and start containers:**
 
 ```bash
-npm start
+npm run docker
 ```
 
-This will start both the frontend and backend servers concurrently.
-
-### Option 2: Run Servers Separately
-
-**Terminal 1 - Backend API:**
-
+Or manually:
 ```bash
-npm run start:backend
-# or
-cd backend
-npm run dev
+docker compose up --build
 ```
 
-**Terminal 2 - Frontend:**
-
-```bash
-npm run start:frontend
-# or
-ng serve
-```
+**Manage Docker containers:**
+- Start (detached): `npm run docker:start`
+- Kill Docker (Remove Volumes): `docker compose down -v`
+- Kill Docker (Dont Remove Volumes): `docker compose down`
+- Remove Images: `docker rmi unify-bank-frontend unify-bank-backend`
 
 ## 🌐 Access the Application
 
-- **Frontend**: https://localhost:4200
+- **User Portal**: https://localhost:4200
+- **Admin Portal**: https://localhost:4200/admin/login
 - **Backend API**: https://localhost:3000
-- **Health Check**: https://localhost:3000/health
 
 **Note**: You may need to accept the self-signed SSL certificate in your browser for development.
 
-## 🔒 Security Features
+### Local Development (Not Recommended)
 
-### 1. **SSL/TLS Encryption**
-
-- All traffic served over HTTPS in development and production
-- Self-signed certificates for development
-- Configurable SSL certificate paths via environment variables
-
-### 2. **Attack Protection**
-
-#### **CSRF Protection**
-
-- Implemented via Helmet's CSRF middleware
-- Custom headers required for state-changing operations
-- Origin validation for all requests
-
-#### **XSS Prevention**
-
-- Content Security Policy (CSP) headers
-- X-XSS-Protection enabled
-- Input sanitization on all endpoints
-- Output encoding for rendered content
-
-#### **SQL/NoSQL Injection Protection**
-
-- `express-mongo-sanitize` middleware removes prohibited characters
-- Parameterized queries via Supabase client
-- No raw query execution
-- Whitelist-based input validation
-
-#### **DDoS Protection**
-
-- Rate limiting on all API endpoints
-- Stricter rate limits on authentication routes (5 attempts per 15 minutes)
-- General API rate limit: 100 requests per 15 minutes per IP
-
-#### **HTTP Parameter Pollution (HPP)**
-
-- `hpp` middleware prevents parameter pollution attacks
-- Only last instance of duplicate parameters is used
-
-### 3. **Input Validation & Whitelisting**
-
-All inputs are validated using regex patterns and express-validator:
-
-#### **Username Validation**
-
-```javascript
-Pattern: /^[a-zA-Z0-9_-]{3,20}$/
-- 3-20 characters
-- Alphanumeric, underscores, and hyphens only
-```
-
-#### **Email Validation**
-
-```javascript
-Pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-- Standard email format
-- No special characters except allowed in email specification
-```
-
-#### **Password Requirements**
-
-```javascript
-Pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-- Minimum 8 characters
-- At least one uppercase letter
-- At least one lowercase letter
-- At least one number
-- At least one special character (@$!%*?&)
-```
-
-#### **UUID Validation**
-
-```javascript
-Pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-- Standard UUID v4 format
-```
-
-#### **Amount Validation**
-
-```javascript
-Pattern: /^\d+(\.\d{1,2})?$/
-- Positive numbers only
-- Up to 2 decimal places
-- No negative values
-```
-
-#### **Account Number Validation**
-
-```javascript
-Pattern: /^\d{10,16}$/
-- 10-16 digits only
-- Numeric characters only
-```
-
-#### **Name Validation**
-
-```javascript
-Pattern: /^[a-zA-Z\s'-]{1,50}$/
-- Letters, spaces, hyphens, and apostrophes only
-- 1-50 characters
-- No special characters or numbers
-```
-
-#### **Description Validation**
-
-```javascript
-Pattern: /^[a-zA-Z0-9\s.,!?'-]{0,500}$/
-- Alphanumeric and basic punctuation
-- Maximum 500 characters
-- No HTML or script tags
-```
-
-### 4. **Password Security**
-
-- **Hashing**: bcrypt with configurable rounds (default: 10)
-- **Salting**: Automatic per-password unique salts
-- **No Plain Text Storage**: Passwords never stored in plain text
-- **Password Change Validation**: Requires current password verification
-- **Frontend Validation**: Real-time password strength indicator
-- **Server-Side Validation**: Double validation on backend
-
-### 5. **Security Headers (Helmet)**
-
-```javascript
-- X-DNS-Prefetch-Control
-- X-Frame-Options: DENY
-- Strict-Transport-Security (HSTS)
-- X-Download-Options: noopen
-- X-Content-Type-Options: nosniff
-- X-Permitted-Cross-Domain-Policies: none
-- Referrer-Policy: no-referrer
-- Content-Security-Policy (CSP)
-```
-
-### 6. **CORS Configuration**
-
-```javascript
-- Allowed Origins: localhost:4200 (HTTP & HTTPS)
-- Credentials: Enabled
-- Methods: GET, POST, PUT, PATCH, DELETE
-- Headers: Content-Type, Authorization, X-User-Token
-- Max Age: 24 hours
-```
-
-### 7. **Request Size Limits**
-
-- JSON payload limit: 10kb
-- URL-encoded payload limit: 10kb
-- Prevents large payload attacks
-
-## 📁 Project Structure
-
-```
-unify-bank/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/      # Business logic
-│   │   ├── routes/           # API endpoints with validation
-│   │   ├── middleware/       # Security & validation middleware
-│   │   ├── utils/            # Validators & helpers
-│   │   ├── config/           # Database configuration
-│   │   └── index.js          # Express server setup
-│   ├── .env                  # Environment variables
-│   └── package.json
-├── src/
-│   ├── app/
-│   │   ├── common/
-│   │   │   ├── guards/       # Route guards
-│   │   │   ├── services/     # API services
-│   │   │   ├── validators/   # Frontend validators
-│   │   │   └── ui/           # Reusable components
-│   │   └── modules/          # Feature modules
-│   └── environment/          # Environment config
-├── ssl/                      # SSL certificates
-└── package.json
-```
-
-## 🛡️ Security Best Practices Implemented
-
-1. ✅ **Defense in Depth**: Multiple layers of security
-2. ✅ **Principle of Least Privilege**: Minimal permissions
-3. ✅ **Input Validation**: Both client and server-side
-4. ✅ **Secure Communication**: HTTPS/TLS encryption
-5. ✅ **Password Security**: Bcrypt hashing with salt
-6. ✅ **Rate Limiting**: Protection against brute force
-7. ✅ **Error Handling**: No sensitive data in error messages
-8. ✅ **Security Headers**: Comprehensive header protection
-9. ✅ **Regular Expression Whitelisting**: Strict input patterns
-10. ✅ **Session Management**: Secure token-based authentication
-
-## 📚 Additional Documentation
-
-- [Backend API Documentation](./backend/README.md)
-- [Security Implementation Details](./SECURITY_IMPLEMENTATION.md)
-- [Running Secured Application Guide](./RUNNING_SECURED_APP.md)
-
-## 🔧 Development
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-### Run Tests
-
-```bash
-npm test
-```
-
-## 📝 License
-
-This project is private and confidential.
-
-## 👥 Support
-
-For issues or questions, please contact the development team.
-
-Backend will run on `http://localhost:3000`
-
-**Terminal 2 - Frontend Development Server:**
+**Run both servers concurrently**
 
 ```bash
 npm start
 ```
 
-Frontend will run on `https://localhost:4200`
+This starts both frontend (port 4200) and backend (port 3000) simultaneously.
 
-Open your browser and navigate to https://localhost:4200/
+**Run servers separately:**
 
-## Features
+Terminal 1 - Backend:
+```bash
+npm run start:backend
+```
 
-- User authentication with secure token-based sessions
-- User profile view and inline editing (reactive forms)
-- Dashboard layout with reusable components
-- Route guards for protected pages
-- Account management (create, view, update, delete)
-- Payment processing and scheduling
-- Transaction history and analytics
-- Fund transfers between accounts
-- Monthly income/expense statistics
-- Dark/Light theme toggle
-- Shared UI components (buttons, inputs, modals, etc.)
+Terminal 2 - Frontend:
+```bash
+npm run start:frontend
+```
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-
 - **Framework**: Angular 19.2.5
-- **Component Library**: PrimeNG
+- **UI Library**: PrimeNG
+- **Icons**: FontAwesome
 - **HTTP Client**: Angular HttpClient
-- **State Management**: RxJS BehaviorSubjects
-- **Forms**: Reactive Forms
+- **Routing**: Angular Router
+- **State Management**: RxJS Observables
+- **Permissions**: ngx-permissions
+- **File Export**: xlsx
 
 ### Backend
-
-- **Runtime**: Node.js
+- **Runtime**: Node.js 20
 - **Framework**: Express.js
-- **Database Client**: @supabase/supabase-js
-- **Authentication**: bcryptjs + custom token management
-- **CORS**: Configured for Angular frontend
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: bcryptjs, crypto
+- **Security**: Helmet, express-rate-limit, hpp, express-mongo-sanitize
+- **Validation**: express-validator
+- **CORS**: cors
+- **Environment**: dotenv
 
-### Database
+### DevOps
+- **Containerization**: Docker & Docker Compose
+- **Process Management**: concurrently, nodemon
+- **SSL/TLS**: HTTPS with self-signed certificates
+- **Pipelines**: CircleCi with SonarQube
 
-- **Provider**: Supabase
-- **Type**: PostgreSQL
-- **Features**: Row Level Security (RLS), Stored Procedures
+### Login Credentials
 
-## Project Structure
+#### Employee
+- **User One**: 
+    - Username: testuser
+    - Password: Testpass123!
+- **User Two**:
+    - Username: tristanstavast
+    - Password: testpass123
 
-```
-unify-bank/
-├── src/                          # Angular frontend
-│   ├── app/
-│   │   ├── common/
-│   │   │   ├── services/        # API services
-│   │   │   ├── guards/          # Route guards
-│   │   │   ├── ui/              # Shared components
-│   │   │   └── types/           # TypeScript interfaces
-│   │   └── modules/             # Feature modules
-│   └── environment/             # Environment config
-│
-├── backend/                      # Express backend
-│   ├── src/
-│   │   ├── config/              # Configuration
-│   │   ├── middleware/          # Auth middleware
-│   │   ├── controllers/         # Business logic
-│   │   ├── routes/              # API routes
-│   │   └── index.js             # Server entry point
-│   ├── .env                     # Environment variables
-│   └── package.json
-│
-├── SETUP_GUIDE.md               # Detailed setup instructions
-├── MIGRATION_SUMMARY.md         # Architecture migration details
-└── README.md                    # This file
-```
+#### Admin User
+- **Admin User One**
+    - Username: aidenhemmings
+    - Password: testpass123

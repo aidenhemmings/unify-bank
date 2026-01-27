@@ -92,16 +92,30 @@ if (process.env.NODE_ENV === "production") {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 } else {
-  const sslKeyPath = path.join(__dirname, "../../ssl/localhost.key");
-  const sslCertPath = path.join(__dirname, "../../ssl/localhost.crt");
+  // Try Docker paths first, then fall back to local development paths
+  const dockerSslKeyPath = "/app/ssl/localhost.key";
+  const dockerSslCertPath = "/app/ssl/localhost.crt";
+  const localSslKeyPath = path.join(__dirname, "../../ssl/localhost.key");
+  const localSslCertPath = path.join(__dirname, "../../ssl/localhost.crt");
 
-  if (fs.existsSync(sslKeyPath) && fs.existsSync(sslCertPath)) {
-    const httpsOptions = {
-      key: fs.readFileSync(sslKeyPath),
-      cert: fs.readFileSync(sslCertPath),
-    };
+  let sslKeyPath, sslCertPath;
 
-    const server = https.createServer(httpsOptions, app);
+  if (fs.existsSync(dockerSslKeyPath) && fs.existsSync(dockerSslCertPath)) {
+    sslKeyPath = dockerSslKeyPath;
+    sslCertPath = dockerSslCertPath;
+  } else if (fs.existsSync(localSslKeyPath) && fs.existsSync(localSslCertPath)) {
+    sslKeyPath = localSslKeyPath;
+    sslCertPath = localSslCertPath;
+  }
+
+  if (sslKeyPath && sslCertPath) {
+    try {
+      const httpsOptions = {
+        key: fs.readFileSync(sslKeyPath),
+        cert: fs.readFileSync(sslCertPath),
+      };
+
+      const server = https.createServer(httpsOptions, app);
     const io = new Server(server, { cors: socketCorsOptions });
 
     // Initialize real-time service
@@ -109,11 +123,18 @@ if (process.env.NODE_ENV === "production") {
     realtimeService.initialize();
 
     server.listen(PORT, () => {
-      console.log(`HTTPS Server running on https://localhost:${PORT}`);
-      console.log(`SSL/TLS encryption enabled`);
+        console.log(`HTTPS Server running on https://localhost:${PORT}`);
+      });
+    } catch (err) {
+      console.error(`Error loading SSL certificates: ${err.message}`);
+      console.log(`Running on HTTP instead`);
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
       console.log(`WebSocket real-time service initialized`);
-    });
+      });
+    }
   } else {
+    console.log(`SSL certificates not found, running on HTTP`);
     const server = http.createServer(app);
     const io = new Server(server, { cors: socketCorsOptions });
 
@@ -122,10 +143,7 @@ if (process.env.NODE_ENV === "production") {
     realtimeService.initialize();
 
     server.listen(PORT, () => {
-      console.log(
-        `Running on http://localhost:${PORT} (SSL certificates not found)`,
-      );
-      console.log(`Generate SSL certificates for HTTPS support`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   }
 }
